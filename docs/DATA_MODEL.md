@@ -19,10 +19,16 @@ Zelda: Tears of the Kingdom
 
 - id
 - email
-- displayName
-- avatarUrl
+- name (Auth.js's field for what the product otherwise calls "display name")
+- image (Auth.js's field for avatar URL)
+- emailVerified
 - createdAt
 - updatedAt
+
+Column names follow Auth.js's Drizzle adapter conventions (`name`,
+`email`, `emailVerified`, `image`) rather than `displayName`/`avatarUrl`,
+so authentication can adopt the adapter directly instead of a custom
+field mapping.
 
 ### Media
 
@@ -61,6 +67,15 @@ Constraint: `(provider, externalId)` is unique.
 - updatedAt
 
 Constraint: `(userId, mediaId)` is unique.
+
+`rating` is a half-star scale stored as an integer 0-10 (e.g. `7` = 3.5
+stars), constrained at the database level.
+
+`progress` is stored as `jsonb` rather than a scalar column, since its
+shape is media-type-aware (season/episode, page/percentage,
+issue/volume — see Requirements → Progress). It is validated at the
+application boundary by a Zod discriminated union keyed on the media's
+`mediaType`, not by a database constraint.
 
 ### List
 
@@ -117,6 +132,13 @@ Every user-owned entity must have a direct or indirect relationship to the authe
 ## Deletion
 
 Removing a user's library entry must not delete canonical media.
+
+Foreign keys to `Media` (from `LibraryItem`, `ListItem`, `Activity`) use
+`ON DELETE RESTRICT`: since no feature currently deletes canonical media,
+this is a safety net against accidental data loss rather than a modeled
+behavior. Foreign keys to `User` and to a resource's own parent (e.g.
+`ListItem.listId`) use `ON DELETE CASCADE`, since that data has no
+meaning once its owner is gone.
 
 ## Privacy
 

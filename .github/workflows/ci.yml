@@ -6,10 +6,27 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  DATABASE_URL: postgresql://geekery:geekery@localhost:5432/geekery
+
 jobs:
   quality:
     name: Lint, typecheck, unit tests, build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: geekery
+          POSTGRES_PASSWORD: geekery
+          POSTGRES_DB: geekery
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U geekery -d geekery"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +49,9 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
+      - name: Apply database migrations
+        run: npm run db:migrate
 
       - name: Build
         run: npm run build
