@@ -68,6 +68,8 @@ export const mediaExternalIdRelations = relations(
   }),
 );
 
+export type MediaType = (typeof mediaTypeEnum.enumValues)[number];
+
 export type Media = typeof media.$inferSelect;
 export type NewMedia = typeof media.$inferInsert;
 export type MediaExternalId = typeof mediaExternalIds.$inferSelect;
