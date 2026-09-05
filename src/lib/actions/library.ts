@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import {
   addToLibrarySchema,
+  libraryStatusSchema,
   removeFromLibrarySchema,
   toggleFavoriteSchema,
   updateNotesSchema,
@@ -12,6 +13,8 @@ import {
   updateRatingSchema,
   updateStatusSchema,
 } from "@/lib/schemas/library";
+import { normalizedSearchResultSchema } from "@/lib/schemas/media";
+import { getOrCreateMedia } from "@/lib/services/media/get-or-create";
 import {
   addToLibrary,
   removeFromLibrary,
@@ -46,6 +49,40 @@ export async function addToLibraryAction(
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${parsed.data.mediaId}`);
+  revalidatePath("/library");
+  revalidatePath("/");
+}
+
+/**
+ * Resolves an unresolved search result to its canonical Media row (creating
+ * it if needed) and adds it straight to the library, in one action. This is
+ * the "Search → Select → Add → Choose status → Done" flow from
+ * docs/UX.md, invoked directly from a Discover result card.
+ */
+export async function quickAddToLibraryAction(
+  _prevState: LibraryActionState,
+  formData: FormData,
+): Promise<LibraryActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const raw = Object.fromEntries(formData);
+  const parsedResult = normalizedSearchResultSchema.safeParse(raw);
+  const parsedStatus = libraryStatusSchema.safeParse(raw.status);
+  if (!parsedResult.success || !parsedStatus.success) {
+    return { error: "That item couldn't be added." };
+  }
+
+  const mediaResult = await getOrCreateMedia(parsedResult.data);
+  if (!mediaResult.success) return { error: mediaResult.error };
+
+  const addResult = await addToLibrary(
+    auth.userId,
+    mediaResult.mediaId,
+    parsedStatus.data,
+  );
+  if (!addResult.success) return { error: addResult.error };
+
   revalidatePath("/library");
   revalidatePath("/");
 }
