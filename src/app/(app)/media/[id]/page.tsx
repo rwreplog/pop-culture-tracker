@@ -1,10 +1,13 @@
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
+import { LibraryControls } from "@/components/library/library-controls";
 import { MediaArtwork } from "@/components/media/media-artwork";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
+import { getLibraryItemForUser } from "@/lib/services/library/queries";
 
 type MediaMetadata = { creator?: string };
 
@@ -14,11 +17,16 @@ export default async function MediaDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const item = await db.query.media.findFirst({
-    where: eq(media.id, id),
-  });
+  const [item, session] = await Promise.all([
+    db.query.media.findFirst({ where: eq(media.id, id) }),
+    auth(),
+  ]);
 
   if (!item) notFound();
+
+  const libraryItem = session?.user?.id
+    ? (await getLibraryItemForUser(session.user.id, item.id)) ?? null
+    : null;
 
   const metadata = item.metadata as MediaMetadata | null;
   const releaseYear = item.releaseDate
@@ -45,6 +53,13 @@ export default async function MediaDetailPage({
         {item.description ? (
           <p className="text-sm">{item.description}</p>
         ) : null}
+        <div className="pt-2">
+          <LibraryControls
+            mediaId={item.id}
+            mediaType={item.mediaType}
+            libraryItem={libraryItem}
+          />
+        </div>
       </div>
     </div>
   );

@@ -7,3 +7,4 @@
  */
 export * from "@/lib/schemas/auth";
 export * from "@/lib/schemas/media";
+export * from "@/lib/schemas/library";

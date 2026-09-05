@@ -1,0 +1,175 @@
+import { and, eq } from "drizzle-orm";
+
+import { db } from "@/lib/db";
+import { libraryItems } from "@/lib/db/schema/library";
+import type { LibraryProgress } from "@/lib/schemas/library";
+import { recordActivity } from "@/lib/services/activity/log";
+
+type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
+
+export type LibraryMutationResult =
+  | { success: true; libraryItemId: string }
+  | { success: false; error: string };
+
+/**
+ * Adds a media item to the user's library. Idempotent: if it's already
+ * there (unique on userId+mediaId, per docs/DATA_MODEL.md), returns the
+ * existing row instead of erroring.
+ */
+export async function addToLibrary(
+  userId: string,
+  mediaId: string,
+  status: LibraryStatus,
+): Promise<LibraryMutationResult> {
+  const now = new Date();
+  try {
+    return await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(libraryItems)
+        .values({
+          userId,
+          mediaId,
+          status,
+          startedAt: status === "in_progress" ? now : undefined,
+          completedAt: status === "completed" ? now : undefined,
+        })
+        .onConflictDoNothing({
+          target: [libraryItems.userId, libraryItems.mediaId],
+        })
+        .returning({ id: libraryItems.id });
+
+      if (!inserted) {
+        const existing = await tx.query.libraryItems.findFirst({
+          where: and(
+            eq(libraryItems.userId, userId),
+            eq(libraryItems.mediaId, mediaId),
+          ),
+        });
+        if (!existing) {
+          return {
+            success: false,
+            error: "Couldn't add this item right now.",
+          };
+        }
+        return { success: true, libraryItemId: existing.id };
+      }
+
+      await recordActivity(tx, userId, "added", mediaId, { status });
+      if (status === "in_progress") {
+        await recordActivity(tx, userId, "started", mediaId);
+      }
+      if (status === "completed") {
+        await recordActivity(tx, userId, "completed", mediaId);
+      }
+
+      return { success: true, libraryItemId: inserted.id };
+    });
+  } catch {
+    return { success: false, error: "Couldn't add this item right now." };
+  }
+}
+
+export type LibraryItemPatch = {
+  status?: LibraryStatus;
+  rating?: number | null;
+  isFavorite?: boolean;
+  notes?: string | null;
+  progress?: LibraryProgress | null;
+};
+
+/**
+ * Applies a partial update to a library item, re-checking ownership
+ * server-side (never trust a client-supplied user id, per docs/SECURITY.md),
+ * and logs the activity events implied by the change.
+ */
+export async function updateLibraryItem(
+  userId: string,
+  libraryItemId: string,
+  patch: LibraryItemPatch,
+): Promise<LibraryMutationResult> {
+  try {
+    return await db.transaction(async (tx) => {
+      const existing = await tx.query.libraryItems.findFirst({
+        where: and(
+          eq(libraryItems.id, libraryItemId),
+          eq(libraryItems.userId, userId),
+        ),
+      });
+      if (!existing) {
+        return { success: false, error: "That item couldn't be found." };
+      }
+
+      const now = new Date();
+      const updates: Partial<typeof libraryItems.$inferInsert> = {
+        updatedAt: now,
+      };
+
+      const statusChanged =
+        patch.status !== undefined && patch.status !== existing.status;
+      if (statusChanged) {
+        updates.status = patch.status;
+        if (patch.status === "in_progress" && !existing.startedAt) {
+          updates.startedAt = now;
+        }
+        if (patch.status === "completed") {
+          updates.completedAt = now;
+        }
+      }
+      if (patch.rating !== undefined) updates.rating = patch.rating;
+      if (patch.isFavorite !== undefined) updates.isFavorite = patch.isFavorite;
+      if (patch.notes !== undefined) updates.notes = patch.notes;
+      if (patch.progress !== undefined) updates.progress = patch.progress;
+
+      await tx
+        .update(libraryItems)
+        .set(updates)
+        .where(eq(libraryItems.id, libraryItemId));
+
+      if (statusChanged && patch.status === "in_progress") {
+        await recordActivity(tx, userId, "started", existing.mediaId);
+      }
+      if (statusChanged && patch.status === "completed") {
+        await recordActivity(tx, userId, "completed", existing.mediaId);
+      }
+      if (patch.rating !== undefined && patch.rating !== existing.rating) {
+        await recordActivity(tx, userId, "rated", existing.mediaId, {
+          rating: patch.rating,
+        });
+      }
+      if (patch.progress !== undefined) {
+        await recordActivity(tx, userId, "updated_progress", existing.mediaId, {
+          progress: patch.progress,
+        });
+      }
+
+      return { success: true, libraryItemId };
+    });
+  } catch {
+    return { success: false, error: "Couldn't update this item right now." };
+  }
+}
+
+export type RemoveFromLibraryResult =
+  | { success: true }
+  | { success: false; error: string };
+
+/** Removes a library item. Never deletes the canonical Media row. */
+export async function removeFromLibrary(
+  userId: string,
+  libraryItemId: string,
+): Promise<RemoveFromLibraryResult> {
+  const removed = await db
+    .delete(libraryItems)
+    .where(
+      and(
+        eq(libraryItems.id, libraryItemId),
+        eq(libraryItems.userId, userId),
+      ),
+    )
+    .returning({ id: libraryItems.id });
+
+  if (removed.length === 0) {
+    return { success: false, error: "That item couldn't be found." };
+  }
+  return { success: true };
+}
