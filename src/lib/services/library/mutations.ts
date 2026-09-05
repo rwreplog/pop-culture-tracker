@@ -8,7 +8,7 @@ import { recordActivity } from "@/lib/services/activity/log";
 type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
 
 export type LibraryMutationResult =
-  | { success: true; libraryItemId: string }
+  | { success: true; libraryItemId: string; mediaId: string }
   | { success: false; error: string };
 
 /**
@@ -51,7 +51,7 @@ export async function addToLibrary(
             error: "Couldn't add this item right now.",
           };
         }
-        return { success: true, libraryItemId: existing.id };
+        return { success: true, libraryItemId: existing.id, mediaId };
       }
 
       await recordActivity(tx, userId, "added", mediaId, { status });
@@ -62,7 +62,7 @@ export async function addToLibrary(
         await recordActivity(tx, userId, "completed", mediaId);
       }
 
-      return { success: true, libraryItemId: inserted.id };
+      return { success: true, libraryItemId: inserted.id, mediaId };
     });
   } catch {
     return { success: false, error: "Couldn't add this item right now." };
@@ -142,7 +142,7 @@ export async function updateLibraryItem(
         });
       }
 
-      return { success: true, libraryItemId };
+      return { success: true, libraryItemId, mediaId: existing.mediaId };
     });
   } catch {
     return { success: false, error: "Couldn't update this item right now." };
@@ -150,7 +150,7 @@ export async function updateLibraryItem(
 }
 
 export type RemoveFromLibraryResult =
-  | { success: true }
+  | { success: true; mediaId: string }
   | { success: false; error: string };
 
 /** Removes a library item. Never deletes the canonical Media row. */
@@ -166,10 +166,10 @@ export async function removeFromLibrary(
         eq(libraryItems.userId, userId),
       ),
     )
-    .returning({ id: libraryItems.id });
+    .returning({ id: libraryItems.id, mediaId: libraryItems.mediaId });
 
   if (removed.length === 0) {
     return { success: false, error: "That item couldn't be found." };
   }
-  return { success: true };
+  return { success: true, mediaId: removed[0].mediaId };
 }

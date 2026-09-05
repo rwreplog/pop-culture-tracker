@@ -102,6 +102,7 @@ export async function updateStatusAction(
   });
   if (!result.success) return { error: result.error };
 
+  revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/library");
   revalidatePath("/");
   revalidatePath("/activity");
@@ -122,6 +123,7 @@ export async function updateRatingAction(
   });
   if (!result.success) return { error: result.error };
 
+  revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/activity");
 }
 
@@ -140,6 +142,7 @@ export async function toggleFavoriteAction(
   });
   if (!result.success) return { error: result.error };
 
+  revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/");
   revalidatePath("/library");
 }
@@ -158,6 +161,8 @@ export async function updateNotesAction(
     notes: parsed.data.notes,
   });
   if (!result.success) return { error: result.error };
+
+  revalidatePath(`/media/${result.mediaId}`);
 }
 
 export async function updateProgressAction(
@@ -179,6 +184,7 @@ export async function updateProgressAction(
   });
   if (!result.success) return { error: result.error };
 
+  revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/activity");
 }
 
@@ -197,6 +203,7 @@ export async function removeFromLibraryAction(
   const result = await removeFromLibrary(auth.userId, parsed.data.libraryItemId);
   if (!result.success) return { error: result.error };
 
+  revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/library");
   revalidatePath("/");
 }

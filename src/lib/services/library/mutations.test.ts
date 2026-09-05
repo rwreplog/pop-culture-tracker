@@ -57,7 +57,11 @@ describe("addToLibrary", () => {
 
     const result = await addToLibrary("user-1", "media-1", "want");
 
-    expect(result).toEqual({ success: true, libraryItemId: "new-item-id" });
+    expect(result).toEqual({
+      success: true,
+      libraryItemId: "new-item-id",
+      mediaId: "media-1",
+    });
     expect(activityValuesMock).toHaveBeenCalledWith(
       expect.objectContaining({ type: "added", mediaId: "media-1" }),
     );
@@ -78,7 +82,11 @@ describe("addToLibrary", () => {
 
     const result = await addToLibrary("user-1", "media-1", "want");
 
-    expect(result).toEqual({ success: true, libraryItemId: "existing-item-id" });
+    expect(result).toEqual({
+      success: true,
+      libraryItemId: "existing-item-id",
+      mediaId: "media-1",
+    });
     expect(activityValuesMock).not.toHaveBeenCalled();
   });
 });
@@ -117,7 +125,11 @@ describe("updateLibraryItem", () => {
       status: "completed",
     });
 
-    expect(result).toEqual({ success: true, libraryItemId: "item-1" });
+    expect(result).toEqual({
+      success: true,
+      libraryItemId: "item-1",
+      mediaId: "media-1",
+    });
     expect(activityValuesMock).toHaveBeenCalledWith(
       expect.objectContaining({ type: "completed", mediaId: "media-1" }),
     );
@@ -163,11 +175,13 @@ describe("removeFromLibrary", () => {
   it("succeeds when a row was deleted", async () => {
     const { db } = await import("@/lib/db");
     vi.mocked(db.delete).mockReturnValue({
-      where: () => ({ returning: async () => [{ id: "item-1" }] }),
+      where: () => ({
+        returning: async () => [{ id: "item-1", mediaId: "media-1" }],
+      }),
     } as never);
 
     const result = await removeFromLibrary("user-1", "item-1");
 
-    expect(result).toEqual({ success: true });
+    expect(result).toEqual({ success: true, mediaId: "media-1" });
   });
 });
