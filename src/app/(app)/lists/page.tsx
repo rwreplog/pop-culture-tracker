@@ -37,6 +37,7 @@ export default async function ListsPage() {
           icon={ListChecks}
           title="No lists yet"
           description="Create a list to start grouping media together."
+          action={<CreateListDialog />}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

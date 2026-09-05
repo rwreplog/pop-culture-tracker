@@ -1,8 +1,10 @@
 import { Library } from "lucide-react";
+import Link from "next/link";
 
 import { LibraryFilters } from "@/components/library/library-filters";
 import { MediaCard } from "@/components/media/media-card";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { getLibraryItems } from "@/lib/services/library/queries";
@@ -65,6 +67,9 @@ export default async function LibraryPage({
           icon={Library}
           title="Nothing here yet"
           description="Search Discover to add movies, shows, games, books, and comics to your library."
+          action={
+            <Button render={<Link href="/discover" />}>Go to Discover</Button>
+          }
         />
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
