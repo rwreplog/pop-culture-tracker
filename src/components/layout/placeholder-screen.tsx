@@ -1,13 +1,16 @@
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export function PlaceholderScreen({
   icon: Icon,
   title,
   description,
+  action,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
+  action?: ReactNode;
 }) {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
@@ -20,6 +23,7 @@ export function PlaceholderScreen({
           {description}
         </p>
       </div>
+      {action}
     </div>
   );
 }

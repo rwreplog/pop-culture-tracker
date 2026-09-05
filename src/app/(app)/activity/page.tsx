@@ -1,7 +1,9 @@
 import { History } from "lucide-react";
+import Link from "next/link";
 
 import { ActivityItem } from "@/components/activity/activity-item";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getActivityFeed } from "@/lib/services/activity/queries";
 
@@ -42,6 +44,9 @@ export default async function ActivityPage() {
         icon={History}
         title="No activity yet"
         description="Adding, rating, and updating media you're tracking will show up here."
+        action={
+          <Button render={<Link href="/discover" />}>Go to Discover</Button>
+        }
       />
     );
   }

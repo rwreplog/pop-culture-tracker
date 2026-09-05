@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -41,9 +42,14 @@ export default async function ListDetailPage({
       </div>
 
       {list.items.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          This list is empty. Add items from a media page.
-        </p>
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-muted-foreground text-sm">
+            This list is empty. Add items from a media page.
+          </p>
+          <Button variant="outline" render={<Link href="/discover" />}>
+            Go to Discover
+          </Button>
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {list.items.map((item, index) => (

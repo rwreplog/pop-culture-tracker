@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/lib/auth";
+import { isRateLimited, recordFailedAttempt } from "@/lib/auth/rate-limit";
 import { loginSchema, registerSchema } from "@/lib/schemas/auth";
 import { registerUser } from "@/lib/services/auth/register";
 
@@ -17,6 +18,10 @@ export async function loginAction(
     return { error: "Enter a valid email and password." };
   }
 
+  if (isRateLimited(parsed.data.email)) {
+    return { error: "Too many attempts. Try again in a minute." };
+  }
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
@@ -25,6 +30,7 @@ export async function loginAction(
     });
   } catch (error) {
     if (error instanceof AuthError) {
+      recordFailedAttempt(parsed.data.email);
       return { error: "Invalid email or password." };
     }
     throw error;
