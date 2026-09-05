@@ -22,3 +22,22 @@ export async function registerViaUi(
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL("/");
 }
+
+/**
+ * Server Actions submit in the background (React intercepts the form
+ * submit), so a plain `.click()`/`.selectOption()` returns before the
+ * mutation lands. Navigating away immediately after can abort the
+ * in-flight request. Wrap the trigger so the test waits for the
+ * Server Action's response before moving on.
+ */
+export async function waitForServerAction(
+  page: Page,
+  trigger: () => Promise<unknown>,
+) {
+  await Promise.all([
+    page.waitForResponse(
+      (response) => response.request().headers()["next-action"] !== undefined,
+    ),
+    trigger(),
+  ]);
+}

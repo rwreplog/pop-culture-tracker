@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser } from "./helpers";
+import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
 
 test("search, quick-add to library, and see it reflected on Library, Dashboard, and Activity", async ({
   page,
@@ -16,7 +16,9 @@ test("search, quick-add to library, and see it reflected on Library, Dashboard, 
   await page
     .getByRole("combobox", { name: "Status" })
     .selectOption("in_progress");
-  await page.getByRole("button", { name: "Add" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add" }).click(),
+  );
 
   await page.goto("/library");
   await expect(page.getByText("Severance", { exact: true })).toBeVisible();

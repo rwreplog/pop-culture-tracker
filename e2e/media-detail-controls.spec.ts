@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser } from "./helpers";
+import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
 
 test("media detail: add, rate, favorite, add notes, and set progress", async ({
   page,
@@ -18,18 +18,28 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
 
   await expect(page.getByRole("heading", { name: "Severance" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Add to Library" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add to Library" }).click(),
+  );
   await expect(page.getByRole("combobox", { name: "Status" })).toBeVisible();
 
-  await page.getByRole("combobox", { name: "Rating" }).selectOption("8");
-  await page.getByRole("button", { name: "Add to favorites" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("combobox", { name: "Rating" }).selectOption("8"),
+  );
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add to favorites" }).click(),
+  );
 
   await page.getByLabel("Notes").fill("Great show.");
-  await page.getByRole("button", { name: "Save notes" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Save notes" }).click(),
+  );
 
   await page.getByLabel("Season").fill("1");
   await page.getByLabel("Episode").fill("3");
-  await page.getByRole("button", { name: "Save progress" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Save progress" }).click(),
+  );
 
   // Reload to confirm the changes were actually persisted, not just
   // reflected optimistically in the client.

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser } from "./helpers";
+import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
 
 async function resolveSearchResult(
   page: import("@playwright/test").Page,
@@ -29,10 +29,14 @@ test("create a list, add items, reorder, remove, and delete", async ({
   const listUrl = page.url();
 
   await resolveSearchResult(page, "tv", "severance");
-  await page.getByRole("button", { name: "Add to List" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add to List" }).click(),
+  );
 
   await resolveSearchResult(page, "book", "project hail mary");
-  await page.getByRole("button", { name: "Add to List" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add to List" }).click(),
+  );
 
   await page.goto(listUrl);
   await expect(page.getByText("Severance", { exact: true })).toBeVisible();
@@ -46,7 +50,9 @@ test("create a list, add items, reorder, remove, and delete", async ({
   await expect(rows.nth(0)).toContainText("Severance");
   await expect(rows.nth(1)).toContainText("Project Hail Mary");
 
-  await rows.nth(1).getByRole("button", { name: "Move up" }).click();
+  await waitForServerAction(page, () =>
+    rows.nth(1).getByRole("button", { name: "Move up" }).click(),
+  );
   await page.reload();
   await expect(rows.nth(0)).toContainText("Project Hail Mary");
   await expect(rows.nth(1)).toContainText("Severance");

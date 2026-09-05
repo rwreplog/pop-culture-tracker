@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser } from "./helpers";
+import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
 
 test("changing status on the media detail page is reflected in library and dashboard", async ({
   page,
@@ -23,16 +23,16 @@ test("changing status on the media detail page is reflected in library and dashb
   await expect(page.getByText("Want to Experience")).toBeVisible();
 
   await page.goto(mediaUrl);
-  await page
-    .getByRole("combobox", { name: "Status" })
-    .selectOption("in_progress");
+  await waitForServerAction(page, () =>
+    page.getByRole("combobox", { name: "Status" }).selectOption("in_progress"),
+  );
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Continue" })).toBeVisible();
 
   await page.goto(mediaUrl);
-  await page
-    .getByRole("combobox", { name: "Status" })
-    .selectOption("completed");
+  await waitForServerAction(page, () =>
+    page.getByRole("combobox", { name: "Status" }).selectOption("completed"),
+  );
 
   await page.goto("/library");
   await expect(page.getByText("Completed")).toBeVisible();
@@ -65,8 +65,11 @@ test("removing an item from the library clears it from Library and Dashboard", a
   await page.goto("/library");
   await expect(page.getByText("Nothing here yet")).toBeVisible();
 
+  // Activity history persists after removal, so the dashboard isn't fully
+  // empty — just check the removed item no longer shows up anywhere on it.
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Welcome to Geekery" }),
-  ).toBeVisible();
+    page.getByRole("heading", { name: "Continue" }),
+  ).not.toBeVisible();
+  await expect(page.getByText("Severance", { exact: true })).not.toBeVisible();
 });

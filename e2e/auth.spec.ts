@@ -58,7 +58,7 @@ test("an invalid password is rejected with a clear error", async ({ page }) => {
   await page.getByLabel("Password").fill("the-wrong-password");
   await page.getByRole("button", { name: "Sign in" }).click();
 
-  await expect(page.getByRole("alert")).toHaveText(
-    "Invalid email or password.",
-  );
+  // Next's route announcer also has role="alert", so match by text instead
+  // of relying on getByRole("alert") resolving to a single element.
+  await expect(page.getByText("Invalid email or password.")).toBeVisible();
 });

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser } from "./helpers";
+import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
 
 test("activity shows an empty state, then entries after adding and rating an item", async ({
   page,
@@ -19,8 +19,12 @@ test("activity shows an empty state, then entries after adding and rating an ite
   await page.getByRole("button", { name: /Severance/ }).click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
 
-  await page.getByRole("button", { name: "Add to Library" }).click();
-  await page.getByRole("combobox", { name: "Rating" }).selectOption("8");
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Add to Library" }).click(),
+  );
+  await waitForServerAction(page, () =>
+    page.getByRole("combobox", { name: "Rating" }).selectOption("8"),
+  );
 
   await page.goto("/activity");
   await expect(page.getByText("No activity yet")).not.toBeVisible();
