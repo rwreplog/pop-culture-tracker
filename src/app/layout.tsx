@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import { AppShell } from "@/components/layout/app-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -20,6 +19,19 @@ export const metadata: Metadata = {
   title: "Geekery",
   description:
     "Track, organize, and discover the movies, shows, games, books, and comics you care about.",
+  openGraph: {
+    title: "Geekery",
+    description:
+      "Track, organize, and discover the movies, shows, games, books, and comics you care about.",
+    images: ["/og-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Geekery",
+    description:
+      "Track, organize, and discover the movies, shows, games, books, and comics you care about.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -36,9 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>
-            <AppShell>{children}</AppShell>
-          </TooltipProvider>
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

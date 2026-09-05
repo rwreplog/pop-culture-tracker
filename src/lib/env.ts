@@ -10,6 +10,10 @@ const serverSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   DATABASE_URL: z.url(),
+  AUTH_SECRET: z.string().min(1),
+  /** Both must be set together to enable Google sign-in; omit both to run credentials-only. */
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
 });
 
 /**
