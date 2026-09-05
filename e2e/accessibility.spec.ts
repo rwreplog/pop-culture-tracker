@@ -4,6 +4,10 @@ import { expect, test, type Page } from "@playwright/test";
 import { registerViaUi, uniqueTestUser } from "./helpers";
 
 async function expectNoSeriousViolations(page: Page) {
+  // After a client-side navigation, Next updates document.title slightly
+  // after the URL changes, so axe can transiently see an empty <title>.
+  await page.waitForFunction(() => document.title.length > 0);
+
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();

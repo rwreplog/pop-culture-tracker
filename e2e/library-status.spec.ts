@@ -35,7 +35,11 @@ test("changing status on the media detail page is reflected in library and dashb
   );
 
   await page.goto("/library");
-  await expect(page.getByText("Completed")).toBeVisible();
+  // "Completed" also appears as an <option> in the library's own status
+  // filter, so scope the match to the media card's badge.
+  await expect(
+    page.getByRole("link", { name: /Severance/ }).getByText("Completed"),
+  ).toBeVisible();
 
   await page.goto("/");
   await expect(
