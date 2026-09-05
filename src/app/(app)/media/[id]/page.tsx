@@ -2,12 +2,14 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { LibraryControls } from "@/components/library/library-controls";
+import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getLibraryItemForUser } from "@/lib/services/library/queries";
+import { getListsForUser } from "@/lib/services/lists/queries";
 
 type MediaMetadata = { creator?: string };
 
@@ -27,6 +29,9 @@ export default async function MediaDetailPage({
   const libraryItem = session?.user?.id
     ? (await getLibraryItemForUser(session.user.id, item.id)) ?? null
     : null;
+  const ownedLists = session?.user?.id
+    ? await getListsForUser(session.user.id)
+    : [];
 
   const metadata = item.metadata as MediaMetadata | null;
   const releaseYear = item.releaseDate
@@ -58,6 +63,15 @@ export default async function MediaDetailPage({
             mediaId={item.id}
             mediaType={item.mediaType}
             libraryItem={libraryItem}
+          />
+        </div>
+        <div className="pt-2">
+          <AddToListPicker
+            mediaId={item.id}
+            ownedLists={ownedLists.map((list) => ({
+              id: list.id,
+              name: list.name,
+            }))}
           />
         </div>
       </div>
