@@ -5,4 +5,4 @@
  * Convention: one file per domain (e.g. `library.ts`, `media.ts`),
  * re-exported here.
  */
-export {};
+export * from "@/lib/schemas/auth";

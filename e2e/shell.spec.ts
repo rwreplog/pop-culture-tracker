@@ -1,10 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+import { registerViaUi, uniqueTestUser } from "./helpers";
+
+test.beforeEach(async ({ page }) => {
+  await registerViaUi(page, uniqueTestUser());
+});
+
 test("home page renders the app shell and primary navigation", async ({
   page,
 }) => {
-  await page.goto("/");
-
   await expect(
     page.getByRole("link", { name: "Geekery", exact: true }),
   ).toBeVisible();
@@ -20,8 +24,6 @@ test("home page renders the app shell and primary navigation", async ({
 test("navigating to Library shows the library placeholder", async ({
   page,
 }) => {
-  await page.goto("/");
-
   const primaryNav = page.getByRole("navigation", { name: "Primary" }).first();
   await primaryNav.getByRole("link", { name: "Library" }).click();
 
