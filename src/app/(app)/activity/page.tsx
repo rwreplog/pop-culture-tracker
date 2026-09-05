@@ -10,8 +10,7 @@ function dayLabel(date: Date): string {
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
 
-  const isSameDay = (a: Date, b: Date) =>
-    a.toDateString() === b.toDateString();
+  const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
   if (isSameDay(date, today)) return "Today";
   if (isSameDay(date, yesterday)) return "Yesterday";

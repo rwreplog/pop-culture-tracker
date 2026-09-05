@@ -89,8 +89,8 @@ export const tmdbAdapter: ProviderAdapter = {
     const creator =
       mediaType === "tv"
         ? (parsed.data.created_by?.map((c) => c.name).join(", ") ?? null)
-        : (parsed.data.credits?.crew?.find((c) => c.job === "Director")
-            ?.name ?? null);
+        : (parsed.data.credits?.crew?.find((c) => c.job === "Director")?.name ??
+          null);
 
     const detail: NormalizedMediaDetail = {
       ...base,

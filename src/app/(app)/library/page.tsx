@@ -7,8 +7,20 @@ import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { getLibraryItems } from "@/lib/services/library/queries";
 
-const MEDIA_TYPES = new Set<MediaType>(["movie", "tv", "game", "book", "comic"]);
-const STATUSES = new Set(["want", "in_progress", "completed", "paused", "abandoned"]);
+const MEDIA_TYPES = new Set<MediaType>([
+  "movie",
+  "tv",
+  "game",
+  "book",
+  "comic",
+]);
+const STATUSES = new Set([
+  "want",
+  "in_progress",
+  "completed",
+  "paused",
+  "abandoned",
+]);
 
 export default async function LibraryPage({
   searchParams,
@@ -32,7 +44,8 @@ export default async function LibraryPage({
       ? (mediaType as MediaType)
       : undefined,
     status: STATUSES.has(status ?? "")
-      ? (status as "want" | "in_progress" | "completed" | "paused" | "abandoned")
+      ? (status as
+          "want" | "in_progress" | "completed" | "paused" | "abandoned")
       : undefined,
   });
 

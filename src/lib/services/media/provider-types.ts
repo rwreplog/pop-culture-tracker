@@ -25,7 +25,10 @@ export type NormalizedMediaDetail = NormalizedSearchResult & {
 
 export interface ProviderAdapter {
   provider: string;
-  search(query: string, mediaType: MediaType): Promise<NormalizedSearchResult[]>;
+  search(
+    query: string,
+    mediaType: MediaType,
+  ): Promise<NormalizedSearchResult[]>;
   getDetails(
     externalId: string,
     mediaType: MediaType,

@@ -6,19 +6,13 @@ function emptyToNull(value: unknown) {
 
 export const createListSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
-  description: z.preprocess(
-    emptyToNull,
-    z.string().trim().max(500).nullable(),
-  ),
+  description: z.preprocess(emptyToNull, z.string().trim().max(500).nullable()),
 });
 
 export const renameListSchema = z.object({
   listId: z.uuid(),
   name: z.string().trim().min(1, "Name is required").max(100),
-  description: z.preprocess(
-    emptyToNull,
-    z.string().trim().max(500).nullable(),
-  ),
+  description: z.preprocess(emptyToNull, z.string().trim().max(500).nullable()),
 });
 
 export const deleteListSchema = z.object({

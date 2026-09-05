@@ -27,16 +27,14 @@ export default async function MediaDetailPage({
   if (!item) notFound();
 
   const libraryItem = session?.user?.id
-    ? (await getLibraryItemForUser(session.user.id, item.id)) ?? null
+    ? ((await getLibraryItemForUser(session.user.id, item.id)) ?? null)
     : null;
   const ownedLists = session?.user?.id
     ? await getListsForUser(session.user.id)
     : [];
 
   const metadata = item.metadata as MediaMetadata | null;
-  const releaseYear = item.releaseDate
-    ? item.releaseDate.split("-")[0]
-    : null;
+  const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row">
@@ -49,9 +47,7 @@ export default async function MediaDetailPage({
         <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
           {mediaTypeLabel(item.mediaType)}
         </span>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {item.title}
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
         <p className="text-muted-foreground text-sm">
           {[metadata?.creator, releaseYear].filter(Boolean).join(" · ")}
         </p>

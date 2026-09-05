@@ -5,8 +5,7 @@ import { lists, listItems } from "@/lib/db/schema/lists";
 import { recordActivity } from "@/lib/services/activity/log";
 
 export type ListResult =
-  | { success: true; listId: string }
-  | { success: false; error: string };
+  { success: true; listId: string } | { success: false; error: string };
 
 export async function createList(
   userId: string,
@@ -42,7 +41,8 @@ export async function renameList(
   return { success: true, listId };
 }
 
-export type SimpleResult = { success: true } | { success: false; error: string };
+export type SimpleResult =
+  { success: true } | { success: false; error: string };
 
 export async function deleteList(
   userId: string,
@@ -70,7 +70,8 @@ export async function addItemToList(
       const list = await tx.query.lists.findFirst({
         where: and(eq(lists.id, listId), eq(lists.userId, userId)),
       });
-      if (!list) return { success: false, error: "That list couldn't be found." };
+      if (!list)
+        return { success: false, error: "That list couldn't be found." };
 
       const [row] = await tx
         .select({ maxPosition: sql<number | null>`max(${listItems.position})` })
@@ -119,7 +120,10 @@ export async function removeItemFromList(
       .returning({ id: listItems.id });
 
     if (deleted.length === 0) {
-      return { success: false, error: "That item couldn't be found in the list." };
+      return {
+        success: false,
+        error: "That item couldn't be found in the list.",
+      };
     }
     return { success: true };
   });
@@ -144,7 +148,10 @@ export async function reorderListItem(
 
     const index = items.findIndex((item) => item.id === listItemId);
     if (index === -1) {
-      return { success: false, error: "That item couldn't be found in the list." };
+      return {
+        success: false,
+        error: "That item couldn't be found in the list.",
+      };
     }
 
     const swapIndex = direction === "up" ? index - 1 : index + 1;

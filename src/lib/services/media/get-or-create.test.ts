@@ -27,9 +27,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { getOrCreateMedia } = await import(
-  "@/lib/services/media/get-or-create"
-);
+const { getOrCreateMedia } = await import("@/lib/services/media/get-or-create");
 
 const searchResult = {
   provider: "fixture",

@@ -39,7 +39,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: eq(users.email, parsed.data.email),
         });
         if (!user?.passwordHash) {
-          console.error("DEBUG authorize: no user/hash", parsed.data.email, !!user);
+          console.error(
+            "DEBUG authorize: no user/hash",
+            parsed.data.email,
+            !!user,
+          );
           return null;
         }
 

@@ -24,7 +24,9 @@ const searchResponseSchema = z.object({
 const workDetailSchema = z.object({
   title: z.string().optional(),
   covers: z.array(z.number()).optional(),
-  description: z.union([z.string(), z.object({ value: z.string() })]).optional(),
+  description: z
+    .union([z.string(), z.object({ value: z.string() })])
+    .optional(),
 });
 
 function toSearchResult(
@@ -35,7 +37,9 @@ function toSearchResult(
     externalId: raw.key,
     mediaType: "book",
     title: raw.title,
-    releaseDate: raw.first_publish_year ? `${raw.first_publish_year}-01-01` : null,
+    releaseDate: raw.first_publish_year
+      ? `${raw.first_publish_year}-01-01`
+      : null,
     imageUrl: raw.cover_i
       ? `https://covers.openlibrary.org/b/id/${raw.cover_i}-M.jpg`
       : null,

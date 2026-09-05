@@ -40,7 +40,8 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       releaseDate: "2022-02-18",
       imageUrl: "https://example.com/severance.jpg",
       creator: "Dan Erickson",
-      description: "Employees undergo a procedure to separate work and life memories.",
+      description:
+        "Employees undergo a procedure to separate work and life memories.",
     },
   ],
   game: [
@@ -76,7 +77,8 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       releaseDate: "2012-03-14",
       imageUrl: "https://example.com/saga.jpg",
       creator: "Brian K. Vaughan",
-      description: "Two lovers from warring extraterrestrial races flee with their newborn.",
+      description:
+        "Two lovers from warring extraterrestrial races flee with their newborn.",
     },
   ],
 };

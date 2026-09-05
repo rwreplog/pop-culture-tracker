@@ -66,10 +66,10 @@ export async function getDashboardSections(userId: string) {
     continueItems: items
       .filter((item) => item.status === "in_progress")
       .slice(0, SECTION_LIMIT),
-    queue: items.filter((item) => item.status === "want").slice(0, SECTION_LIMIT),
-    recentlyCompleted: completed.slice(0, SECTION_LIMIT),
-    favorites: items
-      .filter((item) => item.isFavorite)
+    queue: items
+      .filter((item) => item.status === "want")
       .slice(0, SECTION_LIMIT),
+    recentlyCompleted: completed.slice(0, SECTION_LIMIT),
+    favorites: items.filter((item) => item.isFavorite).slice(0, SECTION_LIMIT),
   };
 }

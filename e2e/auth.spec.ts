@@ -2,14 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import { registerViaUi, uniqueTestUser } from "./helpers";
 
-test("unauthenticated visitors are redirected to sign in", async ({
-  page,
-}) => {
+test("unauthenticated visitors are redirected to sign in", async ({ page }) => {
   await page.goto("/library");
   await page.waitForURL(/\/login/);
-  await expect(
-    page.getByRole("heading", { name: "Sign in" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
 test("a visitor can register, land signed in, and sign out", async ({
@@ -50,9 +46,7 @@ test("a registered user can sign back in with the same credentials", async ({
   ).toBeVisible();
 });
 
-test("an invalid password is rejected with a clear error", async ({
-  page,
-}) => {
+test("an invalid password is rejected with a clear error", async ({ page }) => {
   const user = uniqueTestUser();
   await registerViaUi(page, user);
 
