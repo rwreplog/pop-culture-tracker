@@ -31,7 +31,11 @@ export function ListItemRow({
 }) {
   return (
     <li className="flex items-center gap-3 rounded-lg border p-2">
-      <MediaArtwork src={imageUrl} title={title} className="h-16 w-11 shrink-0" />
+      <MediaArtwork
+        src={imageUrl}
+        title={title}
+        className="h-16 w-11 shrink-0"
+      />
       <Link href={`/media/${mediaId}`} className="flex-1 hover:underline">
         <span className="block text-sm font-medium">{title}</span>
         <span className="text-muted-foreground text-xs">

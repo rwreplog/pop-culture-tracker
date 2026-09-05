@@ -5,8 +5,7 @@ import { media, mediaExternalIds } from "@/lib/db/schema";
 import type { NormalizedSearchResult } from "@/lib/services/media/provider-types";
 
 export type GetOrCreateMediaResult =
-  | { success: true; mediaId: string }
-  | { success: false; error: string };
+  { success: true; mediaId: string } | { success: false; error: string };
 
 function isUniqueViolation(error: unknown): boolean {
   return (

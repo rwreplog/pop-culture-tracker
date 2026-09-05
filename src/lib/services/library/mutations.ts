@@ -150,8 +150,7 @@ export async function updateLibraryItem(
 }
 
 export type RemoveFromLibraryResult =
-  | { success: true; mediaId: string }
-  | { success: false; error: string };
+  { success: true; mediaId: string } | { success: false; error: string };
 
 /** Removes a library item. Never deletes the canonical Media row. */
 export async function removeFromLibrary(
@@ -161,10 +160,7 @@ export async function removeFromLibrary(
   const removed = await db
     .delete(libraryItems)
     .where(
-      and(
-        eq(libraryItems.id, libraryItemId),
-        eq(libraryItems.userId, userId),
-      ),
+      and(eq(libraryItems.id, libraryItemId), eq(libraryItems.userId, userId)),
     )
     .returning({ id: libraryItems.id, mediaId: libraryItems.mediaId });
 

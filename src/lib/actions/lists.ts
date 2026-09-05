@@ -146,9 +146,7 @@ export async function reorderListItemAction(
   const auth = await requireUserId();
   if ("error" in auth) return { error: auth.error };
 
-  const parsed = reorderListItemSchema.safeParse(
-    Object.fromEntries(formData),
-  );
+  const parsed = reorderListItemSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "Invalid request." };
 
   const result = await reorderListItem(

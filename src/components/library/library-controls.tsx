@@ -45,8 +45,15 @@ export function LibraryControls({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <StatusForm libraryItemId={libraryItem.id} mediaType={mediaType} status={libraryItem.status} />
-        <RatingForm libraryItemId={libraryItem.id} rating={libraryItem.rating} />
+        <StatusForm
+          libraryItemId={libraryItem.id}
+          mediaType={mediaType}
+          status={libraryItem.status}
+        />
+        <RatingForm
+          libraryItemId={libraryItem.id}
+          rating={libraryItem.rating}
+        />
         <FavoriteForm
           libraryItemId={libraryItem.id}
           isFavorite={libraryItem.isFavorite}
@@ -208,10 +215,7 @@ function FavoriteForm({
         aria-pressed={isFavorite}
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
-        <Heart
-          className="size-4"
-          fill={isFavorite ? "currentColor" : "none"}
-        />
+        <Heart className="size-4" fill={isFavorite ? "currentColor" : "none"} />
       </Button>
     </form>
   );
@@ -281,7 +285,10 @@ function ProgressForm({
       <div className="flex flex-wrap items-end gap-2">
         {fields.map((field) => (
           <div key={field.name} className="flex flex-col gap-1">
-            <label className="text-muted-foreground text-xs" htmlFor={field.name}>
+            <label
+              className="text-muted-foreground text-xs"
+              htmlFor={field.name}
+            >
               {field.label}
             </label>
             <input

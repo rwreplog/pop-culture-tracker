@@ -97,9 +97,13 @@ export async function updateStatusAction(
   const parsed = updateStatusSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "Invalid request." };
 
-  const result = await updateLibraryItem(auth.userId, parsed.data.libraryItemId, {
-    status: parsed.data.status,
-  });
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      status: parsed.data.status,
+    },
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);
@@ -118,9 +122,13 @@ export async function updateRatingAction(
   const parsed = updateRatingSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "Enter a rating between 0 and 10." };
 
-  const result = await updateLibraryItem(auth.userId, parsed.data.libraryItemId, {
-    rating: parsed.data.rating,
-  });
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      rating: parsed.data.rating,
+    },
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);
@@ -137,9 +145,13 @@ export async function toggleFavoriteAction(
   const parsed = toggleFavoriteSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "Invalid request." };
 
-  const result = await updateLibraryItem(auth.userId, parsed.data.libraryItemId, {
-    isFavorite: parsed.data.isFavorite,
-  });
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      isFavorite: parsed.data.isFavorite,
+    },
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);
@@ -157,9 +169,13 @@ export async function updateNotesAction(
   const parsed = updateNotesSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "Notes are too long." };
 
-  const result = await updateLibraryItem(auth.userId, parsed.data.libraryItemId, {
-    notes: parsed.data.notes,
-  });
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      notes: parsed.data.notes,
+    },
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);
@@ -179,9 +195,13 @@ export async function updateProgressAction(
   });
   if (!parsed.success) return { error: "Invalid progress values." };
 
-  const result = await updateLibraryItem(auth.userId, parsed.data.libraryItemId, {
-    progress: parsed.data.progress,
-  });
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      progress: parsed.data.progress,
+    },
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);
@@ -200,7 +220,10 @@ export async function removeFromLibraryAction(
   );
   if (!parsed.success) return { error: "Invalid request." };
 
-  const result = await removeFromLibrary(auth.userId, parsed.data.libraryItemId);
+  const result = await removeFromLibrary(
+    auth.userId,
+    parsed.data.libraryItemId,
+  );
   if (!result.success) return { error: result.error };
 
   revalidatePath(`/media/${result.mediaId}`);

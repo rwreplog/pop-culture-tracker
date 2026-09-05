@@ -24,7 +24,8 @@ export function describeActivity(
     case "completed":
       return `Completed ${title}`;
     case "rated": {
-      const rating = typeof metadata?.rating === "number" ? metadata.rating : null;
+      const rating =
+        typeof metadata?.rating === "number" ? metadata.rating : null;
       return rating != null
         ? `Rated ${title} ${rating / 2} star${rating === 2 ? "" : "s"}`
         : `Rated ${title}`;

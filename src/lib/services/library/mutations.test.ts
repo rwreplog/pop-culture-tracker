@@ -40,9 +40,8 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { addToLibrary, updateLibraryItem, removeFromLibrary } = await import(
-  "@/lib/services/library/mutations"
-);
+const { addToLibrary, updateLibraryItem, removeFromLibrary } =
+  await import("@/lib/services/library/mutations");
 
 beforeEach(() => {
   findFirstMock.mockReset();

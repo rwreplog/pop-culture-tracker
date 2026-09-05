@@ -31,9 +31,8 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { reorderListItem, removeItemFromList } = await import(
-  "@/lib/services/lists/mutations"
-);
+const { reorderListItem, removeItemFromList } =
+  await import("@/lib/services/lists/mutations");
 
 beforeEach(() => {
   listsFindFirstMock.mockReset();

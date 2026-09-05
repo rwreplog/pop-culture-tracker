@@ -22,13 +22,9 @@ export default async function ListDetailPage({
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold tracking-tight">
-            {list.name}
-          </h1>
+          <h1 className="text-xl font-semibold tracking-tight">{list.name}</h1>
           {list.description ? (
-            <p className="text-muted-foreground text-sm">
-              {list.description}
-            </p>
+            <p className="text-muted-foreground text-sm">{list.description}</p>
           ) : null}
         </div>
         <form

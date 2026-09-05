@@ -35,9 +35,7 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
   // reflected optimistically in the client.
   await page.reload();
 
-  await expect(page.getByRole("combobox", { name: "Rating" })).toHaveValue(
-    "8",
-  );
+  await expect(page.getByRole("combobox", { name: "Rating" })).toHaveValue("8");
   await expect(
     page.getByRole("button", { name: "Remove from favorites" }),
   ).toBeVisible();
