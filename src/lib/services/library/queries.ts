@@ -44,3 +44,32 @@ export async function getLibraryItems(
   if (!filters.mediaType) return items;
   return items.filter((item) => item.media.mediaType === filters.mediaType);
 }
+
+const SECTION_LIMIT = 8;
+
+/**
+ * Curated Dashboard sections, derived in application code from the full
+ * library — fine at MVP's per-user scale. See docs/UX.md: Home prioritizes
+ * continue/queue/recently-completed/favorites over a generic grid.
+ */
+export async function getDashboardSections(userId: string) {
+  const items = await getLibraryItems(userId);
+
+  const completed = items
+    .filter((item) => item.status === "completed")
+    .sort(
+      (a, b) =>
+        (b.completedAt?.getTime() ?? 0) - (a.completedAt?.getTime() ?? 0),
+    );
+
+  return {
+    continueItems: items
+      .filter((item) => item.status === "in_progress")
+      .slice(0, SECTION_LIMIT),
+    queue: items.filter((item) => item.status === "want").slice(0, SECTION_LIMIT),
+    recentlyCompleted: completed.slice(0, SECTION_LIMIT),
+    favorites: items
+      .filter((item) => item.isFavorite)
+      .slice(0, SECTION_LIMIT),
+  };
+}
