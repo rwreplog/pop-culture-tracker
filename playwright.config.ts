@@ -16,5 +16,7 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Never let E2E runs call real provider APIs, locally or in CI.
+    env: { MEDIA_PROVIDER_MODE: "fixture" },
   },
 });

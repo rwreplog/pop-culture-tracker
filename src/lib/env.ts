@@ -14,6 +14,12 @@ const serverSchema = z.object({
   /** Both must be set together to enable Google sign-in; omit both to run credentials-only. */
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  /** Media provider API keys. Omit any of these to leave that provider unconfigured. */
+  TMDB_API_KEY: z.string().min(1).optional(),
+  RAWG_API_KEY: z.string().min(1).optional(),
+  COMICVINE_API_KEY: z.string().min(1).optional(),
+  /** Forces MediaSearchService to use deterministic fixture data instead of calling real provider APIs (used in tests). */
+  MEDIA_PROVIDER_MODE: z.enum(["live", "fixture"]).optional(),
 });
 
 /**
