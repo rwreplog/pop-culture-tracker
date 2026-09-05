@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import {
   Card,
   CardContent,
@@ -17,7 +19,15 @@ export default function LoginPage() {
 
   return (
     <Card className="w-full max-w-sm">
-      <CardHeader>
+      <CardHeader className="justify-items-center text-center">
+        <Image
+          src="/geekery-logo.png"
+          alt=""
+          width={56}
+          height={56}
+          className="mb-1 size-14"
+          priority
+        />
         <CardTitle as="h1" className="text-xl">
           Sign in
         </CardTitle>
