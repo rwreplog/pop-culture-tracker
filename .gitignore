@@ -23,3 +23,8 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+.neon
+.env*
+.agents/
+skills-lock.json
+.claude/
