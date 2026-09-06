@@ -14,6 +14,11 @@ import { getMediaGenres } from "@/lib/media/metadata";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getSmartBacklog } from "@/lib/services/recommendations/queries";
 import {
+  MOODS,
+  MOOD_LABELS,
+  isMood,
+} from "@/lib/services/recommendations/moods";
+import {
   SKIP_COOKIE_NAME,
   getSkippedIds,
 } from "@/lib/services/recommendations/skip-memory";
@@ -21,16 +26,20 @@ import { cn } from "@/lib/utils";
 
 const MEDIA_TYPES: MediaType[] = ["movie", "tv", "game", "book", "comic"];
 
-function buildHref(params: { type?: MediaType }) {
-  return params.type ? `/tonight?type=${params.type}` : "/tonight";
+function buildHref(params: { type?: MediaType; mood?: string }) {
+  const search = new URLSearchParams();
+  if (params.type) search.set("type", params.type);
+  if (params.mood) search.set("mood", params.mood);
+  const query = search.toString();
+  return query ? `/tonight?${query}` : "/tonight";
 }
 
 export default async function TonightPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; mood?: string }>;
 }) {
-  const { type } = await searchParams;
+  const { type, mood: moodParam } = await searchParams;
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -46,8 +55,12 @@ export default async function TonightPage({
   const mediaType = MEDIA_TYPES.includes(type as MediaType)
     ? (type as MediaType)
     : undefined;
+  const mood = isMood(moodParam) ? moodParam : undefined;
 
-  const allCandidates = await getSmartBacklog(session.user.id, { mediaType });
+  const allCandidates = await getSmartBacklog(session.user.id, {
+    mediaType,
+    mood,
+  });
 
   const cookieStore = await cookies();
   const skippedIds = getSkippedIds(cookieStore.get(SKIP_COOKIE_NAME)?.value);
@@ -69,7 +82,7 @@ export default async function TonightPage({
 
       <nav aria-label="Media type" className="flex flex-wrap gap-1">
         <Link
-          href={buildHref({})}
+          href={buildHref({ mood })}
           className={cn(
             "rounded-full px-3 py-1.5 text-sm font-medium",
             !mediaType
@@ -82,7 +95,7 @@ export default async function TonightPage({
         {MEDIA_TYPES.map((value) => (
           <Link
             key={value}
-            href={buildHref({ type: value })}
+            href={buildHref({ type: value, mood })}
             className={cn(
               "rounded-full px-3 py-1.5 text-sm font-medium",
               value === mediaType
@@ -91,6 +104,34 @@ export default async function TonightPage({
             )}
           >
             {mediaTypeLabel(value)}
+          </Link>
+        ))}
+      </nav>
+
+      <nav aria-label="Mood" className="flex flex-wrap gap-1">
+        <Link
+          href={buildHref({ type: mediaType })}
+          className={cn(
+            "rounded-full border px-3 py-1.5 text-sm font-medium",
+            !mood
+              ? "border-primary text-primary"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent",
+          )}
+        >
+          Any mood
+        </Link>
+        {MOODS.map((value) => (
+          <Link
+            key={value}
+            href={buildHref({ type: mediaType, mood: value })}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-sm font-medium",
+              value === mood
+                ? "border-primary text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent",
+            )}
+          >
+            {MOOD_LABELS[value]}
           </Link>
         ))}
       </nav>

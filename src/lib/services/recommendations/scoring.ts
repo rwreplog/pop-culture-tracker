@@ -1,6 +1,7 @@
 import type { LibraryItem } from "@/lib/db/schema/library";
 import type { Media } from "@/lib/db/schema/media";
 import { getMediaGenres } from "@/lib/media/metadata";
+import { MOOD_GENRES, MOOD_LABELS, type Mood } from "./moods";
 
 type LibraryItemWithMedia = LibraryItem & { media: Media };
 
@@ -12,6 +13,11 @@ const NEGLECTED_AFTER_DAYS = 90;
 const GENRE_AFFINITY_WEIGHT = 2;
 const FAVORITE_BOOST = 3;
 const NEGLECT_BOOST = 1;
+/**
+ * Outweighs genre affinity/favorite/neglect combined so an explicit mood
+ * choice reliably wins the ranking rather than just nudging it.
+ */
+const MOOD_MATCH_BOOST = 10;
 
 function daysSince(date: Date): number {
   return (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
@@ -38,9 +44,24 @@ function buildGenreAffinity<T extends LibraryItemWithMedia>(
 function scoreAndExplain(
   item: LibraryItemWithMedia,
   genreAffinity: Map<string, number>,
+  mood: Mood | undefined,
 ): { score: number; reason: string } {
   let score = 0;
   const reasons: { weight: number; text: string }[] = [];
+
+  if (mood) {
+    const moodGenres = MOOD_GENRES[mood];
+    const matchesMood = getMediaGenres(item.media).some((genre) =>
+      moodGenres.includes(genre),
+    );
+    if (matchesMood) {
+      score += MOOD_MATCH_BOOST;
+      reasons.push({
+        weight: MOOD_MATCH_BOOST,
+        text: `Fits "${MOOD_LABELS[mood]}"`,
+      });
+    }
+  }
 
   const matchedGenres = getMediaGenres(item.media).filter((genre) =>
     genreAffinity.has(genre),
@@ -94,12 +115,16 @@ export type ScoredBacklogItem<T extends LibraryItemWithMedia> = T & {
  */
 export function rankBacklog<T extends LibraryItemWithMedia>(
   items: T[],
+  options: { mood?: Mood } = {},
 ): ScoredBacklogItem<T>[] {
   const genreAffinity = buildGenreAffinity(items);
 
   return items
     .filter((item) => item.status === "want")
-    .map((item) => ({ ...item, ...scoreAndExplain(item, genreAffinity) }))
+    .map((item) => ({
+      ...item,
+      ...scoreAndExplain(item, genreAffinity, options.mood),
+    }))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       return a.createdAt.getTime() - b.createdAt.getTime();

@@ -59,3 +59,30 @@ test("skipping a tonight pick remembers it and shows a different one", async ({
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
 });
+
+test("picking a mood filters and explains the pick, and resets via Any mood", async ({
+  page,
+}) => {
+  await registerViaUi(page, uniqueTestUser());
+
+  await addToBacklog(page, "Dune", "movie");
+  await addToBacklog(page, "Severance", "tv");
+
+  await page.goto("/tonight");
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Something thoughtful" }).click();
+  await page.waitForURL(/mood=thoughtful/);
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
+  await expect(page.getByText('Fits "Something thoughtful"')).toBeVisible();
+
+  await page.getByRole("link", { name: "Any mood" }).click();
+  await page.waitForURL((url) => !url.search.includes("mood="));
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
+});
