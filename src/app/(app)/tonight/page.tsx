@@ -1,5 +1,6 @@
 import { Moon } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { MediaArtwork } from "@/components/media/media-artwork";
@@ -7,28 +8,29 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
+import { skipTonightPickAction } from "@/lib/actions/tonight";
 import { updateStatusAction } from "@/lib/actions/library";
 import { getMediaGenres } from "@/lib/media/metadata";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getSmartBacklog } from "@/lib/services/recommendations/queries";
+import {
+  SKIP_COOKIE_NAME,
+  getSkippedIds,
+} from "@/lib/services/recommendations/skip-memory";
 import { cn } from "@/lib/utils";
 
 const MEDIA_TYPES: MediaType[] = ["movie", "tv", "game", "book", "comic"];
 
-function buildHref(params: { skip?: number; type?: MediaType }) {
-  const search = new URLSearchParams();
-  if (params.skip) search.set("skip", String(params.skip));
-  if (params.type) search.set("type", params.type);
-  const query = search.toString();
-  return query ? `/tonight?${query}` : "/tonight";
+function buildHref(params: { type?: MediaType }) {
+  return params.type ? `/tonight?type=${params.type}` : "/tonight";
 }
 
 export default async function TonightPage({
   searchParams,
 }: {
-  searchParams: Promise<{ skip?: string; type?: string }>;
+  searchParams: Promise<{ type?: string }>;
 }) {
-  const { skip: skipParam, type } = await searchParams;
+  const { type } = await searchParams;
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -45,7 +47,14 @@ export default async function TonightPage({
     ? (type as MediaType)
     : undefined;
 
-  const candidates = await getSmartBacklog(session.user.id, { mediaType });
+  const allCandidates = await getSmartBacklog(session.user.id, { mediaType });
+
+  const cookieStore = await cookies();
+  const skippedIds = getSkippedIds(cookieStore.get(SKIP_COOKIE_NAME)?.value);
+  const unskipped = allCandidates.filter((item) => !skippedIds.has(item.id));
+  // Fall back to the full list once everything's been recently skipped,
+  // rather than showing an empty state the user's backlog doesn't warrant.
+  const candidates = unskipped.length > 0 ? unskipped : allCandidates;
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
@@ -103,9 +112,7 @@ export default async function TonightPage({
         />
       ) : (
         (() => {
-          const skip = Number(skipParam) || 0;
-          const index = skip % candidates.length;
-          const pick = candidates[index];
+          const pick = candidates[0];
           const releaseYear = pick.media.releaseDate?.split("-")[0] ?? null;
           const genres = getMediaGenres(pick.media);
 
@@ -152,12 +159,18 @@ export default async function TonightPage({
                   <input type="hidden" name="status" value="in_progress" />
                   <Button type="submit">Start tonight</Button>
                 </form>
-                <Link
-                  href={buildHref({ skip: skip + 1, type: mediaType })}
-                  className={cn(buttonVariants({ variant: "outline" }))}
-                >
-                  Show me something else
-                </Link>
+                <form action={skipTonightPickAction}>
+                  <input type="hidden" name="libraryItemId" value={pick.id} />
+                  {mediaType ? (
+                    <input type="hidden" name="mediaType" value={mediaType} />
+                  ) : null}
+                  <button
+                    type="submit"
+                    className={cn(buttonVariants({ variant: "outline" }))}
+                  >
+                    Show me something else
+                  </button>
+                </form>
                 <Link
                   href={`/media/${pick.mediaId}`}
                   className="text-muted-foreground text-sm hover:underline"

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { PwaUpdateManager } from "@/components/pwa/pwa-update-manager";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <TooltipProvider>{children}</TooltipProvider>
+          <PwaUpdateManager />
         </ThemeProvider>
       </body>
     </html>
