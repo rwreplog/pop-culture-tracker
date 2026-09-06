@@ -41,19 +41,20 @@ test("skipping a tonight pick remembers it and shows a different one", async ({
   const firstPick = await currentPickTitle(page);
   expect(firstPick).toBeTruthy();
 
+  // The skip action re-renders /tonight in place (no navigation), so there's
+  // no URL change to wait on — poll the pick title until the server action's
+  // update lands instead of racing a single read against it.
   await page.getByRole("button", { name: "Show me something else" }).click();
-  await page.waitForURL("/tonight");
+  await expect.poll(() => currentPickTitle(page)).not.toEqual(firstPick);
   await expect(
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
 
-  const secondPick = await currentPickTitle(page);
-  expect(secondPick).not.toEqual(firstPick);
-
   // Skipping the only remaining unskipped item falls back to showing the
   // full candidate list again rather than an empty state.
+  const secondPick = await currentPickTitle(page);
   await page.getByRole("button", { name: "Show me something else" }).click();
-  await page.waitForURL("/tonight");
+  await expect.poll(() => currentPickTitle(page)).not.toEqual(secondPick);
   await expect(
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
