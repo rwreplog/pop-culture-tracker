@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -46,5 +47,6 @@ export async function skipTonightPickAction(formData: FormData) {
     });
   }
 
+  revalidatePath("/tonight");
   redirect(`/tonight${query}`);
 }
