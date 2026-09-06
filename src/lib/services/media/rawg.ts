@@ -18,6 +18,7 @@ const searchResultSchema = z.object({
   name: z.string(),
   released: z.string().nullable().optional(),
   background_image: z.string().nullable().optional(),
+  genres: z.array(z.object({ name: z.string() })).optional(),
 });
 
 const searchResponseSchema = z.object({
@@ -48,6 +49,7 @@ function toSearchResult(
     imageUrl: raw.background_image ?? null,
     creator: null,
     description: null,
+    genres: raw.genres?.map((g) => g.name) ?? [],
   };
 }
 

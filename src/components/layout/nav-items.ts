@@ -19,9 +19,8 @@ export type NavItem = {
 
 /**
  * Primary desktop navigation.
- * Discover and Stats currently render placeholder screens — see
- * docs/UX.md and docs/ROADMAP.md (Discover scope and Stats are not
- * yet defined for MVP).
+ * Discover currently renders a placeholder screen — see docs/UX.md and
+ * docs/ROADMAP.md (Discover scope is not yet defined for MVP).
  */
 export const desktopNavItems: NavItem[] = [
   { href: "/", label: "Home", icon: Home },

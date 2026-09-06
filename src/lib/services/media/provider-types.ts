@@ -16,6 +16,12 @@ export type NormalizedSearchResult = {
   /** Director/developer/author/studio — whatever the type's primary creator credit is. */
   creator: string | null;
   description: string | null;
+  /**
+   * Genre names, empty when the provider doesn't expose a clean genre list
+   * (Open Library's subjects are noisy free text; ComicVine has none). See
+   * docs/ROADMAP.md Phase 3: genre analysis only covers movie/tv/game.
+   */
+  genres: string[];
 };
 
 /** A search result plus any type-specific extra fields for Media.metadata. */

@@ -47,7 +47,15 @@ export async function getOrCreateMedia(
           description: result.description,
           releaseDate: result.releaseDate,
           imageUrl: result.imageUrl,
-          metadata: result.creator ? { creator: result.creator } : null,
+          metadata:
+            result.creator || result.genres.length > 0
+              ? {
+                  ...(result.creator ? { creator: result.creator } : null),
+                  ...(result.genres.length > 0
+                    ? { genres: result.genres }
+                    : null),
+                }
+              : null,
         })
         .returning({ id: media.id });
 

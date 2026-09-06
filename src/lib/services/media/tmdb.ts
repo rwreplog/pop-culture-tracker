@@ -23,7 +23,63 @@ const searchResultSchema = z.object({
   first_air_date: z.string().optional(),
   poster_path: z.string().nullable().optional(),
   overview: z.string().optional(),
+  genre_ids: z.array(z.number()).optional(),
 });
+
+/**
+ * TMDB's search endpoint only returns genre ids, not names, and its genre
+ * lists are stable/well-known — so map them locally rather than making an
+ * extra request. https://developer.themoviedb.org/reference/genre-movie-list
+ * and .../genre-tv-list.
+ */
+const MOVIE_GENRES: Record<number, string> = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Science Fiction",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+};
+
+const TV_GENRES: Record<number, string> = {
+  10759: "Action & Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  10762: "Kids",
+  9648: "Mystery",
+  10763: "News",
+  10764: "Reality",
+  10765: "Sci-Fi & Fantasy",
+  10766: "Soap",
+  10767: "Talk",
+  10768: "War & Politics",
+  37: "Western",
+};
+
+function genreNames(
+  genreIds: number[] | undefined,
+  mediaType: MediaType,
+): string[] {
+  const table = mediaType === "tv" ? TV_GENRES : MOVIE_GENRES;
+  return (genreIds ?? []).map((id) => table[id]).filter((name) => !!name);
+}
 
 const searchResponseSchema = z.object({
   results: z.array(searchResultSchema).catch([]),
@@ -49,6 +105,7 @@ function toSearchResult(
     imageUrl: raw.poster_path ? `${IMAGE_BASE_URL}${raw.poster_path}` : null,
     creator: null,
     description: raw.overview || null,
+    genres: genreNames(raw.genre_ids, mediaType),
   };
 }
 
@@ -81,6 +138,8 @@ export const tmdbAdapter: ProviderAdapter = {
             .optional(),
         })
         .optional(),
+      // The detail endpoint returns full genre objects, not genre_ids.
+      genres: z.array(z.object({ name: z.string() })).optional(),
     });
     const parsed = detailSchema.safeParse(json);
     if (!parsed.success) return null;
@@ -95,6 +154,7 @@ export const tmdbAdapter: ProviderAdapter = {
     const detail: NormalizedMediaDetail = {
       ...base,
       creator: creator || null,
+      genres: parsed.data.genres?.map((g) => g.name) ?? base.genres,
       metadata: null,
     };
     return detail;

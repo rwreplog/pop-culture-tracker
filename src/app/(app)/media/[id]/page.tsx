@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { LibraryControls } from "@/components/library/library-controls";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
+import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
@@ -11,7 +12,7 @@ import { mediaTypeLabel } from "@/lib/media/labels";
 import { getLibraryItemForUser } from "@/lib/services/library/queries";
 import { getListsForUser } from "@/lib/services/lists/queries";
 
-type MediaMetadata = { creator?: string };
+type MediaMetadata = { creator?: string; genres?: string[] };
 
 export default async function MediaDetailPage({
   params,
@@ -51,6 +52,15 @@ export default async function MediaDetailPage({
         <p className="text-muted-foreground text-sm">
           {[metadata?.creator, releaseYear].filter(Boolean).join(" · ")}
         </p>
+        {metadata?.genres && metadata.genres.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {metadata.genres.map((genre) => (
+              <Badge key={genre} variant="secondary">
+                {genre}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
         {item.description ? (
           <p className="text-sm">{item.description}</p>
         ) : null}

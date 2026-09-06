@@ -38,6 +38,7 @@ const searchResult = {
   imageUrl: "https://example.com/dune.jpg",
   creator: "Denis Villeneuve",
   description: "A desert planet.",
+  genres: ["Science Fiction"],
 };
 
 describe("getOrCreateMedia", () => {

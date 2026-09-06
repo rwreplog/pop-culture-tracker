@@ -58,6 +58,8 @@ function toSearchResult(
     imageUrl: raw.image?.medium_url ?? null,
     creator: raw.publisher?.name ?? null,
     description: stripHtml(raw.deck),
+    // ComicVine doesn't expose genre. See docs/ROADMAP.md Phase 3.
+    genres: [],
   };
 }
 
