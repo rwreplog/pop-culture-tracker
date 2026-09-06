@@ -45,6 +45,9 @@ function toSearchResult(
       : null,
     creator: raw.author_name?.join(", ") ?? null,
     description: null,
+    // Open Library's "subjects" are noisy free text, not a clean genre
+    // list — skip genre for books. See docs/ROADMAP.md Phase 3.
+    genres: [],
   };
 }
 
@@ -84,6 +87,7 @@ export const openLibraryAdapter: ProviderAdapter = {
       // not worth the extra round trips for MVP detail enrichment.
       creator: null,
       description,
+      genres: [],
       metadata: null,
     };
     return detail;

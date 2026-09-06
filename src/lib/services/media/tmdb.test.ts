@@ -24,6 +24,7 @@ describe("tmdbAdapter.search", () => {
               release_date: "2021-10-22",
               poster_path: "/x.jpg",
               overview: "A desert planet.",
+              genre_ids: [878, 12],
             },
           ],
         }),
@@ -42,6 +43,7 @@ describe("tmdbAdapter.search", () => {
         imageUrl: "https://image.tmdb.org/t/p/w342/x.jpg",
         creator: null,
         description: "A desert planet.",
+        genres: ["Science Fiction", "Adventure"],
       },
     ]);
   });
@@ -59,6 +61,7 @@ describe("tmdbAdapter.search", () => {
               first_air_date: "2022-02-18",
               poster_path: null,
               overview: "",
+              genre_ids: [18, 9648],
             },
           ],
         }),
@@ -77,6 +80,7 @@ describe("tmdbAdapter.search", () => {
         imageUrl: null,
         creator: null,
         description: null,
+        genres: ["Drama", "Mystery"],
       },
     ]);
   });

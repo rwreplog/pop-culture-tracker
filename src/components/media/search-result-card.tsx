@@ -36,6 +36,11 @@ function HiddenResultFields({ result }: { result: NormalizedSearchResult }) {
         name="description"
         value={result.description ?? ""}
       />
+      <input
+        type="hidden"
+        name="genres"
+        value={JSON.stringify(result.genres)}
+      />
     </>
   );
 }
@@ -87,7 +92,7 @@ export function SearchResultCard({
           id={`status-${result.externalId}`}
           name="status"
           defaultValue="want"
-          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 flex-1 rounded-lg border bg-transparent px-2 py-1 text-xs outline-none focus-visible:ring-3"
+          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 min-w-0 flex-1 rounded-lg border bg-transparent px-2 py-1 text-xs outline-none focus-visible:ring-3"
         >
           {STATUSES.map((status) => (
             <option key={status} value={status}>

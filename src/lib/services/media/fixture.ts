@@ -19,6 +19,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       imageUrl: "https://example.com/dune.jpg",
       creator: "Denis Villeneuve",
       description: "A young man's destiny is tied to a desert planet.",
+      genres: ["Science Fiction", "Adventure"],
     },
     {
       provider: "fixture",
@@ -29,6 +30,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       imageUrl: "https://example.com/dune2.jpg",
       creator: "Denis Villeneuve",
       description: "Paul Atreides unites with the Fremen.",
+      genres: ["Science Fiction", "Adventure"],
     },
   ],
   tv: [
@@ -42,6 +44,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       creator: "Dan Erickson",
       description:
         "Employees undergo a procedure to separate work and life memories.",
+      genres: ["Drama", "Mystery"],
     },
   ],
   game: [
@@ -54,6 +57,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       imageUrl: "https://example.com/bg3.jpg",
       creator: "Larian Studios",
       description: "A party-based RPG set in the Forgotten Realms.",
+      genres: ["RPG"],
     },
   ],
   book: [
@@ -66,6 +70,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       imageUrl: "https://example.com/hailmary.jpg",
       creator: "Andy Weir",
       description: "A lone astronaut must save the earth from disaster.",
+      genres: [],
     },
   ],
   comic: [
@@ -79,6 +84,7 @@ const FIXTURES: Record<MediaType, NormalizedSearchResult[]> = {
       creator: "Brian K. Vaughan",
       description:
         "Two lovers from warring extraterrestrial races flee with their newborn.",
+      genres: [],
     },
   ],
 };

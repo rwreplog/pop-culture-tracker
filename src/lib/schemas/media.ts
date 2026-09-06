@@ -13,6 +13,23 @@ function emptyToNull(value: unknown) {
 }
 
 /**
+ * FormData can't carry arrays either, so `genres` crosses the wire as a
+ * single JSON-stringified hidden field. Anything malformed just becomes no
+ * genres rather than failing the whole form.
+ */
+function parseGenres(value: unknown): string[] {
+  if (typeof value !== "string" || value === "") return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((genre): genre is string => typeof genre === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * A NormalizedSearchResult, as submitted from a search-result form (hidden
  * inputs) back to a server action. Used to resolve/create the canonical
  * Media row for a result the user selected.
@@ -26,6 +43,7 @@ export const normalizedSearchResultSchema = z.object({
   imageUrl: z.preprocess(emptyToNull, z.string().nullable()),
   creator: z.preprocess(emptyToNull, z.string().nullable()),
   description: z.preprocess(emptyToNull, z.string().nullable()),
+  genres: z.preprocess(parseGenres, z.array(z.string())),
 });
 
 export type NormalizedSearchResultInput = z.infer<
