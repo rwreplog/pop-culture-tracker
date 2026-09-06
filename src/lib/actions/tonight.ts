@@ -33,12 +33,17 @@ export async function skipTonightPickAction(formData: FormData) {
       ? `?type=${parsed.data.mediaType}`
       : "";
 
+  console.log("DEBUG skipTonightPickAction", {
+    success: parsed.success,
+    error: parsed.success ? undefined : parsed.error.flatten(),
+    raw: formData.get("libraryItemId"),
+  });
+
   if (parsed.success) {
     const cookieStore = await cookies();
-    const updated = addSkip(
-      cookieStore.get(SKIP_COOKIE_NAME)?.value,
-      parsed.data.libraryItemId,
-    );
+    const before = cookieStore.get(SKIP_COOKIE_NAME)?.value;
+    const updated = addSkip(before, parsed.data.libraryItemId);
+    console.log("DEBUG skip cookie", { before, updated });
     cookieStore.set(SKIP_COOKIE_NAME, updated, {
       maxAge: SKIP_COOKIE_MAX_AGE_SECONDS,
       httpOnly: true,
