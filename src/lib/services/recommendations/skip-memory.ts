@@ -38,7 +38,10 @@ export function getSkippedIds(raw: string | undefined): Set<string> {
  * Adds a skip to a raw `tonight_skips` cookie value, dropping expired
  * entries and capping history so the cookie can't grow unbounded.
  */
-export function addSkip(raw: string | undefined, libraryItemId: string): string {
+export function addSkip(
+  raw: string | undefined,
+  libraryItemId: string,
+): string {
   const entries = pruneExpired(parseEntries(raw));
   entries.push({ id: libraryItemId, skippedAt: Date.now() });
   return JSON.stringify(entries.slice(-MAX_ENTRIES));

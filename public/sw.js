@@ -2,14 +2,21 @@
 const CACHE_VERSION = "v1";
 const CACHE_NAME = `geekery-${CACHE_VERSION}`;
 
-const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
+const PRECACHE_URLS = [
+  "/",
+  "/manifest.webmanifest",
+  "/icon-192.png",
+  "/icon-512.png",
+];
 
 self.addEventListener("install", (event) => {
   // Activate this worker as soon as it finishes installing instead of waiting
   // for old tabs to close, so a new version doesn't sit idle behind stale ones.
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {})),
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {})),
   );
 });
 
@@ -18,7 +25,9 @@ self.addEventListener("activate", (event) => {
     (async () => {
       const keys = await caches.keys();
       await Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)),
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key)),
       );
       // Take control of any already-open tabs immediately, rather than only
       // affecting tabs opened after this activation.
@@ -29,7 +38,10 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  if (request.method !== "GET" || !request.url.startsWith(self.location.origin)) {
+  if (
+    request.method !== "GET" ||
+    !request.url.startsWith(self.location.origin)
+  ) {
     return;
   }
 

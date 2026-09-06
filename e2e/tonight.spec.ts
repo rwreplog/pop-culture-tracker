@@ -35,13 +35,17 @@ test("skipping a tonight pick remembers it and shows a different one", async ({
   console.log("LIBRARY:", await page.locator("main").innerText());
 
   await page.goto("/tonight");
-  await expect(page.getByRole("button", { name: "Start tonight" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
   const firstPick = await currentPickTitle(page);
   expect(firstPick).toBeTruthy();
 
   await page.getByRole("button", { name: "Show me something else" }).click();
   await page.waitForURL("/tonight");
-  await expect(page.getByRole("button", { name: "Start tonight" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
 
   const secondPick = await currentPickTitle(page);
   expect(secondPick).not.toEqual(firstPick);
@@ -50,5 +54,7 @@ test("skipping a tonight pick remembers it and shows a different one", async ({
   // full candidate list again rather than an empty state.
   await page.getByRole("button", { name: "Show me something else" }).click();
   await page.waitForURL("/tonight");
-  await expect(page.getByRole("button", { name: "Start tonight" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Start tonight" }),
+  ).toBeVisible();
 });

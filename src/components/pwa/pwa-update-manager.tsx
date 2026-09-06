@@ -39,11 +39,17 @@ export function PwaUpdateManager() {
       if (hadController) setUpdateAvailable(true);
       hadController = true;
     };
-    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
+    navigator.serviceWorker.addEventListener(
+      "controllerchange",
+      onControllerChange,
+    );
 
     return () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        onControllerChange,
+      );
     };
   }, []);
 
