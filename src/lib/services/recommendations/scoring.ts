@@ -24,7 +24,8 @@ function buildGenreAffinity<T extends LibraryItemWithMedia>(
   const affinity = new Map<string, number>();
   for (const item of items) {
     if (item.status !== "completed") continue;
-    const likedIt = item.isFavorite || (item.rating ?? 0) >= HIGH_RATING_THRESHOLD;
+    const likedIt =
+      item.isFavorite || (item.rating ?? 0) >= HIGH_RATING_THRESHOLD;
     if (!likedIt) continue;
 
     for (const genre of getMediaGenres(item.media)) {

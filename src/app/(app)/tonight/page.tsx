@@ -137,9 +137,7 @@ export default async function TonightPage({
                       ))}
                     </div>
                   ) : null}
-                  <p className="text-muted-foreground text-sm">
-                    {pick.reason}
-                  </p>
+                  <p className="text-muted-foreground text-sm">{pick.reason}</p>
                 </div>
               </div>
 
@@ -150,11 +148,7 @@ export default async function TonightPage({
                     await updateStatusAction(undefined, formData);
                   }}
                 >
-                  <input
-                    type="hidden"
-                    name="libraryItemId"
-                    value={pick.id}
-                  />
+                  <input type="hidden" name="libraryItemId" value={pick.id} />
                   <input type="hidden" name="status" value="in_progress" />
                   <Button type="submit">Start tonight</Button>
                 </form>
