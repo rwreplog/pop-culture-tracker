@@ -45,6 +45,7 @@ export default async function DiscoverPage({
           id="discover-query"
           type="search"
           name="q"
+          enterKeyHint="search"
           defaultValue={query}
           placeholder={`Search ${mediaTypeLabel(mediaType).toLowerCase()}s…`}
         />

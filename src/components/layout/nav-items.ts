@@ -36,7 +36,7 @@ export const desktopNavItems: NavItem[] = [
 export const mobileNavItems: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/library", label: "Library", icon: Library },
-  { href: "/library?add=1", label: "Add", icon: Plus },
+  { href: "/discover", label: "Add", icon: Plus },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/profile", label: "Profile", icon: User },
 ];

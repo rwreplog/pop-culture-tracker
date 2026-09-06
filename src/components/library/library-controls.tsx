@@ -49,7 +49,7 @@ export function LibraryControls({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
         <StatusForm
           libraryItemId={libraryItem.id}
           mediaType={mediaType}
@@ -321,7 +321,7 @@ function ProgressForm({
       <input type="hidden" name="libraryItemId" value={libraryItemId} />
       <input type="hidden" name="mediaType" value={mediaType} />
       <span className="text-sm font-medium">Progress</span>
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-end">
         {fields.map((field) => (
           <div key={field.name} className="flex flex-col gap-1">
             <label
@@ -334,6 +334,7 @@ function ProgressForm({
               id={field.name}
               name={field.name}
               type={field.type}
+              inputMode={field.type === "number" ? "numeric" : undefined}
               defaultValue={
                 progress?.[field.name] != null
                   ? String(progress[field.name])

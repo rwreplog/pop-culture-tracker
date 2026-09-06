@@ -94,7 +94,7 @@ export function SearchResultCard({
 
       <form
         action={addAction}
-        className="mt-auto flex min-w-0 items-center gap-1"
+        className="mt-auto flex min-w-0 flex-wrap items-center gap-1.5"
       >
         <HiddenResultFields result={result} />
         <label className="sr-only" htmlFor={`status-${result.externalId}`}>
@@ -103,7 +103,6 @@ export function SearchResultCard({
         <Select name="status" defaultValue="want">
           <SelectTrigger
             id={`status-${result.externalId}`}
-            size="sm"
             className="min-w-0 flex-1"
           >
             <SelectValue>
@@ -120,7 +119,7 @@ export function SearchResultCard({
             ))}
           </SelectContent>
         </Select>
-        <Button type="submit" size="sm" disabled={addPending}>
+        <Button type="submit" disabled={addPending}>
           Add
         </Button>
       </form>

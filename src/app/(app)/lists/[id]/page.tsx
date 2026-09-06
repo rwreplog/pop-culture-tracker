@@ -22,8 +22,10 @@ export default async function ListDetailPage({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold tracking-tight">{list.name}</h1>
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="truncate text-xl font-semibold tracking-tight">
+            {list.name}
+          </h1>
           {list.description ? (
             <p className="text-muted-foreground text-sm">{list.description}</p>
           ) : null}
@@ -33,6 +35,7 @@ export default async function ListDetailPage({
             "use server";
             await deleteListAction(undefined, formData);
           }}
+          className="shrink-0"
         >
           <input type="hidden" name="listId" value={list.id} />
           <Button type="submit" variant="outline">
