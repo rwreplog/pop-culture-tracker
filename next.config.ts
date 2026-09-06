@@ -12,10 +12,20 @@ function getGitCommitSha() {
   }
 }
 
+/** ISO 8601 commit date of HEAD, i.e. when the current release was made. */
+function getGitCommitDate() {
+  try {
+    return execSync("git log -1 --format=%cI").toString().trim();
+  } catch {
+    return "";
+  }
+}
+
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: packageJson.version,
     NEXT_PUBLIC_APP_COMMIT: getGitCommitSha(),
+    NEXT_PUBLIC_APP_RELEASED_AT: getGitCommitDate(),
   },
 };
 
