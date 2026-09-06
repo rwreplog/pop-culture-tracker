@@ -52,12 +52,6 @@ export default async function TonightPage({
   const cookieStore = await cookies();
   const skippedIds = getSkippedIds(cookieStore.get(SKIP_COOKIE_NAME)?.value);
   const unskipped = allCandidates.filter((item) => !skippedIds.has(item.id));
-  console.error("DEBUG tonight render", {
-    cookieRaw: cookieStore.get(SKIP_COOKIE_NAME)?.value,
-    skippedIds: [...skippedIds],
-    allIds: allCandidates.map((c) => c.id),
-    unskippedIds: unskipped.map((c) => c.id),
-  });
   // Fall back to the full list once everything's been recently skipped,
   // rather than showing an empty state the user's backlog doesn't warrant.
   const candidates = unskipped.length > 0 ? unskipped : allCandidates;
@@ -167,9 +161,6 @@ export default async function TonightPage({
                 </form>
                 <form action={skipTonightPickAction}>
                   <input type="hidden" name="libraryItemId" value={pick.id} />
-                  {mediaType ? (
-                    <input type="hidden" name="mediaType" value={mediaType} />
-                  ) : null}
                   <button
                     type="submit"
                     className={cn(buttonVariants({ variant: "outline" }))}
