@@ -52,6 +52,7 @@
 - "What should I do tonight?"
 - Time-aware recommendations
 - Mood-aware recommendations
+- PWA support (manifest, icons, installability)
 
 ## Phase 5 — Goals
 

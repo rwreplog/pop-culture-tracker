@@ -36,8 +36,11 @@ export function ListItemRow({
         title={title}
         className="h-16 w-11 shrink-0"
       />
-      <Link href={`/media/${mediaId}`} className="flex-1 hover:underline">
-        <span className="block text-sm font-medium">{title}</span>
+      <Link
+        href={`/media/${mediaId}`}
+        className="min-w-0 flex-1 hover:underline"
+      >
+        <span className="block truncate text-sm font-medium">{title}</span>
         <span className="text-muted-foreground text-xs">
           {mediaTypeLabel(mediaType)}
         </span>

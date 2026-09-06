@@ -27,13 +27,13 @@ export function AddToListPicker({
   if (ownedLists.length === 0) return null;
 
   return (
-    <form action={formAction} className="flex items-center gap-2">
+    <form action={formAction} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="mediaId" value={mediaId} />
       <label className="sr-only" htmlFor="add-to-list">
         Add to list
       </label>
       <Select name="listId" defaultValue={ownedLists[0].id}>
-        <SelectTrigger id="add-to-list">
+        <SelectTrigger id="add-to-list" className="min-w-0 flex-1">
           <SelectValue>
             {(value: string) =>
               ownedLists.find((list) => list.id === value)?.name
