@@ -8,6 +8,7 @@ import {
   ListChecks,
   Plus,
   Settings,
+  Target,
   User,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ export const desktopNavItems: NavItem[] = [
   { href: "/discover", label: "Discover", icon: Compass },
   { href: "/activity", label: "Activity", icon: Activity },
   { href: "/stats", label: "Stats", icon: BarChart3 },
+  { href: "/goals", label: "Goals", icon: Target },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
