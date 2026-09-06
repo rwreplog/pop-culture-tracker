@@ -23,8 +23,9 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
   );
   await expect(page.getByRole("combobox", { name: "Status" })).toBeVisible();
 
+  await page.getByRole("combobox", { name: "Rating" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("combobox", { name: "Rating" }).selectOption("8"),
+    page.getByRole("option", { name: "4 stars" }).click(),
   );
   await waitForServerAction(page, () =>
     page.getByRole("button", { name: "Add to favorites" }).click(),
@@ -45,7 +46,11 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
   // reflected optimistically in the client.
   await page.reload();
 
-  await expect(page.getByRole("combobox", { name: "Rating" })).toHaveValue("8");
+  await expect(
+    page
+      .getByRole("combobox", { name: "Rating" })
+      .locator('[data-slot="select-value"]'),
+  ).toHaveText("4 stars");
   await expect(
     page.getByRole("button", { name: "Remove from favorites" }),
   ).toBeVisible();

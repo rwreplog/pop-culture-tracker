@@ -15,23 +15,27 @@ test("changing status on the media detail page is reflected in library and dashb
   const mediaUrl = page.url();
 
   await page.getByRole("button", { name: "Add to Library" }).click();
-  await expect(page.getByRole("combobox", { name: "Status" })).toHaveValue(
-    "want",
-  );
+  await expect(
+    page
+      .getByRole("combobox", { name: "Status" })
+      .locator('[data-slot="select-value"]'),
+  ).toHaveText("Want to Experience");
 
   await page.goto("/library");
   await expect(page.getByText("Want to Experience")).toBeVisible();
 
   await page.goto(mediaUrl);
+  await page.getByRole("combobox", { name: "Status" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("combobox", { name: "Status" }).selectOption("in_progress"),
+    page.getByRole("option", { name: "Watching" }).click(),
   );
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Continue" })).toBeVisible();
 
   await page.goto(mediaUrl);
+  await page.getByRole("combobox", { name: "Status" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("combobox", { name: "Status" }).selectOption("completed"),
+    page.getByRole("option", { name: "Completed" }).click(),
   );
 
   await page.goto("/library");

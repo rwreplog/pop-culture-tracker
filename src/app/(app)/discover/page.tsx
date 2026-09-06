@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { SearchResultCard } from "@/components/media/search-result-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { searchMedia } from "@/lib/services/media/search";
@@ -39,21 +41,17 @@ export default async function DiscoverPage({
         <label className="sr-only" htmlFor="discover-query">
           Search
         </label>
-        <input
+        <Input
           id="discover-query"
           type="search"
           name="q"
           defaultValue={query}
           placeholder={`Search ${mediaTypeLabel(mediaType).toLowerCase()}s…`}
-          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus-visible:ring-3"
         />
-        <button
-          type="submit"
-          className="border-border bg-background hover:bg-muted flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm"
-        >
+        <Button type="submit" variant="outline">
           <Search className="size-4" aria-hidden="true" />
           Search
-        </button>
+        </Button>
       </form>
 
       <nav aria-label="Media type" className="flex flex-wrap gap-1">

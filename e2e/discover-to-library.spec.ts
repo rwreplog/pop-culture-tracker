@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { registerViaUi, uniqueTestUser, waitForServerAction } from "./helpers";
+import {
+  registerViaUi,
+  selectComboboxOption,
+  uniqueTestUser,
+  waitForServerAction,
+} from "./helpers";
 
 test("search, quick-add to library, and see it reflected on Library, Dashboard, and Activity", async ({
   page,
@@ -13,9 +18,7 @@ test("search, quick-add to library, and see it reflected on Library, Dashboard, 
 
   await expect(page.getByText("Severance", { exact: true })).toBeVisible();
 
-  await page
-    .getByRole("combobox", { name: "Status" })
-    .selectOption("in_progress");
+  await selectComboboxOption(page, "Status", "Watching");
   await waitForServerAction(page, () =>
     page.getByRole("button", { name: "Add" }).click(),
   );

@@ -2,7 +2,7 @@ import { Compass } from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -11,7 +11,11 @@ export default function NotFound() {
         icon={Compass}
         title="Page not found"
         description="The page you're looking for doesn't exist or may have been moved."
-        action={<Button render={<Link href="/" />}>Back to dashboard</Button>}
+        action={
+          <Link href="/" className={buttonVariants()}>
+            Back to dashboard
+          </Link>
+        }
       />
     </div>
   );

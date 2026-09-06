@@ -47,9 +47,9 @@ export const updateStatusSchema = z.object({
 
 export const updateRatingSchema = z.object({
   libraryItemId: z.uuid(),
-  // Empty string clears the rating.
+  // Empty string or "none" clears the rating.
   rating: z.preprocess(
-    (v) => (v === "" ? null : v),
+    (v) => (v === "" || v === "none" ? null : v),
     z.coerce.number().int().min(0).max(10).nullable(),
   ),
 });

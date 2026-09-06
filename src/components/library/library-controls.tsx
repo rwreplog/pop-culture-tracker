@@ -1,9 +1,17 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { LibraryItem } from "@/lib/db/schema/library";
 import type { MediaType } from "@/lib/db/schema/media";
@@ -26,9 +34,6 @@ const STATUSES = [
   "abandoned",
 ] as const;
 
-const selectClassName =
-  "border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:ring-3";
-
 export function LibraryControls({
   mediaId,
   mediaType,
@@ -39,7 +44,7 @@ export function LibraryControls({
   libraryItem: LibraryItem | null;
 }) {
   if (!libraryItem) {
-    return <AddToLibraryForm mediaId={mediaId} />;
+    return <AddToLibraryForm mediaId={mediaId} mediaType={mediaType} />;
   }
 
   return (
@@ -70,7 +75,13 @@ export function LibraryControls({
   );
 }
 
-function AddToLibraryForm({ mediaId }: { mediaId: string }) {
+function AddToLibraryForm({
+  mediaId,
+  mediaType,
+}: {
+  mediaId: string;
+  mediaType: MediaType;
+}) {
   const [state, formAction, isPending] = useActionState(
     addToLibraryAction,
     undefined,
@@ -82,18 +93,22 @@ function AddToLibraryForm({ mediaId }: { mediaId: string }) {
       <label className="sr-only" htmlFor="add-status">
         Status
       </label>
-      <select
-        id="add-status"
-        name="status"
-        defaultValue="want"
-        className={selectClassName}
-      >
-        {STATUSES.map((status) => (
-          <option key={status} value={status}>
-            {libraryStatusLabel(status, "movie")}
-          </option>
-        ))}
-      </select>
+      <Select name="status" defaultValue="want">
+        <SelectTrigger id="add-status">
+          <SelectValue>
+            {(value: (typeof STATUSES)[number]) =>
+              libraryStatusLabel(value, mediaType)
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((status) => (
+            <SelectItem key={status} value={status}>
+              {libraryStatusLabel(status, mediaType)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Button type="submit" disabled={isPending}>
         Add to Library
       </Button>
@@ -117,31 +132,41 @@ function StatusForm({
 }) {
   const [state, formAction] = useActionState(updateStatusAction, undefined);
 
+  function handleValueChange(value: (typeof STATUSES)[number] | null) {
+    if (!value) return;
+    const formData = new FormData();
+    formData.set("libraryItemId", libraryItemId);
+    formData.set("status", value);
+    startTransition(() => formAction(formData));
+  }
+
   return (
-    <form action={formAction} className="flex items-center gap-2">
-      <input type="hidden" name="libraryItemId" value={libraryItemId} />
+    <div className="flex items-center gap-2">
       <label className="sr-only" htmlFor="status">
         Status
       </label>
-      <select
-        id="status"
-        name="status"
-        defaultValue={status}
-        className={selectClassName}
-        onChange={(event) => event.currentTarget.form?.requestSubmit()}
-      >
-        {STATUSES.map((value) => (
-          <option key={value} value={value}>
-            {libraryStatusLabel(value, mediaType)}
-          </option>
-        ))}
-      </select>
+      <Select defaultValue={status} onValueChange={handleValueChange}>
+        <SelectTrigger id="status">
+          <SelectValue>
+            {(value: (typeof STATUSES)[number]) =>
+              libraryStatusLabel(value, mediaType)
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((value) => (
+            <SelectItem key={value} value={value}>
+              {libraryStatusLabel(value, mediaType)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {state?.error ? (
         <p role="alert" className="text-destructive text-sm">
           {state.error}
         </p>
       ) : null}
-    </form>
+    </div>
   );
 }
 
@@ -161,33 +186,47 @@ function RatingForm({
   rating: number | null;
 }) {
   const [state, formAction] = useActionState(updateRatingAction, undefined);
+  const NO_RATING = "none";
+
+  function handleValueChange(value: string | null) {
+    if (!value) return;
+    const formData = new FormData();
+    formData.set("libraryItemId", libraryItemId);
+    formData.set("rating", value === NO_RATING ? "" : value);
+    startTransition(() => formAction(formData));
+  }
 
   return (
-    <form action={formAction} className="flex items-center gap-2">
-      <input type="hidden" name="libraryItemId" value={libraryItemId} />
+    <div className="flex items-center gap-2">
       <label className="sr-only" htmlFor="rating">
         Rating
       </label>
-      <select
-        id="rating"
-        name="rating"
-        defaultValue={rating ?? ""}
-        className={selectClassName}
-        onChange={(event) => event.currentTarget.form?.requestSubmit()}
+      <Select
+        defaultValue={rating ? String(rating) : NO_RATING}
+        onValueChange={handleValueChange}
       >
-        <option value="">No rating</option>
-        {RATING_OPTIONS.filter((value) => value > 0).map((value) => (
-          <option key={value} value={value}>
-            {ratingLabel(value)}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger id="rating">
+          <SelectValue>
+            {(value: string) =>
+              value === NO_RATING ? "No rating" : ratingLabel(Number(value))
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={NO_RATING}>No rating</SelectItem>
+          {RATING_OPTIONS.filter((value) => value > 0).map((value) => (
+            <SelectItem key={value} value={String(value)}>
+              {ratingLabel(value)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {state?.error ? (
         <p role="alert" className="text-destructive text-sm">
           {state.error}
         </p>
       ) : null}
-    </form>
+    </div>
   );
 }
 
@@ -291,7 +330,7 @@ function ProgressForm({
             >
               {field.label}
             </label>
-            <input
+            <Input
               id={field.name}
               name={field.name}
               type={field.type}
@@ -300,7 +339,7 @@ function ProgressForm({
                   ? String(progress[field.name])
                   : ""
               }
-              className={`${selectClassName} w-28`}
+              className="w-28"
             />
           </div>
         ))}

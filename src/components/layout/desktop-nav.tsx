@@ -24,13 +24,17 @@ export function DesktopNav() {
             href={item.href}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
-              isActive && "bg-accent text-accent-foreground",
+              "before:bg-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:opacity-0 before:transition-opacity",
+              isActive && "bg-accent text-accent-foreground before:opacity-100",
             )}
           >
-            <item.icon className="size-4" aria-hidden="true" />
+            <item.icon
+              className={cn("size-4", isActive && "text-primary")}
+              aria-hidden="true"
+            />
             {item.label}
           </Link>
         );

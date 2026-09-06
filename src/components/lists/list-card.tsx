@@ -18,7 +18,7 @@ export function ListCard({
   return (
     <Link
       href={`/lists/${id}`}
-      className="focus-visible:ring-ring border-border flex flex-col gap-3 rounded-lg border p-4 outline-none focus-visible:ring-2"
+      className="focus-visible:ring-ring border-border group hover:border-foreground/20 hover:bg-muted/40 flex flex-col gap-3 rounded-lg border p-4 transition-colors outline-none focus-visible:ring-2"
     >
       <div className="grid grid-cols-4 gap-1">
         {Array.from({ length: 4 }).map((_, index) => {
@@ -34,7 +34,7 @@ export function ListCard({
         })}
       </div>
       <div className="flex flex-col gap-0.5">
-        <span className="font-medium">{name}</span>
+        <span className="font-medium group-hover:underline">{name}</span>
         {description ? (
           <p className="text-muted-foreground line-clamp-2 text-sm">
             {description}

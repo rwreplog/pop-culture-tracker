@@ -4,6 +4,13 @@ import { useActionState } from "react";
 
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { resolveMediaAction } from "@/lib/actions/media";
 import { quickAddToLibraryAction } from "@/lib/actions/library";
 import { libraryStatusLabel } from "@/lib/media/labels";
@@ -60,7 +67,7 @@ export function SearchResultCard({
   );
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex h-full flex-col gap-2">
       <form action={viewAction}>
         <HiddenResultFields result={result} />
         <button
@@ -68,38 +75,51 @@ export function SearchResultCard({
           disabled={viewPending}
           className="focus-visible:ring-ring group flex w-full flex-col gap-2 rounded-lg text-left outline-none focus-visible:ring-2 disabled:opacity-50"
         >
-          <MediaArtwork
-            src={result.imageUrl}
-            title={result.title}
-            className="aspect-2/3 w-full"
-          />
-          <span className="line-clamp-2 text-sm leading-tight font-medium group-hover:underline">
+          <div className="overflow-hidden rounded-lg ring-1 ring-black/5 transition-shadow group-hover:shadow-lg group-hover:ring-black/10 dark:ring-white/10 dark:group-hover:ring-white/15">
+            <MediaArtwork
+              src={result.imageUrl}
+              title={result.title}
+              className="aspect-2/3 w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
+            />
+          </div>
+          <span className="line-clamp-2 min-h-9 text-sm leading-tight font-medium group-hover:underline">
             {result.title}
           </span>
         </button>
       </form>
 
       <span className="text-muted-foreground text-xs">
-        {result.releaseDate ? result.releaseDate.split("-")[0] : null}
+        {result.releaseDate ? result.releaseDate.split("-")[0] : " "}
       </span>
 
-      <form action={addAction} className="flex items-center gap-1">
+      <form
+        action={addAction}
+        className="mt-auto flex min-w-0 items-center gap-1"
+      >
         <HiddenResultFields result={result} />
         <label className="sr-only" htmlFor={`status-${result.externalId}`}>
           Status
         </label>
-        <select
-          id={`status-${result.externalId}`}
-          name="status"
-          defaultValue="want"
-          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 min-w-0 flex-1 rounded-lg border bg-transparent px-2 py-1 text-xs outline-none focus-visible:ring-3"
-        >
-          {STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {libraryStatusLabel(status, result.mediaType)}
-            </option>
-          ))}
-        </select>
+        <Select name="status" defaultValue="want">
+          <SelectTrigger
+            id={`status-${result.externalId}`}
+            size="sm"
+            className="min-w-0 flex-1"
+          >
+            <SelectValue>
+              {(value: (typeof STATUSES)[number]) =>
+                libraryStatusLabel(value, result.mediaType)
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {STATUSES.map((status) => (
+              <SelectItem key={status} value={status}>
+                {libraryStatusLabel(status, result.mediaType)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button type="submit" size="sm" disabled={addPending}>
           Add
         </Button>

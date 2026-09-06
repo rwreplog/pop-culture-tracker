@@ -129,8 +129,7 @@ function buildAnnualSummary(
 ): AnnualSummary {
   const completedThisYear = items.filter(
     (item) =>
-      item.status === "completed" &&
-      item.completedAt?.getFullYear() === year,
+      item.status === "completed" && item.completedAt?.getFullYear() === year,
   );
 
   const byMediaType: Record<MediaType, number> = {

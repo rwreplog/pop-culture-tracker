@@ -5,7 +5,7 @@ import { ActivityItem } from "@/components/activity/activity-item";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { MediaCard } from "@/components/media/media-card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getActivityFeed } from "@/lib/services/activity/queries";
 import { getDashboardSections } from "@/lib/services/library/queries";
@@ -41,7 +41,9 @@ export default async function HomePage() {
         title="Welcome to Geekery"
         description="Search Discover to add your first movie, show, game, book, or comic."
         action={
-          <Button render={<Link href="/discover" />}>Go to Discover</Button>
+          <Link href="/discover" className={buttonVariants()}>
+            Go to Discover
+          </Link>
         }
       />
     );
