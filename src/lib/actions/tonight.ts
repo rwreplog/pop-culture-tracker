@@ -33,7 +33,7 @@ export async function skipTonightPickAction(formData: FormData) {
       ? `?type=${parsed.data.mediaType}`
       : "";
 
-  console.log("DEBUG skipTonightPickAction", {
+  console.error("DEBUG skipTonightPickAction", {
     success: parsed.success,
     error: parsed.success ? undefined : parsed.error.flatten(),
     raw: formData.get("libraryItemId"),
@@ -43,7 +43,7 @@ export async function skipTonightPickAction(formData: FormData) {
     const cookieStore = await cookies();
     const before = cookieStore.get(SKIP_COOKIE_NAME)?.value;
     const updated = addSkip(before, parsed.data.libraryItemId);
-    console.log("DEBUG skip cookie", { before, updated });
+    console.error("DEBUG skip cookie", { before, updated });
     cookieStore.set(SKIP_COOKIE_NAME, updated, {
       maxAge: SKIP_COOKIE_MAX_AGE_SECONDS,
       httpOnly: true,

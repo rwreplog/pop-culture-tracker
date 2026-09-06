@@ -52,7 +52,7 @@ export default async function TonightPage({
   const cookieStore = await cookies();
   const skippedIds = getSkippedIds(cookieStore.get(SKIP_COOKIE_NAME)?.value);
   const unskipped = allCandidates.filter((item) => !skippedIds.has(item.id));
-  console.log("DEBUG tonight render", {
+  console.error("DEBUG tonight render", {
     cookieRaw: cookieStore.get(SKIP_COOKIE_NAME)?.value,
     skippedIds: [...skippedIds],
     allIds: allCandidates.map((c) => c.id),
