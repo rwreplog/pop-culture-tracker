@@ -6,7 +6,10 @@ import { AnnualSummaryCard } from "@/components/stats/annual-summary-card";
 import { CountBarList } from "@/components/stats/count-bar-list";
 import { StatsOverviewCards } from "@/components/stats/stats-overview-cards";
 import { auth } from "@/lib/auth";
-import { getActivityChartData, getInsights } from "@/lib/services/insights/queries";
+import {
+  getActivityChartData,
+  getInsights,
+} from "@/lib/services/insights/queries";
 
 export default async function StatsPage() {
   const session = await auth();
@@ -43,18 +46,14 @@ export default async function StatsPage() {
 
       {insights.genreBreakdown.length > 0 ? (
         <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">
-            Top genres
-          </h2>
+          <h2 className="text-lg font-semibold tracking-tight">Top genres</h2>
           <CountBarList entries={insights.genreBreakdown} />
         </section>
       ) : null}
 
       {insights.topCreators.length > 0 ? (
         <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">
-            Top creators
-          </h2>
+          <h2 className="text-lg font-semibold tracking-tight">Top creators</h2>
           <CountBarList entries={insights.topCreators} />
         </section>
       ) : null}

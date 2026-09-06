@@ -12,9 +12,8 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { getInsights, getActivityChartData } = await import(
-  "@/lib/services/insights/queries"
-);
+const { getInsights, getActivityChartData } =
+  await import("@/lib/services/insights/queries");
 
 function makeItem(overrides: Record<string, unknown> = {}) {
   return {
@@ -117,7 +116,10 @@ describe("getInsights", () => {
       makeItem({
         media: {
           ...makeItem().media,
-          metadata: { creator: "Denis Villeneuve", genres: ["Sci-Fi", "Adventure"] },
+          metadata: {
+            creator: "Denis Villeneuve",
+            genres: ["Sci-Fi", "Adventure"],
+          },
         },
       }),
       makeItem({
