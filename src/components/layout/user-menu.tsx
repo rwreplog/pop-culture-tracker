@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,14 +22,12 @@ function initials(user: HeaderUser) {
 export function UserMenu({ user }: { user?: HeaderUser }) {
   if (!user) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        nativeButton={false}
-        render={<Link href="/login" />}
+      <Link
+        href="/login"
+        className={buttonVariants({ variant: "ghost", size: "sm" })}
       >
         Sign in
-      </Button>
+      </Link>
     );
   }
 

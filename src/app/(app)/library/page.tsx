@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LibraryFilters } from "@/components/library/library-filters";
 import { MediaCard } from "@/components/media/media-card";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { getLibraryItems } from "@/lib/services/library/queries";
@@ -68,9 +68,9 @@ export default async function LibraryPage({
           title="Nothing here yet"
           description="Search Discover to add movies, shows, games, books, and comics to your library."
           action={
-            <Button nativeButton={false} render={<Link href="/discover" />}>
+            <Link href="/discover" className={buttonVariants()}>
               Go to Discover
-            </Button>
+            </Link>
           }
         />
       ) : (

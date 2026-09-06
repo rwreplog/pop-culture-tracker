@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ListItemRow } from "@/components/lists/list-item-row";
 import { auth } from "@/lib/auth";
 import { deleteListAction } from "@/lib/actions/lists";
@@ -46,13 +46,12 @@ export default async function ListDetailPage({
           <p className="text-muted-foreground text-sm">
             This list is empty. Add items from a media page.
           </p>
-          <Button
-            variant="outline"
-            nativeButton={false}
-            render={<Link href="/discover" />}
+          <Link
+            href="/discover"
+            className={buttonVariants({ variant: "outline" })}
           >
             Go to Discover
-          </Button>
+          </Link>
         </div>
       ) : (
         <ul className="flex flex-col gap-2">
