@@ -110,6 +110,7 @@ export async function updateStatusAction(
   revalidatePath("/library");
   revalidatePath("/");
   revalidatePath("/activity");
+  revalidatePath("/tonight");
 }
 
 export async function updateRatingAction(

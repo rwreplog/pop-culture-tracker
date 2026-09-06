@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import type { MediaType } from "@/lib/db/schema/media";
 import { libraryItems } from "@/lib/db/schema/library";
+import { rankBacklog } from "@/lib/services/recommendations/scoring";
 
 type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
 
@@ -66,9 +67,7 @@ export async function getDashboardSections(userId: string) {
     continueItems: items
       .filter((item) => item.status === "in_progress")
       .slice(0, SECTION_LIMIT),
-    queue: items
-      .filter((item) => item.status === "want")
-      .slice(0, SECTION_LIMIT),
+    queue: rankBacklog(items).slice(0, SECTION_LIMIT),
     recentlyCompleted: completed.slice(0, SECTION_LIMIT),
     favorites: items.filter((item) => item.isFavorite).slice(0, SECTION_LIMIT),
   };
