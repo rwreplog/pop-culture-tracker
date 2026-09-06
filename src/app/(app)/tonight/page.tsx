@@ -1,0 +1,180 @@
+import { Moon } from "lucide-react";
+import Link from "next/link";
+
+import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { MediaArtwork } from "@/components/media/media-artwork";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
+import type { MediaType } from "@/lib/db/schema/media";
+import { updateStatusAction } from "@/lib/actions/library";
+import { getMediaGenres } from "@/lib/media/metadata";
+import { mediaTypeLabel } from "@/lib/media/labels";
+import { getSmartBacklog } from "@/lib/services/recommendations/queries";
+import { cn } from "@/lib/utils";
+
+const MEDIA_TYPES: MediaType[] = ["movie", "tv", "game", "book", "comic"];
+
+function buildHref(params: { skip?: number; type?: MediaType }) {
+  const search = new URLSearchParams();
+  if (params.skip) search.set("skip", String(params.skip));
+  if (params.type) search.set("type", params.type);
+  const query = search.toString();
+  return query ? `/tonight?${query}` : "/tonight";
+}
+
+export default async function TonightPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ skip?: string; type?: string }>;
+}) {
+  const { skip: skipParam, type } = await searchParams;
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return (
+      <PlaceholderScreen
+        icon={Moon}
+        title="What should I do tonight?"
+        description="Sign in to get a pick from your backlog."
+      />
+    );
+  }
+
+  const mediaType = MEDIA_TYPES.includes(type as MediaType)
+    ? (type as MediaType)
+    : undefined;
+
+  const candidates = await getSmartBacklog(session.user.id, { mediaType });
+
+  return (
+    <div className="mx-auto flex max-w-md flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl font-semibold tracking-tight">
+          What should I do tonight?
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          A pick from your backlog, based on what you&apos;ve liked before.
+        </p>
+      </div>
+
+      <nav aria-label="Media type" className="flex flex-wrap gap-1">
+        <Link
+          href={buildHref({})}
+          className={cn(
+            "rounded-full px-3 py-1.5 text-sm font-medium",
+            !mediaType
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          )}
+        >
+          All
+        </Link>
+        {MEDIA_TYPES.map((value) => (
+          <Link
+            key={value}
+            href={buildHref({ type: value })}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-sm font-medium",
+              value === mediaType
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            {mediaTypeLabel(value)}
+          </Link>
+        ))}
+      </nav>
+
+      {candidates.length === 0 ? (
+        <PlaceholderScreen
+          icon={Moon}
+          title="Nothing to suggest yet"
+          description={
+            mediaType
+              ? `Add something to your ${mediaTypeLabel(mediaType).toLowerCase()} backlog to get a pick.`
+              : "Add something to your backlog to get a pick."
+          }
+          action={
+            <Link href="/discover" className={buttonVariants()}>
+              Go to Discover
+            </Link>
+          }
+        />
+      ) : (
+        (() => {
+          const skip = Number(skipParam) || 0;
+          const index = skip % candidates.length;
+          const pick = candidates[index];
+          const releaseYear = pick.media.releaseDate?.split("-")[0] ?? null;
+          const genres = getMediaGenres(pick.media);
+
+          return (
+            <div className="flex flex-col gap-4 rounded-xl border p-4">
+              <div className="flex gap-4">
+                <MediaArtwork
+                  src={pick.media.imageUrl}
+                  title={pick.media.title}
+                  className="h-40 w-28 shrink-0"
+                />
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                    {mediaTypeLabel(pick.media.mediaType)}
+                    {releaseYear ? ` · ${releaseYear}` : ""}
+                  </span>
+                  <Link
+                    href={`/media/${pick.mediaId}`}
+                    className="font-semibold hover:underline"
+                  >
+                    {pick.media.title}
+                  </Link>
+                  {genres.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {genres.slice(0, 3).map((genre) => (
+                        <Badge key={genre} variant="secondary">
+                          {genre}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null}
+                  <p className="text-muted-foreground text-sm">
+                    {pick.reason}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <form
+                  action={async (formData: FormData) => {
+                    "use server";
+                    await updateStatusAction(undefined, formData);
+                  }}
+                >
+                  <input
+                    type="hidden"
+                    name="libraryItemId"
+                    value={pick.id}
+                  />
+                  <input type="hidden" name="status" value="in_progress" />
+                  <Button type="submit">Start tonight</Button>
+                </form>
+                <Link
+                  href={buildHref({ skip: skip + 1, type: mediaType })}
+                  className={cn(buttonVariants({ variant: "outline" }))}
+                >
+                  Show me something else
+                </Link>
+                <Link
+                  href={`/media/${pick.mediaId}`}
+                  className="text-muted-foreground text-sm hover:underline"
+                >
+                  View details
+                </Link>
+              </div>
+            </div>
+          );
+        })()
+      )}
+    </div>
+  );
+}

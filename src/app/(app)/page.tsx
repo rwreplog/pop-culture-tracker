@@ -1,4 +1,4 @@
-import { Compass } from "lucide-react";
+import { Compass, Moon } from "lucide-react";
 import Link from "next/link";
 
 import { ActivityItem } from "@/components/activity/activity-item";
@@ -51,6 +51,23 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-8">
+      {sections.queue.length > 0 ? (
+        <Link
+          href="/tonight"
+          className="border-border bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl border p-4 transition-colors"
+        >
+          <div className="bg-background flex size-10 shrink-0 items-center justify-center rounded-full">
+            <Moon className="text-muted-foreground size-5" aria-hidden="true" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold">What should I do tonight?</span>
+            <span className="text-muted-foreground text-sm">
+              Get a pick from your backlog
+            </span>
+          </div>
+        </Link>
+      ) : null}
+
       {sections.continueItems.length > 0 ? (
         <DashboardSection title="Continue">
           {sections.continueItems.map((item) => (

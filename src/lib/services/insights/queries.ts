@@ -3,14 +3,11 @@ import { and, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { activity } from "@/lib/db/schema/activity";
 import type { MediaType } from "@/lib/db/schema/media";
+import { getMediaCreator, getMediaGenres } from "@/lib/media/metadata";
 import { getLibraryItems } from "@/lib/services/library/queries";
 
 type LibraryItemWithMedia = Awaited<ReturnType<typeof getLibraryItems>>[number];
 type LibraryStatus = LibraryItemWithMedia["status"];
-
-function mediaMetadata(item: LibraryItemWithMedia) {
-  return (item.media.metadata ?? {}) as { creator?: string; genres?: string[] };
-}
 
 export type CountEntry = { name: string; count: number };
 
@@ -84,7 +81,7 @@ function buildGenreBreakdown(
 ): CountEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {
-    for (const genre of mediaMetadata(item).genres ?? []) {
+    for (const genre of getMediaGenres(item.media)) {
       counts.set(genre, (counts.get(genre) ?? 0) + 1);
     }
   }
@@ -97,7 +94,7 @@ function buildTopCreators(
 ): CountEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {
-    const creator = mediaMetadata(item).creator;
+    const creator = getMediaCreator(item.media);
     if (creator) counts.set(creator, (counts.get(creator) ?? 0) + 1);
   }
   return topEntries(counts, limit);
