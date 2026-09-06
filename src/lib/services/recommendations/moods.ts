@@ -40,3 +40,29 @@ export const MOOD_GENRES: Record<Mood, string[]> = {
 export function isMood(value: string | undefined): value is Mood {
   return !!value && (MOODS as readonly string[]).includes(value);
 }
+
+/**
+ * Sentinel `mood` query value for "explicitly no mood" (the "Any mood"
+ * link), distinct from the param being absent — which means the caller
+ * should fall back to {@link getAutoMood} instead.
+ */
+export const NO_MOOD = "none";
+
+/**
+ * A default mood guess from the current time, used when the user hasn't
+ * picked one explicitly. Three broad, deliberately simple buckets: wound
+ * down for a late night, up for something bigger on a free weekend, and
+ * easy/low-commitment on a weeknight otherwise.
+ */
+export function getAutoMood(date: Date): Mood {
+  const day = date.getDay();
+  const hour = date.getHours();
+
+  const isLateNight = hour >= 22 || hour < 5;
+  if (isLateNight) return "cozy";
+
+  const isWeekend = day === 0 || day === 6 || (day === 5 && hour >= 17);
+  if (isWeekend) return "thoughtful";
+
+  return "light";
+}

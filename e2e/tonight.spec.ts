@@ -72,6 +72,10 @@ test("picking a mood filters and explains the pick, and resets via Any mood", as
   await expect(
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
+  // No `mood` param yet, so a time-of-day guess is applied automatically.
+  await expect(
+    page.getByText(/Based on the time, we're leaning/),
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Something thoughtful" }).click();
   await page.waitForURL(/mood=thoughtful/);
@@ -79,10 +83,17 @@ test("picking a mood filters and explains the pick, and resets via Any mood", as
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
   await expect(page.getByText('Fits "Something thoughtful"')).toBeVisible();
+  // An explicit mood choice replaces the time-of-day hint.
+  await expect(
+    page.getByText(/Based on the time, we're leaning/),
+  ).not.toBeVisible();
 
   await page.getByRole("link", { name: "Any mood" }).click();
-  await page.waitForURL((url) => !url.search.includes("mood="));
+  await page.waitForURL(/mood=none/);
   await expect(
     page.getByRole("button", { name: "Start tonight" }),
   ).toBeVisible();
+  await expect(
+    page.getByText(/Based on the time, we're leaning/),
+  ).not.toBeVisible();
 });
