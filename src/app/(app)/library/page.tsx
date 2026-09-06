@@ -68,7 +68,9 @@ export default async function LibraryPage({
           title="Nothing here yet"
           description="Search Discover to add movies, shows, games, books, and comics to your library."
           action={
-            <Button render={<Link href="/discover" />}>Go to Discover</Button>
+            <Button nativeButton={false} render={<Link href="/discover" />}>
+              Go to Discover
+            </Button>
           }
         />
       ) : (

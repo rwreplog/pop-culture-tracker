@@ -46,7 +46,11 @@ export default async function ListDetailPage({
           <p className="text-muted-foreground text-sm">
             This list is empty. Add items from a media page.
           </p>
-          <Button variant="outline" render={<Link href="/discover" />}>
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={<Link href="/discover" />}
+          >
             Go to Discover
           </Button>
         </div>

@@ -41,7 +41,9 @@ export default async function HomePage() {
         title="Welcome to Geekery"
         description="Search Discover to add your first movie, show, game, book, or comic."
         action={
-          <Button render={<Link href="/discover" />}>Go to Discover</Button>
+          <Button nativeButton={false} render={<Link href="/discover" />}>
+            Go to Discover
+          </Button>
         }
       />
     );

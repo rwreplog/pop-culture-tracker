@@ -36,11 +36,11 @@ export function MediaCard({
       href={href}
       className="focus-visible:ring-ring group flex flex-col gap-2 rounded-lg outline-none focus-visible:ring-2"
     >
-      <div className="relative">
+      <div className="relative overflow-hidden rounded-lg ring-1 ring-black/5 transition-shadow group-hover:shadow-lg group-hover:ring-black/10 dark:ring-white/10 dark:group-hover:ring-white/15">
         <MediaArtwork
           src={imageUrl}
           title={title}
-          className="aspect-2/3 w-full"
+          className="aspect-2/3 w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
         />
         {isFavorite ? (
           <Heart

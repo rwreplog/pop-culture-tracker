@@ -41,3 +41,17 @@ export async function waitForServerAction(
     trigger(),
   ]);
 }
+
+/**
+ * Our `Select` components are Base UI comboboxes, not native `<select>`
+ * elements, so `.selectOption()` doesn't apply. Open the trigger and click
+ * the option by its visible label instead.
+ */
+export async function selectComboboxOption(
+  page: Page,
+  comboboxName: string,
+  optionName: string | RegExp,
+) {
+  await page.getByRole("combobox", { name: comboboxName }).click();
+  await page.getByRole("option", { name: optionName }).click();
+}

@@ -45,7 +45,9 @@ export default async function ActivityPage() {
         title="No activity yet"
         description="Adding, rating, and updating media you're tracking will show up here."
         action={
-          <Button render={<Link href="/discover" />}>Go to Discover</Button>
+          <Button nativeButton={false} render={<Link href="/discover" />}>
+            Go to Discover
+          </Button>
         }
       />
     );

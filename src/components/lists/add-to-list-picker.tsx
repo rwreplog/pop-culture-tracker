@@ -3,6 +3,13 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { addItemToListAction } from "@/lib/actions/lists";
 
 export function AddToListPicker({
@@ -25,17 +32,22 @@ export function AddToListPicker({
       <label className="sr-only" htmlFor="add-to-list">
         Add to list
       </label>
-      <select
-        id="add-to-list"
-        name="listId"
-        className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:ring-3"
-      >
-        {ownedLists.map((list) => (
-          <option key={list.id} value={list.id}>
-            {list.name}
-          </option>
-        ))}
-      </select>
+      <Select name="listId" defaultValue={ownedLists[0].id}>
+        <SelectTrigger id="add-to-list">
+          <SelectValue>
+            {(value: string) =>
+              ownedLists.find((list) => list.id === value)?.name
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {ownedLists.map((list) => (
+            <SelectItem key={list.id} value={list.id}>
+              {list.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Button type="submit" variant="outline" disabled={isPending}>
         Add to List
       </Button>

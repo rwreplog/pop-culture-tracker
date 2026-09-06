@@ -11,7 +11,11 @@ export default function NotFound() {
         icon={Compass}
         title="Page not found"
         description="The page you're looking for doesn't exist or may have been moved."
-        action={<Button render={<Link href="/" />}>Back to dashboard</Button>}
+        action={
+          <Button nativeButton={false} render={<Link href="/" />}>
+            Back to dashboard
+          </Button>
+        }
       />
     </div>
   );
