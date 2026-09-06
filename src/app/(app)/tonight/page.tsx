@@ -16,6 +16,8 @@ import { getSmartBacklog } from "@/lib/services/recommendations/queries";
 import {
   MOODS,
   MOOD_LABELS,
+  NO_MOOD,
+  getAutoMood,
   isMood,
 } from "@/lib/services/recommendations/moods";
 import {
@@ -55,7 +57,13 @@ export default async function TonightPage({
   const mediaType = MEDIA_TYPES.includes(type as MediaType)
     ? (type as MediaType)
     : undefined;
-  const mood = isMood(moodParam) ? moodParam : undefined;
+  // No `mood` param at all means the user hasn't weighed in yet, so default
+  // to a time-of-day guess; `mood=none` ("Any mood") explicitly opts out.
+  const mood = isMood(moodParam)
+    ? moodParam
+    : moodParam === NO_MOOD
+      ? undefined
+      : getAutoMood(new Date());
 
   const allCandidates = await getSmartBacklog(session.user.id, {
     mediaType,
@@ -110,7 +118,7 @@ export default async function TonightPage({
 
       <nav aria-label="Mood" className="flex flex-wrap gap-1">
         <Link
-          href={buildHref({ type: mediaType })}
+          href={buildHref({ type: mediaType, mood: NO_MOOD })}
           className={cn(
             "rounded-full border px-3 py-1.5 text-sm font-medium",
             !mood
@@ -135,6 +143,12 @@ export default async function TonightPage({
           </Link>
         ))}
       </nav>
+      {moodParam === undefined && mood ? (
+        <p className="text-muted-foreground -mt-4 text-xs">
+          Based on the time, we&apos;re leaning{" "}
+          {MOOD_LABELS[mood].toLowerCase()}.
+        </p>
+      ) : null}
 
       {candidates.length === 0 ? (
         <PlaceholderScreen
