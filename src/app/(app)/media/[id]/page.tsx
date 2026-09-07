@@ -41,52 +41,65 @@ export default async function MediaDetailPage({
   const metadata = item.metadata as MediaMetadata | null;
   const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
+  const artUrl = customArtUrl ?? item.imageUrl;
+
   return (
-    <div className="relative mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row">
-      <div className="dark:bg-primary/15 pointer-events-none absolute -top-16 -left-24 -z-10 size-72 rounded-full blur-3xl" />
-      <div className="ring-foreground/10 shrink-0 self-start overflow-hidden rounded-2xl shadow-[0_24px_48px_-24px_rgba(0,0,0,0.6)] ring-1 dark:shadow-[0_24px_48px_-20px_var(--primary)]">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+      <div className="relative -mx-4 -mt-6 h-[440px] w-[calc(100%+2rem)] overflow-hidden md:mx-0 md:mt-0 md:h-[380px] md:w-full md:rounded-3xl">
         <MediaArtwork
-          src={customArtUrl ?? item.imageUrl}
+          src={artUrl}
           title={item.title}
-          className="h-72 w-48 shrink-0"
+          className="absolute inset-0 h-full w-full scale-110 rounded-none object-cover opacity-70 blur-2xl"
         />
+        <div className="from-background via-background/55 to-background/10 absolute inset-0 bg-gradient-to-t" />
+        <div className="absolute inset-0 flex items-end justify-center pt-10 pb-36 md:pb-28">
+          <MediaArtwork
+            src={artUrl}
+            title={item.title}
+            className="h-full max-h-56 w-auto rounded-2xl shadow-[0_24px_48px_-16px_rgba(0,0,0,0.7)] ring-1 ring-white/10 md:max-h-52"
+          />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 md:p-6">
+          <span className="text-primary text-xs font-semibold tracking-wide uppercase">
+            {[mediaTypeLabel(item.mediaType), releaseYear]
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
+          <h1 className="text-3xl font-semibold tracking-tight text-balance">
+            {item.title}
+          </h1>
+          {metadata?.creator ? (
+            <p className="text-muted-foreground text-sm">
+              {metadata.creator}
+            </p>
+          ) : null}
+          {metadata?.genres && metadata.genres.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {metadata.genres.map((genre) => (
+                <Badge key={genre} variant="secondary">
+                  {genre}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <span className="text-primary text-xs font-semibold tracking-wide uppercase">
-          {mediaTypeLabel(item.mediaType)}
-        </span>
-        <h1 className="text-3xl font-semibold tracking-tight">{item.title}</h1>
-        <p className="text-muted-foreground text-sm">
-          {[metadata?.creator, releaseYear].filter(Boolean).join(" · ")}
-        </p>
-        {metadata?.genres && metadata.genres.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {metadata.genres.map((genre) => (
-              <Badge key={genre} variant="secondary">
-                {genre}
-              </Badge>
-            ))}
-          </div>
-        ) : null}
+      <div className="flex flex-col gap-4">
         {item.description ? (
           <p className="text-sm">{item.description}</p>
         ) : null}
-        <div className="pt-2">
-          <LibraryControls
-            mediaId={item.id}
-            mediaType={item.mediaType}
-            libraryItem={libraryItem}
-          />
-        </div>
-        <div className="pt-2">
-          <AddToListPicker
-            mediaId={item.id}
-            ownedLists={ownedLists.map((list) => ({
-              id: list.id,
-              name: list.name,
-            }))}
-          />
-        </div>
+        <LibraryControls
+          mediaId={item.id}
+          mediaType={item.mediaType}
+          libraryItem={libraryItem}
+        />
+        <AddToListPicker
+          mediaId={item.id}
+          ownedLists={ownedLists.map((list) => ({
+            id: list.id,
+            name: list.name,
+          }))}
+        />
       </div>
     </div>
   );
