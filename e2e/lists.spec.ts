@@ -61,12 +61,16 @@ test("create a list, add items, reorder, remove, and delete", async ({
     .filter({ hasText: "Severance" })
     .getByRole("button", { name: "Remove from list" })
     .click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Remove", exact: true }).click(),
+  );
   await expect(page.getByText("Severance", { exact: true })).not.toBeVisible();
   await expect(
     page.getByText("Project Hail Mary", { exact: true }),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Delete list" }).click();
+  await page.getByRole("button", { name: "Delete", exact: true }).click();
   await page.waitForURL("/lists");
   await expect(page.getByText("My List")).not.toBeVisible();
 });

@@ -39,5 +39,8 @@ test("create a goal, track progress as items are completed, then delete it", asy
   await expect(page.getByText("1 of 1 completed — achieved!")).toBeVisible();
 
   await page.getByRole("button", { name: "Delete goal" }).click();
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Delete", exact: true }).click(),
+  );
   await expect(page.getByText(/Movies in \d{4}/)).not.toBeVisible();
 });
