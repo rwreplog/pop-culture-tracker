@@ -22,9 +22,8 @@ test("activity shows an empty state, then entries after adding and rating an ite
   await waitForServerAction(page, () =>
     page.getByRole("button", { name: "Add to Library" }).click(),
   );
-  await page.getByRole("combobox", { name: "Rating" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("option", { name: "4 stars" }).click(),
+    page.getByRole("radio", { name: "Rate 4 stars" }).click(),
   );
 
   await page.goto("/activity");
