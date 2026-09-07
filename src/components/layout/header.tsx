@@ -1,8 +1,11 @@
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export type HeaderUser = {
   id: string;
@@ -30,6 +33,18 @@ export function Header({ user }: { user?: HeaderUser }) {
       </Link>
 
       <div className="flex items-center gap-2">
+        {user ? (
+          <Link
+            href="/discover"
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "hidden md:inline-flex",
+            )}
+          >
+            <Plus data-icon="inline-start" aria-hidden="true" />
+            Add
+          </Link>
+        ) : null}
         <ThemeToggle />
         <UserMenu user={user} />
       </div>

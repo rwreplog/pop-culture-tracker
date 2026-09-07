@@ -85,6 +85,7 @@ export default async function LibraryPage({
               imageUrl={item.media.imageUrl}
               status={item.status}
               isFavorite={item.isFavorite}
+              libraryItemId={item.id}
             />
           ))}
         </div>

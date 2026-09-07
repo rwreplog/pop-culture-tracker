@@ -83,6 +83,7 @@ export default async function HomePage() {
                 imageUrl={item.media.imageUrl}
                 status={item.status}
                 isFavorite={item.isFavorite}
+                libraryItemId={item.id}
               />
             </div>
           ))}
@@ -101,6 +102,7 @@ export default async function HomePage() {
                 imageUrl={item.media.imageUrl}
                 status={item.status}
                 isFavorite={item.isFavorite}
+                libraryItemId={item.id}
               />
             </div>
           ))}
@@ -119,6 +121,7 @@ export default async function HomePage() {
                 imageUrl={item.media.imageUrl}
                 status={item.status}
                 isFavorite={item.isFavorite}
+                libraryItemId={item.id}
               />
             </div>
           ))}
@@ -137,6 +140,7 @@ export default async function HomePage() {
                 imageUrl={item.media.imageUrl}
                 status={item.status}
                 isFavorite={item.isFavorite}
+                libraryItemId={item.id}
               />
             </div>
           ))}

@@ -8,7 +8,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/80 dark:bg-linear-to-br dark:from-primary dark:to-accent-2 dark:shadow-[0_8px_20px_-8px_var(--primary)] dark:hover:brightness-110 dark:hover:shadow-[0_10px_26px_-6px_var(--primary)]",
+          "bg-primary text-primary-foreground hover:bg-primary/80 dark:bg-linear-to-br dark:from-primary dark:to-accent-2 dark:hover:brightness-110",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
@@ -25,10 +25,11 @@ const buttonVariants = cva(
         xs: "h-6 gap-1 px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-9 gap-1 px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-11 gap-1.5 px-3 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5",
-        icon: "size-10 in-data-[slot=button-group]:rounded-lg",
+        icon: "relative size-10 in-data-[slot=button-group]:rounded-lg after:absolute after:-inset-0.5 after:content-['']",
         "icon-xs":
-          "size-6 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-9 in-data-[slot=button-group]:rounded-lg",
+          "relative size-6 in-data-[slot=button-group]:rounded-lg after:absolute after:-inset-2.5 after:content-[''] [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm":
+          "relative size-9 in-data-[slot=button-group]:rounded-lg after:absolute after:-inset-1 after:content-['']",
         "icon-lg": "size-11 in-data-[slot=button-group]:rounded-lg",
       },
     },
