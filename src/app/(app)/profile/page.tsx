@@ -1,14 +1,17 @@
-import { Activity, ListChecks, Settings, User } from "lucide-react";
+import { Activity, ListChecks, Settings, User, Users } from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { EditProfileForm } from "@/components/profile/edit-profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { signOutAction } from "@/lib/auth/actions";
+import { getUserById } from "@/lib/services/users/queries";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "/friends", label: "Friends", icon: Users },
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/activity", label: "Activity", icon: Activity },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -33,6 +36,8 @@ export default async function ProfilePage() {
     );
   }
 
+  const profile = await getUserById(user.id);
+
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-6">
       <div className="flex items-center gap-4">
@@ -51,8 +56,21 @@ export default async function ProfilePage() {
               {user.email}
             </p>
           ) : null}
+          {profile?.handle ? (
+            <Link
+              href={`/u/${profile.handle}`}
+              className="text-primary text-sm hover:underline"
+            >
+              View public profile
+            </Link>
+          ) : null}
         </div>
       </div>
+
+      <EditProfileForm
+        handle={profile?.handle ?? null}
+        bio={profile?.bio ?? null}
+      />
 
       <nav aria-label="Profile" className="flex flex-col gap-2">
         {LINKS.map((link) => (

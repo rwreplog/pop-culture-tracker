@@ -10,6 +10,7 @@ import { accounts, users } from "@/lib/db/schema";
 import { env } from "@/lib/env";
 import { loginSchema } from "@/lib/schemas/auth";
 import { verifyPassword } from "@/lib/services/auth/password";
+import { generateUniqueHandle } from "@/lib/services/users/handle";
 
 declare module "next-auth" {
   interface Session {
@@ -22,6 +23,19 @@ declare module "next-auth" {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db, { usersTable: users, accountsTable: accounts }),
+  events: {
+    /**
+     * Only fires for adapter-created users, i.e. OAuth sign-up (the
+     * Credentials path inserts its own row directly in registerUser and
+     * sets a handle there) — DrizzleAdapter's insert doesn't know about
+     * our extra `handle` column, so it's backfilled right after.
+     */
+    async createUser({ user }) {
+      if (!user.id) return;
+      const handle = await generateUniqueHandle(user.name || user.email || "");
+      await db.update(users).set({ handle }).where(eq(users.id, user.id));
+    },
+  },
   providers: [
     Credentials({
       credentials: {

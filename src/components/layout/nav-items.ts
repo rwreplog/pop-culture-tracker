@@ -10,6 +10,7 @@ import {
   Settings,
   Target,
   User,
+  Users,
 } from "lucide-react";
 
 export type NavItem = {
@@ -31,6 +32,7 @@ export const desktopNavItems: NavItem[] = [
   { href: "/activity", label: "Activity", icon: Activity },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/goals", label: "Goals", icon: Target },
+  { href: "/friends", label: "Friends", icon: Users },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

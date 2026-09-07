@@ -34,3 +34,8 @@ export const reorderListItemSchema = z.object({
   listItemId: z.uuid(),
   direction: z.enum(["up", "down"]),
 });
+
+export const setListVisibilitySchema = z.object({
+  listId: z.uuid(),
+  isPublic: z.enum(["true", "false"]).transform((v) => v === "true"),
+});
