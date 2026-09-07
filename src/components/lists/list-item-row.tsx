@@ -19,6 +19,7 @@ export function ListItemRow({
   imageUrl,
   canMoveUp,
   canMoveDown,
+  readOnly = false,
 }: {
   listId: string;
   listItemId: string;
@@ -28,6 +29,7 @@ export function ListItemRow({
   imageUrl: string | null;
   canMoveUp: boolean;
   canMoveDown: boolean;
+  readOnly?: boolean;
 }) {
   return (
     <li className="flex items-center gap-3 rounded-lg border p-2">
@@ -46,61 +48,65 @@ export function ListItemRow({
         </span>
       </Link>
 
-      <form
-        action={async (formData: FormData) => {
-          "use server";
-          await reorderListItemAction(undefined, formData);
-        }}
-      >
-        <input type="hidden" name="listId" value={listId} />
-        <input type="hidden" name="listItemId" value={listItemId} />
-        <input type="hidden" name="direction" value="up" />
-        <Button
-          type="submit"
-          variant="ghost"
-          size="icon"
-          disabled={!canMoveUp}
-          aria-label="Move up"
-        >
-          <ChevronUp className="size-4" />
-        </Button>
-      </form>
-      <form
-        action={async (formData: FormData) => {
-          "use server";
-          await reorderListItemAction(undefined, formData);
-        }}
-      >
-        <input type="hidden" name="listId" value={listId} />
-        <input type="hidden" name="listItemId" value={listItemId} />
-        <input type="hidden" name="direction" value="down" />
-        <Button
-          type="submit"
-          variant="ghost"
-          size="icon"
-          disabled={!canMoveDown}
-          aria-label="Move down"
-        >
-          <ChevronDown className="size-4" />
-        </Button>
-      </form>
-      <form
-        action={async (formData: FormData) => {
-          "use server";
-          await removeItemFromListAction(undefined, formData);
-        }}
-      >
-        <input type="hidden" name="listId" value={listId} />
-        <input type="hidden" name="listItemId" value={listItemId} />
-        <Button
-          type="submit"
-          variant="ghost"
-          size="icon"
-          aria-label="Remove from list"
-        >
-          <X className="size-4" />
-        </Button>
-      </form>
+      {readOnly ? null : (
+        <>
+          <form
+            action={async (formData: FormData) => {
+              "use server";
+              await reorderListItemAction(undefined, formData);
+            }}
+          >
+            <input type="hidden" name="listId" value={listId} />
+            <input type="hidden" name="listItemId" value={listItemId} />
+            <input type="hidden" name="direction" value="up" />
+            <Button
+              type="submit"
+              variant="ghost"
+              size="icon"
+              disabled={!canMoveUp}
+              aria-label="Move up"
+            >
+              <ChevronUp className="size-4" />
+            </Button>
+          </form>
+          <form
+            action={async (formData: FormData) => {
+              "use server";
+              await reorderListItemAction(undefined, formData);
+            }}
+          >
+            <input type="hidden" name="listId" value={listId} />
+            <input type="hidden" name="listItemId" value={listItemId} />
+            <input type="hidden" name="direction" value="down" />
+            <Button
+              type="submit"
+              variant="ghost"
+              size="icon"
+              disabled={!canMoveDown}
+              aria-label="Move down"
+            >
+              <ChevronDown className="size-4" />
+            </Button>
+          </form>
+          <form
+            action={async (formData: FormData) => {
+              "use server";
+              await removeItemFromListAction(undefined, formData);
+            }}
+          >
+            <input type="hidden" name="listId" value={listId} />
+            <input type="hidden" name="listItemId" value={listItemId} />
+            <Button
+              type="submit"
+              variant="ghost"
+              size="icon"
+              aria-label="Remove from list"
+            >
+              <X className="size-4" />
+            </Button>
+          </form>
+        </>
+      )}
     </li>
   );
 }

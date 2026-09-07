@@ -23,6 +23,23 @@ export async function createList(
   }
 }
 
+export async function setListVisibility(
+  userId: string,
+  listId: string,
+  isPublic: boolean,
+): Promise<ListResult> {
+  const updated = await db
+    .update(lists)
+    .set({ isPublic, updatedAt: new Date() })
+    .where(and(eq(lists.id, listId), eq(lists.userId, userId)))
+    .returning({ id: lists.id });
+
+  if (updated.length === 0) {
+    return { success: false, error: "That list couldn't be found." };
+  }
+  return { success: true, listId };
+}
+
 export async function renameList(
   userId: string,
   listId: string,

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { hashPassword } from "@/lib/services/auth/password";
+import { generateUniqueHandle } from "@/lib/services/users/handle";
 import type { RegisterInput } from "@/lib/schemas/auth";
 
 export type RegisterResult =
@@ -24,10 +25,11 @@ export async function registerUser(
   }
 
   const passwordHash = await hashPassword(input.password);
+  const handle = await generateUniqueHandle(input.name || input.email);
 
   const [created] = await db
     .insert(users)
-    .values({ name: input.name, email: input.email, passwordHash })
+    .values({ name: input.name, email: input.email, passwordHash, handle })
     .returning({ id: users.id });
 
   return { success: true, userId: created.id };

@@ -11,6 +11,7 @@ import {
   removeItemFromListSchema,
   renameListSchema,
   reorderListItemSchema,
+  setListVisibilitySchema,
 } from "@/lib/schemas/lists";
 import {
   addItemToList,
@@ -19,6 +20,7 @@ import {
   removeItemFromList,
   renameList,
   reorderListItem,
+  setListVisibility,
 } from "@/lib/services/lists/mutations";
 
 export type ListActionState = { error?: string } | undefined;
@@ -154,6 +156,28 @@ export async function reorderListItemAction(
     parsed.data.listId,
     parsed.data.listItemId,
     parsed.data.direction,
+  );
+  if (!result.success) return { error: result.error };
+
+  revalidatePath(`/lists/${parsed.data.listId}`);
+}
+
+export async function setListVisibilityAction(
+  _prevState: ListActionState,
+  formData: FormData,
+): Promise<ListActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const parsed = setListVisibilitySchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) return { error: "Invalid request." };
+
+  const result = await setListVisibility(
+    auth.userId,
+    parsed.data.listId,
+    parsed.data.isPublic,
   );
   if (!result.success) return { error: result.error };
 

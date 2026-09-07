@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ListItemRow } from "@/components/lists/list-item-row";
+import { ListVisibilityToggle } from "@/components/lists/list-visibility-toggle";
 import { auth } from "@/lib/auth";
 import { deleteListAction } from "@/lib/actions/lists";
-import { getListForUser } from "@/lib/services/lists/queries";
+import { getListForViewer } from "@/lib/services/lists/queries";
 
 export default async function ListDetailPage({
   params,
@@ -16,45 +18,57 @@ export default async function ListDetailPage({
   const session = await auth();
   if (!session?.user?.id) notFound();
 
-  const list = await getListForUser(session.user.id, id);
+  const list = await getListForViewer(session.user.id, id);
   if (!list) notFound();
+  const isOwner = list.userId === session.user.id;
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="truncate text-xl font-semibold tracking-tight">
-            {list.name}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="truncate text-xl font-semibold tracking-tight">
+              {list.name}
+            </h1>
+            {list.isPublic ? <Badge variant="secondary">Public</Badge> : null}
+          </div>
           {list.description ? (
             <p className="text-muted-foreground text-sm">{list.description}</p>
           ) : null}
         </div>
-        <form
-          action={async (formData: FormData) => {
-            "use server";
-            await deleteListAction(undefined, formData);
-          }}
-          className="shrink-0"
-        >
-          <input type="hidden" name="listId" value={list.id} />
-          <Button type="submit" variant="outline">
-            Delete list
-          </Button>
-        </form>
+        {isOwner ? (
+          <div className="flex shrink-0 items-center gap-2">
+            <ListVisibilityToggle listId={list.id} isPublic={list.isPublic} />
+            <form
+              action={async (formData: FormData) => {
+                "use server";
+                await deleteListAction(undefined, formData);
+              }}
+            >
+              <input type="hidden" name="listId" value={list.id} />
+              <Button type="submit" variant="outline">
+                Delete list
+              </Button>
+            </form>
+          </div>
+        ) : null}
       </div>
 
       {list.items.length === 0 ? (
         <div className="flex flex-col items-start gap-3">
           <p className="text-muted-foreground text-sm">
-            This list is empty. Add items from a media page.
+            {isOwner
+              ? "This list is empty. Add items from a media page."
+              : "This list is empty."}
           </p>
-          <Link
-            href="/discover"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            Go to Discover
-          </Link>
+          {isOwner ? (
+            <Link
+              href="/discover"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Go to Discover
+            </Link>
+          ) : null}
         </div>
       ) : (
         <ul className="flex flex-col gap-2">
@@ -69,6 +83,7 @@ export default async function ListDetailPage({
               imageUrl={item.media.imageUrl}
               canMoveUp={index > 0}
               canMoveDown={index < list.items.length - 1}
+              readOnly={!isOwner}
             />
           ))}
         </ul>

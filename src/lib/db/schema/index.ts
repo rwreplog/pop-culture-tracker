@@ -5,3 +5,4 @@ export * from "@/lib/db/schema/library";
 export * from "@/lib/db/schema/lists";
 export * from "@/lib/db/schema/activity";
 export * from "@/lib/db/schema/goals";
+export * from "@/lib/db/schema/friendships";
