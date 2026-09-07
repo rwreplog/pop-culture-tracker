@@ -34,14 +34,17 @@ export function MediaCard({
   return (
     <Link
       href={href}
-      className="focus-visible:ring-ring group flex flex-col gap-2 rounded-lg outline-none focus-visible:ring-2"
+      className="focus-visible:ring-ring group flex flex-col gap-2 rounded-2xl outline-none focus-visible:ring-2"
     >
-      <div className="relative overflow-hidden rounded-lg ring-1 ring-black/5 transition-shadow group-hover:shadow-lg group-hover:ring-black/10 dark:ring-white/10 dark:group-hover:ring-white/15">
+      <div className="ring-foreground/10 relative overflow-hidden rounded-2xl shadow-[0_10px_24px_-16px_rgba(0,0,0,0.5)] ring-1 transition-shadow group-hover:shadow-[0_16px_32px_-14px_var(--primary)] dark:ring-white/10 dark:group-hover:ring-white/20">
         <MediaArtwork
           src={imageUrl}
           title={title}
           className="aspect-2/3 w-full motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
         />
+        <span className="text-foreground absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase backdrop-blur-sm">
+          {mediaTypeLabel(mediaType)}
+        </span>
         {isFavorite ? (
           <Heart
             aria-label="Favorite"
@@ -54,8 +57,7 @@ export function MediaCard({
           {title}
         </span>
         <span className="text-muted-foreground text-xs">
-          {mediaTypeLabel(mediaType)}
-          {releaseDate ? ` · ${releaseDate.split("-")[0]}` : ""}
+          {releaseDate ? releaseDate.split("-")[0] : mediaTypeLabel(mediaType)}
         </span>
         {status ? (
           <Badge variant="secondary" className="w-fit">

@@ -18,7 +18,7 @@ export function ListCard({
   return (
     <Link
       href={`/lists/${id}`}
-      className="focus-visible:ring-ring border-border group hover:border-foreground/20 hover:bg-muted/40 flex flex-col gap-3 rounded-lg border p-4 transition-colors outline-none focus-visible:ring-2"
+      className="focus-visible:ring-ring border-border group hover:border-foreground/20 hover:bg-muted/40 flex flex-col gap-3 rounded-2xl border p-4 transition-colors outline-none focus-visible:ring-2 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] dark:supports-[backdrop-filter]:backdrop-blur-xl"
     >
       <div className="grid grid-cols-4 gap-1">
         {Array.from({ length: 4 }).map((_, index) => {
