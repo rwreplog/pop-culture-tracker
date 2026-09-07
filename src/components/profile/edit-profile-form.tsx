@@ -30,6 +30,9 @@ export function EditProfileForm({
           required
           maxLength={30}
           pattern="[a-z0-9][a-z0-9-]*"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           defaultValue={handle ?? ""}
         />
         <p className="text-muted-foreground text-xs">

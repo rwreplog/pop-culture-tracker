@@ -66,6 +66,10 @@ test("removing an item from the library clears it from Library and Dashboard", a
   await expect(page.getByRole("combobox", { name: "Status" })).toBeVisible();
 
   await page.getByRole("button", { name: "Remove from Library" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Remove" })
+    .click();
   await expect(
     page.getByRole("button", { name: "Add to Library" }),
   ).toBeVisible();
