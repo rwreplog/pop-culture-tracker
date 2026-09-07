@@ -1,7 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import type { MediaType } from "@/lib/db/schema/media";
+import { mediaExternalIds } from "@/lib/db/schema/media";
 import { libraryItems } from "@/lib/db/schema/library";
 import { rankBacklog } from "@/lib/services/recommendations/scoring";
 
@@ -14,6 +15,41 @@ export async function getLibraryItemForUser(userId: string, mediaId: string) {
       eq(libraryItems.mediaId, mediaId),
     ),
   });
+}
+
+/**
+ * Given a batch of (provider, externalId) pairs from a fresh search — not
+ * yet resolved to Media rows — returns the subset already in the user's
+ * library, keyed as "provider:externalId". Lets Discover show "already
+ * added" without waiting for getOrCreateMedia to run.
+ */
+export async function getLibraryStatusForResults(
+  userId: string,
+  results: { provider: string; externalId: string }[],
+): Promise<Set<string>> {
+  if (results.length === 0) return new Set();
+
+  const rows = await db
+    .select({
+      provider: mediaExternalIds.provider,
+      externalId: mediaExternalIds.externalId,
+    })
+    .from(mediaExternalIds)
+    .innerJoin(
+      libraryItems,
+      eq(libraryItems.mediaId, mediaExternalIds.mediaId),
+    )
+    .where(
+      and(
+        eq(libraryItems.userId, userId),
+        inArray(
+          mediaExternalIds.externalId,
+          results.map((result) => result.externalId),
+        ),
+      ),
+    );
+
+  return new Set(rows.map((row) => `${row.provider}:${row.externalId}`));
 }
 
 export type LibraryFilters = {

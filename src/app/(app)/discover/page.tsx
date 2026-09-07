@@ -5,8 +5,10 @@ import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { SearchResultCard } from "@/components/media/search-result-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
+import { getLibraryStatusForResults } from "@/lib/services/library/queries";
 import { searchMedia } from "@/lib/services/media/search";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +28,12 @@ export default async function DiscoverPage({
   const result = query
     ? await searchMedia(query, mediaType)
     : { success: true as const, results: [] };
+
+  const session = await auth();
+  const alreadyInLibrary =
+    session?.user?.id && result.success
+      ? await getLibraryStatusForResults(session.user.id, result.results)
+      : new Set<string>();
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,6 +104,9 @@ export default async function DiscoverPage({
             <SearchResultCard
               key={`${item.provider}:${item.externalId}`}
               result={item}
+              alreadyInLibrary={alreadyInLibrary.has(
+                `${item.provider}:${item.externalId}`,
+              )}
             />
           ))}
         </div>
