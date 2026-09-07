@@ -69,9 +69,7 @@ export default async function MediaDetailPage({
             {item.title}
           </h1>
           {metadata?.creator ? (
-            <p className="text-muted-foreground text-sm">
-              {metadata.creator}
-            </p>
+            <p className="text-muted-foreground text-sm">{metadata.creator}</p>
           ) : null}
           {metadata?.genres && metadata.genres.length > 0 ? (
             <div className="flex flex-wrap gap-1.5 pt-1">
