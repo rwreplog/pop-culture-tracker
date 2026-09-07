@@ -29,6 +29,13 @@
       "when": 1788739801152,
       "tag": "0003_condemned_the_santerians",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788782458327,
+      "tag": "0004_melted_masque",
+      "breakpoints": true
     }
   ]
 }

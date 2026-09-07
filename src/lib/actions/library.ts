@@ -6,20 +6,26 @@ import { auth } from "@/lib/auth";
 import {
   addToLibrarySchema,
   libraryStatusSchema,
+  removeCustomArtSchema,
   removeFromLibrarySchema,
   toggleFavoriteSchema,
+  updateCompletedAtSchema,
   updateNotesSchema,
   updateProgressSchema,
   updateRatingSchema,
   updateStatusSchema,
+  uploadCustomArtSchema,
 } from "@/lib/schemas/library";
 import { normalizedSearchResultSchema } from "@/lib/schemas/media";
 import { getOrCreateMedia } from "@/lib/services/media/get-or-create";
 import {
   addToLibrary,
+  clearCustomArt,
   removeFromLibrary,
+  setCustomArt,
   updateLibraryItem,
 } from "@/lib/services/library/mutations";
+import { uploadCustomArt } from "@/lib/storage/custom-art";
 
 export type LibraryActionState = { error?: string } | undefined;
 
@@ -230,4 +236,75 @@ export async function removeFromLibraryAction(
   revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/library");
   revalidatePath("/");
+}
+
+export async function updateCompletedAtAction(
+  _prevState: LibraryActionState,
+  formData: FormData,
+): Promise<LibraryActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const parsed = updateCompletedAtSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) return { error: "Enter a valid date." };
+
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    {
+      completedAt: parsed.data.completedAt,
+    },
+  );
+  if (!result.success) return { error: result.error };
+
+  revalidatePath(`/media/${result.mediaId}`);
+  revalidatePath("/activity");
+}
+
+export async function uploadCustomArtAction(
+  _prevState: LibraryActionState,
+  formData: FormData,
+): Promise<LibraryActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const raw = Object.fromEntries(formData);
+  const parsed = uploadCustomArtSchema.safeParse(raw);
+  if (!parsed.success || parsed.data.file.size === 0) {
+    return { error: "Choose an image to upload." };
+  }
+
+  const uploadResult = await uploadCustomArt(
+    auth.userId,
+    parsed.data.libraryItemId,
+    parsed.data.file,
+  );
+  if (!uploadResult.success) return { error: uploadResult.error };
+
+  const result = await setCustomArt(
+    auth.userId,
+    parsed.data.libraryItemId,
+    uploadResult.key,
+  );
+  if (!result.success) return { error: result.error };
+
+  revalidatePath(`/media/${result.mediaId}`);
+}
+
+export async function removeCustomArtAction(
+  _prevState: LibraryActionState,
+  formData: FormData,
+): Promise<LibraryActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const parsed = removeCustomArtSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: "Invalid request." };
+
+  const result = await clearCustomArt(auth.userId, parsed.data.libraryItemId);
+  if (!result.success) return { error: result.error };
+
+  revalidatePath(`/media/${result.mediaId}`);
 }

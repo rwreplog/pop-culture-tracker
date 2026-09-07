@@ -75,3 +75,20 @@ export const updateProgressSchema = z.object({
 export const removeFromLibrarySchema = z.object({
   libraryItemId: z.uuid(),
 });
+
+export const updateCompletedAtSchema = z.object({
+  libraryItemId: z.uuid(),
+  completedAt: z.preprocess(
+    (v) => (v === "" ? null : v),
+    z.coerce.date().nullable(),
+  ),
+});
+
+export const uploadCustomArtSchema = z.object({
+  libraryItemId: z.uuid(),
+  file: z.instanceof(File),
+});
+
+export const removeCustomArtSchema = z.object({
+  libraryItemId: z.uuid(),
+});

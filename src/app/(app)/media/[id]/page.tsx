@@ -11,6 +11,7 @@ import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getLibraryItemForUser } from "@/lib/services/library/queries";
 import { getListsForUser } from "@/lib/services/lists/queries";
+import { presignCustomArtUrl } from "@/lib/storage/custom-art";
 
 type MediaMetadata = { creator?: string; genres?: string[] };
 
@@ -33,6 +34,9 @@ export default async function MediaDetailPage({
   const ownedLists = session?.user?.id
     ? await getListsForUser(session.user.id)
     : [];
+  const customArtUrl = libraryItem?.customImageKey
+    ? await presignCustomArtUrl(libraryItem.customImageKey)
+    : null;
 
   const metadata = item.metadata as MediaMetadata | null;
   const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
@@ -40,7 +44,7 @@ export default async function MediaDetailPage({
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row">
       <MediaArtwork
-        src={item.imageUrl}
+        src={customArtUrl ?? item.imageUrl}
         title={item.title}
         className="h-72 w-48 shrink-0"
       />

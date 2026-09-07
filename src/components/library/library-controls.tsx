@@ -1,7 +1,13 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { startTransition, useActionState, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,12 +33,15 @@ import type { MediaType } from "@/lib/db/schema/media";
 import { libraryStatusLabel } from "@/lib/media/labels";
 import {
   addToLibraryAction,
+  removeCustomArtAction,
   removeFromLibraryAction,
   toggleFavoriteAction,
+  updateCompletedAtAction,
   updateNotesAction,
   updateProgressAction,
   updateRatingAction,
   updateStatusAction,
+  uploadCustomArtAction,
 } from "@/lib/actions/library";
 
 const STATUSES = [
@@ -73,12 +82,22 @@ export function LibraryControls({
           isFavorite={libraryItem.isFavorite}
         />
       </div>
+      {libraryItem.status === "completed" ? (
+        <CompletedAtForm
+          libraryItemId={libraryItem.id}
+          completedAt={libraryItem.completedAt}
+        />
+      ) : null}
       <ProgressForm
         libraryItemId={libraryItem.id}
         mediaType={mediaType}
         progress={libraryItem.progress as Record<string, unknown> | null}
       />
       <NotesForm libraryItemId={libraryItem.id} notes={libraryItem.notes} />
+      <CustomArtForm
+        libraryItemId={libraryItem.id}
+        hasCustomArt={Boolean(libraryItem.customImageKey)}
+      />
       <RemoveForm libraryItemId={libraryItem.id} />
     </div>
   );
@@ -230,6 +249,51 @@ function RatingForm({
           ))}
         </SelectContent>
       </Select>
+      {state?.error ? (
+        <p role="alert" className="text-destructive text-sm">
+          {state.error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function toDateInputValue(date: Date | null): string {
+  if (!date) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function CompletedAtForm({
+  libraryItemId,
+  completedAt,
+}: {
+  libraryItemId: string;
+  completedAt: Date | null;
+}) {
+  const [state, formAction] = useActionState(
+    updateCompletedAtAction,
+    undefined,
+  );
+
+  function handleChange(value: string) {
+    const formData = new FormData();
+    formData.set("libraryItemId", libraryItemId);
+    formData.set("completedAt", value);
+    startTransition(() => formAction(formData));
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <label className="text-sm font-medium" htmlFor="completedAt">
+        Date finished
+      </label>
+      <Input
+        id="completedAt"
+        type="date"
+        defaultValue={toDateInputValue(completedAt)}
+        onChange={(event) => handleChange(event.target.value)}
+        className="w-40"
+      />
       {state?.error ? (
         <p role="alert" className="text-destructive text-sm">
           {state.error}
@@ -393,6 +457,139 @@ function progressFieldsFor(
     case "movie":
       return [];
   }
+}
+
+function CustomArtForm({
+  libraryItemId,
+  hasCustomArt,
+}: {
+  libraryItemId: string;
+  hasCustomArt: boolean;
+}) {
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [uploadState, uploadAction, isUploading] = useActionState(
+    uploadCustomArtAction,
+    undefined,
+  );
+  const [removeState, removeAction, isRemoving] = useActionState(
+    removeCustomArtAction,
+    undefined,
+  );
+  const wasUploading = useRef(false);
+  const wasRemoving = useRef(false);
+
+  useEffect(() => {
+    if (wasUploading.current && !isUploading && !uploadState?.error) {
+      setUploadOpen(false);
+    }
+    wasUploading.current = isUploading;
+  }, [isUploading, uploadState]);
+
+  useEffect(() => {
+    if (wasRemoving.current && !isRemoving && !removeState?.error) {
+      setRemoveOpen(false);
+    }
+    wasRemoving.current = isRemoving;
+  }, [isRemoving, removeState]);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium">Custom art</span>
+      <div className="flex items-center gap-2">
+        <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+          <DialogTrigger render={<Button variant="outline" type="button" />}>
+            {hasCustomArt ? "Replace art" : "Upload art"}
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {hasCustomArt ? "Replace custom art" : "Upload custom art"}
+              </DialogTitle>
+              <DialogDescription>
+                Only you will see this artwork. JPEG, PNG, WEBP, or GIF, up to
+                5MB.
+              </DialogDescription>
+            </DialogHeader>
+            <form action={uploadAction} className="flex flex-col gap-3">
+              <input type="hidden" name="libraryItemId" value={libraryItemId} />
+              <label className="sr-only" htmlFor="customArtFile">
+                Image file
+              </label>
+              <input
+                id="customArtFile"
+                name="file"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                required
+              />
+              {uploadState?.error ? (
+                <p role="alert" className="text-destructive text-sm">
+                  {uploadState.error}
+                </p>
+              ) : null}
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setUploadOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isUploading}>
+                  Upload
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+        {hasCustomArt ? (
+          <Dialog open={removeOpen} onOpenChange={setRemoveOpen}>
+            <DialogTrigger render={<Button variant="outline" type="button" />}>
+              Remove custom art
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Remove custom art?</DialogTitle>
+                <DialogDescription>
+                  This deletes your uploaded image. The title will go back to
+                  showing its default artwork.
+                </DialogDescription>
+              </DialogHeader>
+              <form action={removeAction}>
+                <input
+                  type="hidden"
+                  name="libraryItemId"
+                  value={libraryItemId}
+                />
+                {removeState?.error ? (
+                  <p role="alert" className="text-destructive text-sm">
+                    {removeState.error}
+                  </p>
+                ) : null}
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setRemoveOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="destructive"
+                    disabled={isRemoving}
+                  >
+                    Remove
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        ) : null}
+      </div>
+    </div>
+  );
 }
 
 function RemoveForm({ libraryItemId }: { libraryItemId: string }) {
