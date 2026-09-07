@@ -89,6 +89,31 @@ export function DashboardSectionSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
+export function GoalCardSkeleton() {
+  return (
+    <div className="border-border flex flex-col gap-3 rounded-lg border p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-1.5">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <Skeleton className="size-9" />
+      </div>
+      <Skeleton className="h-2 w-full rounded-full" />
+    </div>
+  );
+}
+
+export function GoalCardGridSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-hidden="true">
+      {Array.from({ length: count }, (_, index) => (
+        <GoalCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
 export function RowListSkeleton({
   count = 6,
   className,
