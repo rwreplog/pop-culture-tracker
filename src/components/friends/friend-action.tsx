@@ -1,8 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   removeFriendshipAction,
   respondFriendRequestAction,
@@ -37,6 +46,7 @@ export function FriendAction({
       friendshipId={status.friendshipId}
       label="Friends"
       cancelLabel="Remove friend"
+      confirm
     />
   );
 }
@@ -99,28 +109,68 @@ function CancelForm({
   friendshipId,
   label,
   cancelLabel,
+  confirm = false,
 }: {
   friendshipId: string;
   label: string;
   cancelLabel: string;
+  confirm?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
     removeFriendshipAction,
     undefined,
+  );
+
+  const form = (
+    <form action={formAction}>
+      <input type="hidden" name="friendshipId" value={friendshipId} />
+      {state?.error ? (
+        <p role="alert" className="text-destructive text-sm">
+          {state.error}
+        </p>
+      ) : null}
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+        <Button type="submit" variant="destructive" disabled={isPending}>
+          {cancelLabel}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 
   return (
     <div className="flex flex-col items-start gap-1">
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm">{label}</span>
-        <form action={formAction}>
-          <input type="hidden" name="friendshipId" value={friendshipId} />
-          <Button type="submit" variant="outline" disabled={isPending}>
-            {cancelLabel}
-          </Button>
-        </form>
+        {confirm ? (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger render={<Button variant="outline" type="button" />}>
+              {cancelLabel}
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Remove this friend?</DialogTitle>
+                <DialogDescription>
+                  You&apos;ll need to send a new request to become friends
+                  again.
+                </DialogDescription>
+              </DialogHeader>
+              {form}
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <form action={formAction}>
+            <input type="hidden" name="friendshipId" value={friendshipId} />
+            <Button type="submit" variant="outline" disabled={isPending}>
+              {cancelLabel}
+            </Button>
+          </form>
+        )}
       </div>
-      {state?.error ? (
+      {!confirm && state?.error ? (
         <p role="alert" className="text-destructive text-sm">
           {state.error}
         </p>

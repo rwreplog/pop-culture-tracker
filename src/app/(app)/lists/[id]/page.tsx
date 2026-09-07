@@ -2,11 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { DeleteListButton } from "@/components/lists/delete-list-button";
 import { ListItemRow } from "@/components/lists/list-item-row";
 import { ListVisibilityToggle } from "@/components/lists/list-visibility-toggle";
 import { auth } from "@/lib/auth";
-import { deleteListAction } from "@/lib/actions/lists";
 import { getListForViewer } from "@/lib/services/lists/queries";
 
 export default async function ListDetailPage({
@@ -39,17 +39,7 @@ export default async function ListDetailPage({
         {isOwner ? (
           <div className="flex shrink-0 items-center gap-2">
             <ListVisibilityToggle listId={list.id} isPublic={list.isPublic} />
-            <form
-              action={async (formData: FormData) => {
-                "use server";
-                await deleteListAction(undefined, formData);
-              }}
-            >
-              <input type="hidden" name="listId" value={list.id} />
-              <Button type="submit" variant="outline">
-                Delete list
-              </Button>
-            </form>
+            <DeleteListButton listId={list.id} />
           </div>
         ) : null}
       </div>

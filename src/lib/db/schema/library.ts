@@ -54,6 +54,8 @@ export const libraryItems = pgTable(
     isFavorite: boolean("is_favorite").notNull().default(false),
     notes: text("notes"),
     progress: jsonb("progress"),
+    /** Object key in the `custom-art` bucket for this user's custom artwork override, if set. */
+    customImageKey: text("custom_image_key"),
     startedAt: timestamp("started_at"),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),

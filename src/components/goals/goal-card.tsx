@@ -1,9 +1,18 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { deleteGoalAction } from "@/lib/actions/goals";
@@ -30,6 +39,7 @@ export function GoalCard({
   mediaType: MediaType | null;
   genre: string | null;
 }) {
+  const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
     deleteGoalAction,
     undefined,
@@ -49,18 +59,53 @@ export function GoalCard({
             {achieved ? " — achieved!" : ""}
           </span>
         </div>
-        <form action={formAction}>
-          <input type="hidden" name="goalId" value={id} />
-          <Button
-            type="submit"
-            variant="ghost"
-            size="icon-sm"
-            disabled={isPending}
-            aria-label="Delete goal"
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                type="button"
+                aria-label="Delete goal"
+              />
+            }
           >
             <X />
-          </Button>
-        </form>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete this goal?</DialogTitle>
+              <DialogDescription>
+                This removes the goal and its progress tracking. Titles
+                you&apos;ve already completed aren&apos;t affected.
+              </DialogDescription>
+            </DialogHeader>
+            <form action={formAction}>
+              <input type="hidden" name="goalId" value={id} />
+              {state?.error ? (
+                <p role="alert" className="text-destructive text-sm">
+                  {state.error}
+                </p>
+              ) : null}
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isPending}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
       <div
         className="bg-muted h-2 overflow-hidden rounded-full"
@@ -74,11 +119,6 @@ export function GoalCard({
           style={{ width: `${percent}%` }}
         />
       </div>
-      {state?.error ? (
-        <p role="alert" className="text-destructive text-sm">
-          {state.error}
-        </p>
-      ) : null}
     </div>
   );
 }

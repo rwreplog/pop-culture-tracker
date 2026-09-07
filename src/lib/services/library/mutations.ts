@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { libraryItems } from "@/lib/db/schema/library";
 import type { LibraryProgress } from "@/lib/schemas/library";
 import { recordActivity } from "@/lib/services/activity/log";
+import { deleteCustomArt } from "@/lib/storage/custom-art";
 
 type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
 
@@ -75,6 +76,7 @@ export type LibraryItemPatch = {
   isFavorite?: boolean;
   notes?: string | null;
   progress?: LibraryProgress | null;
+  completedAt?: Date | null;
 };
 
 /**
@@ -119,6 +121,9 @@ export async function updateLibraryItem(
       if (patch.isFavorite !== undefined) updates.isFavorite = patch.isFavorite;
       if (patch.notes !== undefined) updates.notes = patch.notes;
       if (patch.progress !== undefined) updates.progress = patch.progress;
+      // Explicit completedAt overrides the auto-stamp above, e.g. backdating.
+      if (patch.completedAt !== undefined)
+        updates.completedAt = patch.completedAt;
 
       await tx
         .update(libraryItems)
@@ -168,4 +173,62 @@ export async function removeFromLibrary(
     return { success: false, error: "That item couldn't be found." };
   }
   return { success: true, mediaId: removed[0].mediaId };
+}
+
+/**
+ * Sets a library item's custom art override, deleting the previous object
+ * (if any) once ownership is confirmed.
+ */
+export async function setCustomArt(
+  userId: string,
+  libraryItemId: string,
+  key: string,
+): Promise<LibraryMutationResult> {
+  const existing = await db.query.libraryItems.findFirst({
+    where: and(
+      eq(libraryItems.id, libraryItemId),
+      eq(libraryItems.userId, userId),
+    ),
+  });
+  if (!existing) {
+    return { success: false, error: "That item couldn't be found." };
+  }
+
+  await db
+    .update(libraryItems)
+    .set({ customImageKey: key, updatedAt: new Date() })
+    .where(eq(libraryItems.id, libraryItemId));
+
+  if (existing.customImageKey) {
+    await deleteCustomArt(existing.customImageKey);
+  }
+
+  return { success: true, libraryItemId, mediaId: existing.mediaId };
+}
+
+/** Clears a library item's custom art override and deletes the object. */
+export async function clearCustomArt(
+  userId: string,
+  libraryItemId: string,
+): Promise<LibraryMutationResult> {
+  const existing = await db.query.libraryItems.findFirst({
+    where: and(
+      eq(libraryItems.id, libraryItemId),
+      eq(libraryItems.userId, userId),
+    ),
+  });
+  if (!existing) {
+    return { success: false, error: "That item couldn't be found." };
+  }
+
+  await db
+    .update(libraryItems)
+    .set({ customImageKey: null, updatedAt: new Date() })
+    .where(eq(libraryItems.id, libraryItemId));
+
+  if (existing.customImageKey) {
+    await deleteCustomArt(existing.customImageKey);
+  }
+
+  return { success: true, libraryItemId, mediaId: existing.mediaId };
 }

@@ -1,13 +1,11 @@
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Button } from "@/components/ui/button";
+import { RemoveListItemButton } from "@/components/lists/remove-list-item-button";
 import { mediaTypeLabel } from "@/lib/media/labels";
-import {
-  removeItemFromListAction,
-  reorderListItemAction,
-} from "@/lib/actions/lists";
+import { reorderListItemAction } from "@/lib/actions/lists";
 import type { MediaType } from "@/lib/db/schema/media";
 
 export function ListItemRow({
@@ -88,23 +86,7 @@ export function ListItemRow({
               <ChevronDown className="size-4" />
             </Button>
           </form>
-          <form
-            action={async (formData: FormData) => {
-              "use server";
-              await removeItemFromListAction(undefined, formData);
-            }}
-          >
-            <input type="hidden" name="listId" value={listId} />
-            <input type="hidden" name="listItemId" value={listItemId} />
-            <Button
-              type="submit"
-              variant="ghost"
-              size="icon"
-              aria-label="Remove from list"
-            >
-              <X className="size-4" />
-            </Button>
-          </form>
+          <RemoveListItemButton listId={listId} listItemId={listItemId} />
         </>
       )}
     </li>

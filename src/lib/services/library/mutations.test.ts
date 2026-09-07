@@ -6,6 +6,12 @@ const findFirstMock = vi.fn();
 const activityValuesMock = vi.fn();
 const libraryInsertReturningMock = vi.fn();
 const updateSetMock = vi.fn();
+const topLevelUpdateSetMock = vi.fn();
+const deleteCustomArtMock = vi.fn();
+
+vi.mock("@/lib/storage/custom-art", () => ({
+  deleteCustomArt: deleteCustomArtMock,
+}));
 
 vi.mock("@/lib/db", () => ({
   db: {
@@ -36,18 +42,33 @@ vi.mock("@/lib/db", () => ({
       };
       return callback(tx);
     }),
+    query: { libraryItems: { findFirst: findFirstMock } },
+    update: () => ({
+      set: (vals: unknown) => ({
+        where: async () => {
+          topLevelUpdateSetMock(vals);
+        },
+      }),
+    }),
     delete: vi.fn(),
   },
 }));
 
-const { addToLibrary, updateLibraryItem, removeFromLibrary } =
-  await import("@/lib/services/library/mutations");
+const {
+  addToLibrary,
+  updateLibraryItem,
+  removeFromLibrary,
+  setCustomArt,
+  clearCustomArt,
+} = await import("@/lib/services/library/mutations");
 
 beforeEach(() => {
   findFirstMock.mockReset();
   activityValuesMock.mockReset();
   libraryInsertReturningMock.mockReset();
   updateSetMock.mockReset();
+  topLevelUpdateSetMock.mockReset();
+  deleteCustomArtMock.mockReset();
 });
 
 describe("addToLibrary", () => {
@@ -153,6 +174,88 @@ describe("updateLibraryItem", () => {
     expect(activityValuesMock).toHaveBeenCalledWith(
       expect.objectContaining({ type: "rated", metadata: { rating: 8 } }),
     );
+  });
+
+  it("applies an explicit completedAt, overriding the auto-stamp", async () => {
+    findFirstMock.mockResolvedValue(existingItem);
+    const backdate = new Date("2020-01-01T00:00:00.000Z");
+
+    await updateLibraryItem("user-1", "item-1", {
+      status: "completed",
+      completedAt: backdate,
+    });
+
+    expect(updateSetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ completedAt: backdate }),
+    );
+  });
+});
+
+describe("setCustomArt", () => {
+  it("rejects when the item doesn't belong to the requesting user", async () => {
+    findFirstMock.mockResolvedValue(undefined);
+
+    const result = await setCustomArt("someone-else", "item-1", "key-1");
+
+    expect(result).toEqual({
+      success: false,
+      error: "That item couldn't be found.",
+    });
+    expect(topLevelUpdateSetMock).not.toHaveBeenCalled();
+  });
+
+  it("sets the key and deletes the previous object", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "item-1",
+      mediaId: "media-1",
+      customImageKey: "old-key",
+    });
+
+    const result = await setCustomArt("user-1", "item-1", "new-key");
+
+    expect(result).toEqual({
+      success: true,
+      libraryItemId: "item-1",
+      mediaId: "media-1",
+    });
+    expect(topLevelUpdateSetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ customImageKey: "new-key" }),
+    );
+    expect(deleteCustomArtMock).toHaveBeenCalledWith("old-key");
+  });
+
+  it("does not attempt to delete when there was no previous object", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "item-1",
+      mediaId: "media-1",
+      customImageKey: null,
+    });
+
+    await setCustomArt("user-1", "item-1", "new-key");
+
+    expect(deleteCustomArtMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("clearCustomArt", () => {
+  it("clears the key and deletes the object", async () => {
+    findFirstMock.mockResolvedValue({
+      id: "item-1",
+      mediaId: "media-1",
+      customImageKey: "old-key",
+    });
+
+    const result = await clearCustomArt("user-1", "item-1");
+
+    expect(result).toEqual({
+      success: true,
+      libraryItemId: "item-1",
+      mediaId: "media-1",
+    });
+    expect(topLevelUpdateSetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ customImageKey: null }),
+    );
+    expect(deleteCustomArtMock).toHaveBeenCalledWith("old-key");
   });
 });
 
