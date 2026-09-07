@@ -18,7 +18,7 @@ export default function LoginPage() {
   );
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card variant="glass" className="w-full max-w-sm">
       <CardHeader className="justify-items-center text-center">
         <Image
           src="/geekery-logo.png"

@@ -42,17 +42,20 @@ export default async function MediaDetailPage({
   const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row">
-      <MediaArtwork
-        src={customArtUrl ?? item.imageUrl}
-        title={item.title}
-        className="h-72 w-48 shrink-0"
-      />
+    <div className="relative mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row">
+      <div className="dark:bg-primary/15 pointer-events-none absolute -top-16 -left-24 -z-10 size-72 rounded-full blur-3xl" />
+      <div className="ring-foreground/10 shrink-0 self-start overflow-hidden rounded-2xl shadow-[0_24px_48px_-24px_rgba(0,0,0,0.6)] ring-1 dark:shadow-[0_24px_48px_-20px_var(--primary)]">
+        <MediaArtwork
+          src={customArtUrl ?? item.imageUrl}
+          title={item.title}
+          className="h-72 w-48 shrink-0"
+        />
+      </div>
       <div className="flex flex-col gap-2">
-        <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+        <span className="text-primary text-xs font-semibold tracking-wide uppercase">
           {mediaTypeLabel(item.mediaType)}
         </span>
-        <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{item.title}</h1>
         <p className="text-muted-foreground text-sm">
           {[metadata?.creator, releaseYear].filter(Boolean).join(" · ")}
         </p>

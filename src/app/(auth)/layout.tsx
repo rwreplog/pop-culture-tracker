@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <header className="flex h-14 items-center justify-between px-4 md:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-semibold tracking-tight"
+          className="font-heading flex items-center gap-2 text-lg font-semibold tracking-tight"
         >
           <Image
             src="/geekery-logo.png"
