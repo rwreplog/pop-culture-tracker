@@ -30,7 +30,7 @@ export function MobileNav() {
                 className={cn(
                   "-mt-6 flex size-13 shrink-0 items-center justify-center rounded-full",
                   "bg-primary text-primary-foreground shadow-lg",
-                  "dark:from-primary dark:to-accent-2 dark:bg-linear-to-br dark:shadow-[0_10px_28px_-6px_var(--primary)]",
+                  "dark:from-primary dark:to-accent-2 dark:bg-linear-to-br",
                   "focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                 )}
               >
