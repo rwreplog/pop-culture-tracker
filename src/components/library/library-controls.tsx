@@ -1,9 +1,18 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -387,22 +396,48 @@ function progressFieldsFor(
 }
 
 function RemoveForm({ libraryItemId }: { libraryItemId: string }) {
+  const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
     removeFromLibraryAction,
     undefined,
   );
 
   return (
-    <form action={formAction}>
-      <input type="hidden" name="libraryItemId" value={libraryItemId} />
-      <Button type="submit" variant="outline" disabled={isPending}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={<Button variant="outline" className="self-start" />}
+      >
         Remove from Library
-      </Button>
-      {state?.error ? (
-        <p role="alert" className="text-destructive text-sm">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Remove from library?</DialogTitle>
+          <DialogDescription>
+            This deletes your status, rating, notes, and progress for this
+            title. This can&apos;t be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <form action={formAction}>
+          <input type="hidden" name="libraryItemId" value={libraryItemId} />
+          {state?.error ? (
+            <p role="alert" className="text-destructive text-sm">
+              {state.error}
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="destructive" disabled={isPending}>
+              Remove
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

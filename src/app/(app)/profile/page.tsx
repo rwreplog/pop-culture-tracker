@@ -1,4 +1,11 @@
-import { Activity, ListChecks, Settings, User, Users } from "lucide-react";
+import {
+  Activity,
+  ListChecks,
+  Settings,
+  Target,
+  User,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
@@ -13,6 +20,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/friends", label: "Friends", icon: Users },
   { href: "/lists", label: "Lists", icon: ListChecks },
+  { href: "/goals", label: "Goals", icon: Target },
   { href: "/activity", label: "Activity", icon: Activity },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

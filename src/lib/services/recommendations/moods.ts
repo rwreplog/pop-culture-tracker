@@ -11,7 +11,7 @@ export const MOOD_LABELS: Record<Mood, string> = {
 
 /**
  * Genre strings that count as a match for each mood. Genre vocabularies
- * differ across providers (movies vs. TV vs. games; see tmdb.ts/rawg.ts), so
+ * differ across providers (movies vs. TV vs. games; see tmdb.ts/igdb.ts), so
  * each list covers the equivalent genre across providers rather than
  * assuming one shared taxonomy.
  */

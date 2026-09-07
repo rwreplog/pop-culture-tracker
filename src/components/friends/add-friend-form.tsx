@@ -23,6 +23,9 @@ export function AddFriendForm() {
           id="friend-handle"
           name="handle"
           placeholder="Their handle, e.g. jane-doe"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           required
         />
         <Button type="submit" disabled={isPending}>

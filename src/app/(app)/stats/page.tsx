@@ -1,10 +1,12 @@
 import { BarChart3 } from "lucide-react";
+import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { ActivityChart } from "@/components/stats/activity-chart";
 import { AnnualSummaryCard } from "@/components/stats/annual-summary-card";
 import { CountBarList } from "@/components/stats/count-bar-list";
 import { StatsOverviewCards } from "@/components/stats/stats-overview-cards";
+import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import {
   getActivityChartData,
@@ -34,6 +36,11 @@ export default async function StatsPage() {
         icon={BarChart3}
         title="No stats yet"
         description="Add items to your library to start seeing insights about your habits."
+        action={
+          <Link href="/discover" className={buttonVariants()}>
+            Go to Discover
+          </Link>
+        }
       />
     );
   }

@@ -12,7 +12,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Primary"
-      className="bg-background/95 fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="bg-background/95 fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t pb-[calc(env(safe-area-inset-bottom)+0.5rem)] backdrop-blur md:hidden"
     >
       {mobileNavItems.map((item) => {
         const path = item.href.split("?")[0];

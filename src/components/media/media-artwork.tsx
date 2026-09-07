@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Provider artwork comes from arbitrary external hosts (TMDB, RAWG, Open
+ * Provider artwork comes from arbitrary external hosts (TMDB, IGDB, Open
  * Library, ComicVine, ...), so next/image's remotePatterns allowlist isn't a
  * good fit here — a plain <img> is the pragmatic choice.
  */

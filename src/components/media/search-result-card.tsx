@@ -109,22 +109,29 @@ export function SearchResultCard({
       </span>
 
       {added ? (
-        <span
-          className={cn(
-            "mt-auto inline-flex h-10 w-fit items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium",
-            "bg-green-600/10 text-green-700 dark:bg-green-500/15 dark:text-green-400",
-          )}
-        >
-          <Check
+        <form action={viewAction} className="mt-auto">
+          <HiddenResultFields result={result} />
+          <button
+            type="submit"
+            disabled={viewPending}
+            title="Open to change status, rating, or notes"
             className={cn(
-              "size-4",
-              justAdded &&
-                "motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:spin-in-45 motion-safe:duration-300",
+              "inline-flex h-10 w-fit items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium outline-none",
+              "focus-visible:ring-ring/50 bg-green-600/10 text-green-700 hover:bg-green-600/20 focus-visible:ring-3 dark:bg-green-500/15 dark:text-green-400 dark:hover:bg-green-500/25",
+              "disabled:pointer-events-none disabled:opacity-50",
             )}
-            aria-hidden="true"
-          />
-          In library
-        </span>
+          >
+            <Check
+              className={cn(
+                "size-4",
+                justAdded &&
+                  "motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:spin-in-45 motion-safe:duration-300",
+              )}
+              aria-hidden="true"
+            />
+            In library
+          </button>
+        </form>
       ) : (
         <form
           action={addAction}
