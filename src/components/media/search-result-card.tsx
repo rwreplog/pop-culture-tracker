@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { Check } from "lucide-react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { resolveMediaAction } from "@/lib/actions/media";
 import { quickAddToLibraryAction } from "@/lib/actions/library";
 import { libraryStatusLabel } from "@/lib/media/labels";
 import type { NormalizedSearchResult } from "@/lib/services/media/provider-types";
+import { cn } from "@/lib/utils";
 
 const STATUSES = [
   "want",
@@ -54,8 +56,10 @@ function HiddenResultFields({ result }: { result: NormalizedSearchResult }) {
 
 export function SearchResultCard({
   result,
+  alreadyInLibrary = false,
 }: {
   result: NormalizedSearchResult;
+  alreadyInLibrary?: boolean;
 }) {
   const [viewState, viewAction, viewPending] = useActionState(
     resolveMediaAction,
@@ -65,6 +69,18 @@ export function SearchResultCard({
     quickAddToLibraryAction,
     undefined,
   );
+
+  const [justAdded, setJustAdded] = useState(false);
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !addPending && !addState?.error) {
+      setJustAdded(true);
+    }
+    wasPending.current = addPending;
+  }, [addPending, addState]);
+
+  const added = alreadyInLibrary || justAdded;
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -92,37 +108,56 @@ export function SearchResultCard({
         {result.releaseDate ? result.releaseDate.split("-")[0] : " "}
       </span>
 
-      <form
-        action={addAction}
-        className="mt-auto flex min-w-0 flex-wrap items-center gap-1.5"
-      >
-        <HiddenResultFields result={result} />
-        <label className="sr-only" htmlFor={`status-${result.externalId}`}>
-          Status
-        </label>
-        <Select name="status" defaultValue="want">
-          <SelectTrigger
-            id={`status-${result.externalId}`}
-            className="min-w-0 flex-1"
-          >
-            <SelectValue>
-              {(value: (typeof STATUSES)[number]) =>
-                libraryStatusLabel(value, result.mediaType)
-              }
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {STATUSES.map((status) => (
-              <SelectItem key={status} value={status}>
-                {libraryStatusLabel(status, result.mediaType)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button type="submit" disabled={addPending}>
-          Add
-        </Button>
-      </form>
+      {added ? (
+        <span
+          className={cn(
+            "mt-auto inline-flex h-10 w-fit items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium",
+            "bg-green-600/10 text-green-700 dark:bg-green-500/15 dark:text-green-400",
+          )}
+        >
+          <Check
+            className={cn(
+              "size-4",
+              justAdded &&
+                "motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:spin-in-45 motion-safe:duration-300",
+            )}
+            aria-hidden="true"
+          />
+          In library
+        </span>
+      ) : (
+        <form
+          action={addAction}
+          className="mt-auto flex min-w-0 flex-wrap items-center gap-1.5"
+        >
+          <HiddenResultFields result={result} />
+          <label className="sr-only" htmlFor={`status-${result.externalId}`}>
+            Status
+          </label>
+          <Select name="status" defaultValue="want">
+            <SelectTrigger
+              id={`status-${result.externalId}`}
+              className="min-w-0 flex-1"
+            >
+              <SelectValue>
+                {(value: (typeof STATUSES)[number]) =>
+                  libraryStatusLabel(value, result.mediaType)
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {libraryStatusLabel(status, result.mediaType)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button type="submit" disabled={addPending}>
+            Add
+          </Button>
+        </form>
+      )}
 
       {viewState?.error ? (
         <p role="alert" className="text-destructive text-xs">
