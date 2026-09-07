@@ -78,8 +78,8 @@
   --chart-3: oklch(0.6 0.2 330);
   --chart-4: oklch(0.75 0.18 140);
   --chart-5: oklch(0.75 0.18 60);
-  /* Violet-pink complement to --primary, used sparingly for gradient accents. */
-  --accent-2: oklch(0.62 0.19 322);
+  /* Deeper, more saturated blue than --primary, for two-tone gradient accents. */
+  --accent-2: oklch(0.4 0.16 264);
   --radius: 0.75rem;
   --sidebar: oklch(0.98 0.006 264);
   --sidebar-foreground: oklch(0.18 0.02 264);
@@ -106,7 +106,7 @@
   --muted-foreground: oklch(0.72 0.03 264);
   --accent: oklch(0.32 0.045 264);
   --accent-foreground: oklch(0.96 0.008 264);
-  --accent-2: oklch(0.68 0.19 322);
+  --accent-2: oklch(0.55 0.19 264);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
