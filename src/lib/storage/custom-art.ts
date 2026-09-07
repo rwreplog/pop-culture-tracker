@@ -12,7 +12,17 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/gif": "gif",
 };
 
-const files = new Files({ adapter: neon({ bucket: BUCKET }) });
+let files: Files | undefined;
+
+/**
+ * Lazily constructs the storage client. The neon adapter throws if storage
+ * credentials aren't configured, so this must not run at module load time —
+ * doing so would crash any build/route that merely imports this module.
+ */
+function getFiles(): Files {
+  files ??= new Files({ adapter: neon({ bucket: BUCKET }) });
+  return files;
+}
 
 export type UploadCustomArtResult =
   { success: true; key: string } | { success: false; error: string };
@@ -36,17 +46,17 @@ export async function uploadCustomArt(
 
   const key = `custom-art/${userId}/${libraryItemId}/${randomUUID()}.${ext}`;
   const bytes = new Uint8Array(await file.arrayBuffer());
-  await files.upload(key, bytes, { contentType: file.type });
+  await getFiles().upload(key, bytes, { contentType: file.type });
 
   return { success: true, key };
 }
 
 /** Presigns a short-lived GET url for a custom art object key. */
 export async function presignCustomArtUrl(key: string): Promise<string> {
-  return files.url(key, { expiresIn: 3600 });
+  return getFiles().url(key, { expiresIn: 3600 });
 }
 
 /** Deletes a custom art object. Safe to call on a key that no longer exists. */
 export async function deleteCustomArt(key: string): Promise<void> {
-  await files.delete(key);
+  await getFiles().delete(key);
 }
