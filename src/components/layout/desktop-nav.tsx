@@ -24,11 +24,11 @@ export function DesktopNav() {
             href={item.href}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "relative flex items-center gap-3 rounded-full px-3 py-2 text-sm font-medium transition-colors",
               "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
-              "before:bg-primary before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:opacity-0 before:transition-opacity",
-              isActive && "bg-accent text-accent-foreground before:opacity-100",
+              isActive &&
+                "bg-accent text-accent-foreground dark:from-primary/25 dark:to-accent-2/15 dark:text-foreground dark:bg-linear-to-r dark:ring-1 dark:ring-white/10",
             )}
           >
             <item.icon

@@ -29,6 +29,7 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -77,7 +78,9 @@
   --chart-3: oklch(0.6 0.2 330);
   --chart-4: oklch(0.75 0.18 140);
   --chart-5: oklch(0.75 0.18 60);
-  --radius: 0.625rem;
+  /* Violet-pink complement to --primary, used sparingly for gradient accents. */
+  --accent-2: oklch(0.62 0.19 322);
+  --radius: 0.75rem;
   --sidebar: oklch(0.98 0.006 264);
   --sidebar-foreground: oklch(0.18 0.02 264);
   --sidebar-primary: oklch(0.5 0.18 264);
@@ -89,23 +92,24 @@
 }
 
 .dark {
-  --background: oklch(0.19 0.025 264);
+  --background: oklch(0.15 0.03 264);
   --foreground: oklch(0.96 0.008 264);
-  --card: oklch(0.24 0.03 264);
+  --card: oklch(0.21 0.032 264);
   --card-foreground: oklch(0.96 0.008 264);
-  --popover: oklch(0.24 0.03 264);
+  --popover: oklch(0.22 0.032 264);
   --popover-foreground: oklch(0.96 0.008 264);
   --primary: oklch(0.75 0.15 264);
-  --primary-foreground: oklch(0.19 0.025 264);
-  --secondary: oklch(0.3 0.035 264);
+  --primary-foreground: oklch(0.15 0.03 264);
+  --secondary: oklch(0.28 0.035 264);
   --secondary-foreground: oklch(0.96 0.008 264);
-  --muted: oklch(0.3 0.035 264);
+  --muted: oklch(0.28 0.035 264);
   --muted-foreground: oklch(0.72 0.03 264);
-  --accent: oklch(0.34 0.045 264);
+  --accent: oklch(0.32 0.045 264);
   --accent-foreground: oklch(0.96 0.008 264);
+  --accent-2: oklch(0.68 0.19 322);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.75 0.15 264);
   --chart-1: oklch(0.7 0.18 264);
   --chart-2: oklch(0.65 0.17 200);
@@ -128,6 +132,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .dark body {
+    background-image: radial-gradient(
+      80rem 40rem at 50% -10%,
+      oklch(0.32 0.06 264 / 55%),
+      transparent 60%
+    );
+    background-repeat: no-repeat;
   }
   html {
     @apply font-sans;
