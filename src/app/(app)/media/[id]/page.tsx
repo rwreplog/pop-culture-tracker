@@ -5,6 +5,7 @@ import { LibraryControls } from "@/components/library/library-controls";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
@@ -84,20 +85,38 @@ export default async function MediaDetailPage({
       </div>
       <div className="flex flex-col gap-4">
         {item.description ? (
-          <p className="text-sm">{item.description}</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">{item.description}</p>
+            </CardContent>
+          </Card>
         ) : null}
+
         <LibraryControls
           mediaId={item.id}
           mediaType={item.mediaType}
           libraryItem={libraryItem}
         />
-        <AddToListPicker
-          mediaId={item.id}
-          ownedLists={ownedLists.map((list) => ({
-            id: list.id,
-            name: list.name,
-          }))}
-        />
+
+        {ownedLists.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lists</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AddToListPicker
+                mediaId={item.id}
+                ownedLists={ownedLists.map((list) => ({
+                  id: list.id,
+                  name: list.name,
+                }))}
+              />
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </div>
   );
