@@ -17,6 +17,8 @@ export type NavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
+  /** Rendered as an elevated accent action in the mobile dock. */
+  isPrimary?: boolean;
 };
 
 /**
@@ -40,7 +42,7 @@ export const desktopNavItems: NavItem[] = [
 export const mobileNavItems: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/library", label: "Library", icon: Library },
-  { href: "/discover", label: "Add", icon: Plus },
+  { href: "/discover", label: "Add", icon: Plus, isPrimary: true },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/profile", label: "Profile", icon: User },
 ];

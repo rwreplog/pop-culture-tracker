@@ -54,10 +54,13 @@ export default async function HomePage() {
       {sections.queue.length > 0 ? (
         <Link
           href="/tonight"
-          className="border-border bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl border p-4 transition-colors"
+          className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl p-4 ring-1 transition-colors dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
         >
-          <div className="bg-background flex size-10 shrink-0 items-center justify-center rounded-full">
-            <Moon className="text-muted-foreground size-5" aria-hidden="true" />
+          <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 shrink-0 items-center justify-center rounded-full dark:bg-linear-to-br">
+            <Moon
+              className="text-muted-foreground dark:text-foreground size-5"
+              aria-hidden="true"
+            />
           </div>
           <div className="flex flex-col">
             <span className="font-semibold">What should I do tonight?</span>

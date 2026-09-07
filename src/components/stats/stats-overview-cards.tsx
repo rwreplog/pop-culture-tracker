@@ -3,7 +3,7 @@ import type { StatsOverview } from "@/lib/services/insights/queries";
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <Card size="sm">
+    <Card size="sm" variant="glass">
       <CardHeader>
         <CardTitle className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
           {label}

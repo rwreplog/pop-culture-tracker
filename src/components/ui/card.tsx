@@ -4,14 +4,22 @@ import { cn } from "cn";
 function Card({
   className,
   size = "default",
+  variant = "default",
   ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & {
+  size?: "default" | "sm";
+  /** "glass" adds a translucent, blurred surface in dark mode for hero/stat emphasis. */
+  variant?: "default" | "glass";
+}) {
   return (
     <div
       data-slot="card"
       data-size={size}
+      data-variant={variant}
       className={cn(
         "group/card bg-card text-card-foreground ring-foreground/10 flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm ring-1 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        variant === "glass" &&
+          "dark:bg-white/[0.045] dark:shadow-[0_20px_50px_-24px_oklch(0.1_0.04_264/0.85)] dark:ring-white/12 dark:supports-[backdrop-filter]:bg-white/[0.03] dark:supports-[backdrop-filter]:backdrop-blur-xl",
         className,
       )}
       {...props}
