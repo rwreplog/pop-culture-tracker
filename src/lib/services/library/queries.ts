@@ -35,10 +35,7 @@ export async function getLibraryStatusForResults(
       externalId: mediaExternalIds.externalId,
     })
     .from(mediaExternalIds)
-    .innerJoin(
-      libraryItems,
-      eq(libraryItems.mediaId, mediaExternalIds.mediaId),
-    )
+    .innerJoin(libraryItems, eq(libraryItems.mediaId, mediaExternalIds.mediaId))
     .where(
       and(
         eq(libraryItems.userId, userId),
