@@ -163,7 +163,7 @@ export default async function HomePage() {
                 mediaType={item.media.mediaType}
                 imageUrl={item.media.imageUrl}
                 metadata={item.metadata as Record<string, unknown> | null}
-                createdAt={item.createdAt}
+                createdAt={item.createdAt.toISOString()}
               />
             ))}
           </ul>
