@@ -9,7 +9,15 @@ import {
   useState,
 } from "react";
 
+import { RatingStars } from "@/components/library/rating-stars";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -62,43 +70,73 @@ export function LibraryControls({
   libraryItem: LibraryItem | null;
 }) {
   if (!libraryItem) {
-    return <AddToLibraryForm mediaId={mediaId} mediaType={mediaType} />;
+    return (
+      <Card variant="glass">
+        <CardContent>
+          <AddToLibraryForm mediaId={mediaId} mediaType={mediaType} />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-        <StatusForm
-          libraryItemId={libraryItem.id}
-          mediaType={mediaType}
-          status={libraryItem.status}
-        />
-        <RatingForm
-          libraryItemId={libraryItem.id}
-          rating={libraryItem.rating}
-        />
-        <FavoriteForm
-          libraryItemId={libraryItem.id}
-          isFavorite={libraryItem.isFavorite}
-        />
-      </div>
-      {libraryItem.status === "completed" ? (
-        <CompletedAtForm
-          libraryItemId={libraryItem.id}
-          completedAt={libraryItem.completedAt}
-        />
-      ) : null}
+      <Card variant="glass">
+        <CardHeader>
+          <CardTitle>Your status</CardTitle>
+          <CardAction>
+            <FavoriteForm
+              libraryItemId={libraryItem.id}
+              isFavorite={libraryItem.isFavorite}
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <StatusForm
+            libraryItemId={libraryItem.id}
+            mediaType={mediaType}
+            status={libraryItem.status}
+          />
+          <RatingForm
+            libraryItemId={libraryItem.id}
+            rating={libraryItem.rating}
+          />
+          {libraryItem.status === "completed" ? (
+            <CompletedAtForm
+              libraryItemId={libraryItem.id}
+              completedAt={libraryItem.completedAt}
+            />
+          ) : null}
+        </CardContent>
+      </Card>
+
       <ProgressForm
         libraryItemId={libraryItem.id}
         mediaType={mediaType}
         progress={libraryItem.progress as Record<string, unknown> | null}
       />
-      <NotesForm libraryItemId={libraryItem.id} notes={libraryItem.notes} />
-      <CustomArtForm
-        libraryItemId={libraryItem.id}
-        hasCustomArt={Boolean(libraryItem.customImageKey)}
-      />
-      <RemoveForm libraryItemId={libraryItem.id} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <NotesForm libraryItemId={libraryItem.id} notes={libraryItem.notes} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <CustomArtForm
+            libraryItemId={libraryItem.id}
+            hasCustomArt={Boolean(libraryItem.customImageKey)}
+          />
+          <RemoveForm libraryItemId={libraryItem.id} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -169,12 +207,15 @@ function StatusForm({
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <label className="sr-only" htmlFor="status">
+    <div className="flex flex-col gap-1">
+      <label
+        className="text-muted-foreground text-xs font-medium"
+        htmlFor="status"
+      >
         Status
       </label>
       <Select defaultValue={status} onValueChange={handleValueChange}>
-        <SelectTrigger id="status">
+        <SelectTrigger id="status" className="w-full sm:w-64">
           <SelectValue>
             {(value: (typeof STATUSES)[number]) =>
               libraryStatusLabel(value, mediaType)
@@ -198,14 +239,6 @@ function StatusForm({
   );
 }
 
-const RATING_OPTIONS = Array.from({ length: 11 }, (_, value) => value);
-
-function ratingLabel(value: number): string {
-  if (value === 0) return "No rating";
-  const stars = value / 2;
-  return `${stars} star${stars === 1 ? "" : "s"}`;
-}
-
 function RatingForm({
   libraryItemId,
   rating,
@@ -213,42 +246,26 @@ function RatingForm({
   libraryItemId: string;
   rating: number | null;
 }) {
-  const [state, formAction] = useActionState(updateRatingAction, undefined);
-  const NO_RATING = "none";
+  const [state, formAction, isPending] = useActionState(
+    updateRatingAction,
+    undefined,
+  );
 
-  function handleValueChange(value: string | null) {
-    if (!value) return;
+  function handleChange(value: number) {
     const formData = new FormData();
     formData.set("libraryItemId", libraryItemId);
-    formData.set("rating", value === NO_RATING ? "" : value);
+    formData.set("rating", value === 0 ? "" : String(value));
     startTransition(() => formAction(formData));
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <label className="sr-only" htmlFor="rating">
-        Rating
-      </label>
-      <Select
-        defaultValue={rating ? String(rating) : NO_RATING}
-        onValueChange={handleValueChange}
-      >
-        <SelectTrigger id="rating">
-          <SelectValue>
-            {(value: string) =>
-              value === NO_RATING ? "No rating" : ratingLabel(Number(value))
-            }
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={NO_RATING}>No rating</SelectItem>
-          {RATING_OPTIONS.filter((value) => value > 0).map((value) => (
-            <SelectItem key={value} value={String(value)}>
-              {ratingLabel(value)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col gap-1">
+      <span className="text-muted-foreground text-xs font-medium">Rating</span>
+      <RatingStars
+        value={rating ?? 0}
+        onChange={handleChange}
+        disabled={isPending}
+      />
       {state?.error ? (
         <p role="alert" className="text-destructive text-sm">
           {state.error}
@@ -348,7 +365,7 @@ function NotesForm({
   return (
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="libraryItemId" value={libraryItemId} />
-      <label className="text-sm font-medium" htmlFor="notes">
+      <label className="sr-only" htmlFor="notes">
         Notes
       </label>
       <Textarea
@@ -390,43 +407,50 @@ function ProgressForm({
   if (fields.length === 0) return null;
 
   return (
-    <form action={formAction} className="flex flex-col gap-2">
-      <input type="hidden" name="libraryItemId" value={libraryItemId} />
-      <input type="hidden" name="mediaType" value={mediaType} />
-      <span className="text-sm font-medium">Progress</span>
-      <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-end">
-        {fields.map((field) => (
-          <div key={field.name} className="flex flex-col gap-1">
-            <label
-              className="text-muted-foreground text-xs"
-              htmlFor={field.name}
-            >
-              {field.label}
-            </label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type={field.type}
-              inputMode={field.type === "number" ? "numeric" : undefined}
-              defaultValue={
-                progress?.[field.name] != null
-                  ? String(progress[field.name])
-                  : ""
-              }
-              className="w-28"
-            />
-          </div>
-        ))}
-        <Button type="submit" variant="outline" disabled={isPending}>
-          Save progress
-        </Button>
-      </div>
-      {state?.error ? (
-        <p role="alert" className="text-destructive text-sm">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Progress</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form
+          action={formAction}
+          className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
+        >
+          <input type="hidden" name="libraryItemId" value={libraryItemId} />
+          <input type="hidden" name="mediaType" value={mediaType} />
+          {fields.map((field) => (
+            <div key={field.name} className="flex flex-col gap-1">
+              <label
+                className="text-muted-foreground text-xs font-medium"
+                htmlFor={field.name}
+              >
+                {field.label}
+              </label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type={field.type}
+                inputMode={field.type === "number" ? "numeric" : undefined}
+                defaultValue={
+                  progress?.[field.name] != null
+                    ? String(progress[field.name])
+                    : ""
+                }
+                className="w-28"
+              />
+            </div>
+          ))}
+          <Button type="submit" variant="outline" disabled={isPending}>
+            Save progress
+          </Button>
+          {state?.error ? (
+            <p role="alert" className="text-destructive text-sm">
+              {state.error}
+            </p>
+          ) : null}
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
