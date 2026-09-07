@@ -3,19 +3,19 @@ import type { MediaType } from "@/lib/db/schema/media";
 import { comicVineAdapter } from "@/lib/services/media/comicvine";
 import { fixtureAdapter } from "@/lib/services/media/fixture";
 import { ProviderNotConfiguredError } from "@/lib/services/media/http";
+import { igdbAdapter } from "@/lib/services/media/igdb";
 import { openLibraryAdapter } from "@/lib/services/media/open-library";
 import type {
   GetMediaDetailsResult,
   ProviderAdapter,
   SearchMediaResult,
 } from "@/lib/services/media/provider-types";
-import { rawgAdapter } from "@/lib/services/media/rawg";
 import { tmdbAdapter } from "@/lib/services/media/tmdb";
 
 const LIVE_PROVIDERS: Record<MediaType, ProviderAdapter> = {
   movie: tmdbAdapter,
   tv: tmdbAdapter,
-  game: rawgAdapter,
+  game: igdbAdapter,
   book: openLibraryAdapter,
   comic: comicVineAdapter,
 };
