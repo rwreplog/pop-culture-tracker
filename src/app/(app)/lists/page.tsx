@@ -1,5 +1,6 @@
 import { ListChecks } from "lucide-react";
 
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { CreateListDialog } from "@/components/lists/create-list-dialog";
 import { ListCard } from "@/components/lists/list-card";
@@ -22,6 +23,7 @@ export default async function ListsPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <BackButton fallbackHref="/profile" />
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold tracking-tight">Your lists</h1>

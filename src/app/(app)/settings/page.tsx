@@ -1,5 +1,6 @@
 import { Palette, Settings, User } from "lucide-react";
 
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { AppearanceForm } from "@/components/settings/appearance-form";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
@@ -33,6 +34,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-6">
+      <BackButton fallbackHref="/profile" />
       <h1 className="text-2xl font-semibold">Settings</h1>
 
       <div className="flex flex-col gap-3">

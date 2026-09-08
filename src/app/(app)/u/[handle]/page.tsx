@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { BackButton } from "@/components/layout/back-button";
 import { FriendAction } from "@/components/friends/friend-action";
 import { ListCard } from "@/components/lists/list-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,6 +35,7 @@ export default async function PublicProfilePage({
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
+      <BackButton fallbackHref="/friends" />
       <div className="flex items-center gap-4">
         <Avatar className="size-14">
           {profileUser.image ? (

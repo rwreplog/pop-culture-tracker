@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { ActivityItem } from "@/components/activity/activity-item";
+import { BackButton } from "@/components/layout/back-button";
 import { LibraryControls } from "@/components/library/library-controls";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
@@ -69,6 +70,11 @@ export default async function MediaDetailPage({
           className="absolute inset-0 h-full w-full scale-110 rounded-none object-cover opacity-70 blur-2xl"
         />
         <div className="from-background via-background/55 to-background/10 absolute inset-0 bg-gradient-to-t" />
+        <BackButton
+          fallbackHref="/library"
+          iconOnly
+          className="absolute top-4 left-4 z-10 rounded-full bg-black/55 text-white backdrop-blur-sm hover:bg-black/70 hover:text-white"
+        />
         <div className="absolute inset-0 flex items-end justify-center pt-10 pb-36 md:pb-28">
           <MediaArtwork
             src={artUrl}

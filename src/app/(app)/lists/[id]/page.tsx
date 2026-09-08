@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BackButton } from "@/components/layout/back-button";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteListButton } from "@/components/lists/delete-list-button";
@@ -24,6 +25,7 @@ export default async function ListDetailPage({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
+      <BackButton fallbackHref="/lists" />
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <div className="flex items-center gap-2">
