@@ -15,9 +15,7 @@ test("an incorrect current password is rejected with a clear error", async ({
     page.getByRole("button", { name: "Update password" }).click(),
   );
 
-  await expect(
-    page.getByText("Current password is incorrect."),
-  ).toBeVisible();
+  await expect(page.getByText("Current password is incorrect.")).toBeVisible();
 });
 
 test("a user can change their password and sign in with the new one", async ({
