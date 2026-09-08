@@ -35,6 +35,14 @@ export async function userHasPassword(userId: string): Promise<boolean> {
   return !!user?.passwordHash;
 }
 
+/** Appearance settings, read on every page load (RootLayout) to set the initial theme/accent/font server-side. */
+export async function getUserPreferences(userId: string) {
+  return db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { theme: true, accentColor: true, fontFamily: true },
+  });
+}
+
 export async function isHandleTaken(
   handle: string,
   excludingUserId: string,

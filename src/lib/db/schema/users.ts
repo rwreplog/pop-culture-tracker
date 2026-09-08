@@ -1,4 +1,26 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+/** Appearance mode. "system" follows the device's OS-level preference. */
+export const themeEnum = pgEnum("theme", ["light", "dark", "system"]);
+
+/**
+ * Brand accent hue. Each maps to a single --hue value in globals.css — see
+ * "Accent themes" in docs/DESIGN_SYSTEM.md.
+ */
+export const accentColorEnum = pgEnum("accent_color", [
+  "blue",
+  "violet",
+  "emerald",
+  "amber",
+]);
+
+/** Single font used for both headings and body text — see globals.css's --font-app. */
+export const fontFamilyEnum = pgEnum("font_family", [
+  "space-grotesk",
+  "bricolage-grotesque",
+  "manrope",
+  "sora",
+]);
 
 /**
  * Column names follow Auth.js's Drizzle adapter conventions
@@ -22,6 +44,9 @@ export const users = pgTable("users", {
    */
   handle: text("handle").unique(),
   bio: text("bio"),
+  theme: themeEnum("theme").notNull().default("system"),
+  accentColor: accentColorEnum("accent_color").notNull().default("blue"),
+  fontFamily: fontFamilyEnum("font_family").notNull().default("space-grotesk"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -38,10 +38,16 @@ the redesign is meant to be seen.
 
 ## Color & Glow
 
-One brand hue only: blue, ~264° (`--primary` / `--accent-2`). Never introduce
-a second accent hue (no pink, purple, or violet) — glow and gradients stay
-strictly single-hue, varying only lightness/chroma for depth (see
-`--accent-2` in `globals.css`).
+Brand hue is user-selectable per account (Settings → Appearance): Blue
+(~264°, default), Violet (~292°), Emerald (~158°), or Amber (~75°).
+Whichever is active, the app stays single-hue throughout — glow, gradients,
+`--primary`, and `--accent-2` all derive from one `--hue` custom property
+in `globals.css` (each accent theme is a one-line `[data-accent]` override
+of it), varying only lightness/chroma for depth, never mixing two accent
+hues at once. Component code should reference the semantic tokens
+(`--primary`, `--ring`, `--accent-2`, etc.) — or `var(--hue)` directly for
+a one-off like a hardcoded shadow color — rather than hardcoding a hue
+value, so it follows whichever accent theme is active.
 
 - **Glass surfaces**: `Card` and `Dialog`/`Sheet` get a `variant="glass"` (or
   built-in dark-mode) treatment — translucent, blurred, softly bordered — for
@@ -63,16 +69,16 @@ Support light and dark modes using semantic design tokens.
 
 ## Typography
 
-Two-font pairing, both via `next/font/google`:
+A single font, user-selectable per account (Settings → Appearance) and used
+for both headings and body text: Space Grotesk (default), Bricolage
+Grotesque, Manrope, or Sora — each loaded via `next/font/google` in
+`layout.tsx`. `--font-sans`, `--font-heading`, and `--font-mono` all map to
+one `--font-app` token in `globals.css` (a `[data-font]` attribute on
+`<html>` selects which); component code should use those Tailwind
+utilities rather than a hardcoded font so it follows whichever is active.
 
-- **Display / headings** (`--font-heading`, Bricolage Grotesque): page
-  titles, section headings (`h1`/`h2` pick this up automatically via the
-  base layer), hero numerals/stats.
-- **Body / UI** (`--font-sans`, Space Grotesk): everything else — body text,
-  controls, captions, numerals in dense contexts (`--font-mono` also maps to
-  it for tabular numbers).
-
-Clear weight/size hierarchy:
+Clear weight/size hierarchy still applies, driven by size/weight rather
+than a second typeface:
 
 - Display
 - Page heading
