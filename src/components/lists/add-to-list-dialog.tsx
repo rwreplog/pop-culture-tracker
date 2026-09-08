@@ -54,8 +54,7 @@ export function AddToListDialog({
         <DialogHeader>
           <DialogTitle>Add to a list?</DialogTitle>
           <DialogDescription>
-            You can add this to one of your lists now, or skip and do it
-            later.
+            You can add this to one of your lists now, or skip and do it later.
           </DialogDescription>
         </DialogHeader>
         <form action={formAction} className="flex flex-col gap-4">

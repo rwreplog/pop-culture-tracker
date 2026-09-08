@@ -76,7 +76,12 @@ export function SearchResultCard({
   const wasPending = useRef(false);
 
   useEffect(() => {
-    if (wasPending.current && !addPending && addState && !("error" in addState)) {
+    if (
+      wasPending.current &&
+      !addPending &&
+      addState &&
+      !("error" in addState)
+    ) {
       setJustAdded(true);
       onAdded?.(addState.mediaId);
     }

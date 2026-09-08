@@ -4,9 +4,8 @@ vi.mock("@/lib/env", () => ({
   env: { NODE_ENV: "test", GOOGLE_BOOKS_API_KEY: undefined },
 }));
 
-const { googleBooksAdapter } = await import(
-  "@/lib/services/media/google-books"
-);
+const { googleBooksAdapter } =
+  await import("@/lib/services/media/google-books");
 
 describe("googleBooksAdapter.search", () => {
   beforeEach(() => {

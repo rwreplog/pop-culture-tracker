@@ -12,7 +12,10 @@ type ActionState = { error?: string } | undefined;
  * in the unmounting component never runs. Firing inside the action itself
  * sidesteps that race entirely.
  */
-export function withActionToast<State extends ActionState, Args extends unknown[]>(
+export function withActionToast<
+  State extends ActionState,
+  Args extends unknown[],
+>(
   action: (...args: Args) => State | Promise<State>,
   successMessage: string | ((...args: Args) => string),
 ) {

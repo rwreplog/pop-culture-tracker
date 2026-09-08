@@ -30,9 +30,7 @@ import { uploadCustomArt } from "@/lib/storage/custom-art";
 export type LibraryActionState = { error?: string } | undefined;
 
 export type QuickAddLibraryActionState =
-  | { error: string }
-  | { mediaId: string }
-  | undefined;
+  { error: string } | { mediaId: string } | undefined;
 
 async function requireUserId(): Promise<
   { userId: string } | { error: string }

@@ -96,11 +96,7 @@ describe("respondToFriendRequest", () => {
       }),
     });
 
-    const result = await respondToFriendRequest(
-      "user-1",
-      "friendship-1",
-      true,
-    );
+    const result = await respondToFriendRequest("user-1", "friendship-1", true);
 
     expect(result).toEqual({ success: true });
     expect(deleteNotificationMock).toHaveBeenCalledWith(
