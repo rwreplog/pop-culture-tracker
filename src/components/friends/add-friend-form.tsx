@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { sendFriendRequestAction } from "@/lib/actions/friendships";
+import { withActionToast } from "@/lib/action-toast";
 
 export function AddFriendForm() {
   const [state, formAction, isPending] = useActionState(
-    sendFriendRequestAction,
+    withActionToast(sendFriendRequestAction, "Friend request sent"),
     undefined,
   );
 

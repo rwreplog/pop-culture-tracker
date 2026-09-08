@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { NotificationsBell } from "@/components/layout/notifications-bell";
 import { UserMenu } from "@/components/layout/user-menu";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,13 @@ export type HeaderUser = {
   image?: string | null;
 };
 
-export function Header({ user }: { user?: HeaderUser }) {
+export function Header({
+  user,
+  unreadNotificationCount = 0,
+}: {
+  user?: HeaderUser;
+  unreadNotificationCount?: number;
+}) {
   return (
     <header className="bg-background/80 sticky top-0 z-50 flex min-h-14 items-center justify-between border-b px-4 pt-[env(safe-area-inset-top)] backdrop-blur-xl md:px-6">
       <Link
@@ -43,6 +50,9 @@ export function Header({ user }: { user?: HeaderUser }) {
             <Plus data-icon="inline-start" aria-hidden="true" />
             Add
           </Link>
+        ) : null}
+        {user ? (
+          <NotificationsBell initialUnreadCount={unreadNotificationCount} />
         ) : null}
         <UserMenu user={user} />
       </div>

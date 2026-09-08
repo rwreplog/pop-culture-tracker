@@ -4,14 +4,13 @@ import Link from "next/link";
 import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
+import {
+  RemoveFriendshipButton,
+  RespondButtons,
+} from "@/components/friends/friend-list-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import {
-  removeFriendshipAction,
-  respondFriendRequestAction,
-} from "@/lib/actions/friendships";
 import {
   getFriends,
   getIncomingRequests,
@@ -98,42 +97,7 @@ export default async function FriendsPage() {
               handle={request.from.handle}
               name={request.from.name}
               image={request.from.image}
-              action={
-                <div className="flex shrink-0 gap-2">
-                  <form
-                    action={async (formData: FormData) => {
-                      "use server";
-                      await respondFriendRequestAction(undefined, formData);
-                    }}
-                  >
-                    <input
-                      type="hidden"
-                      name="friendshipId"
-                      value={request.friendshipId}
-                    />
-                    <input type="hidden" name="accept" value="true" />
-                    <Button type="submit" size="sm">
-                      Accept
-                    </Button>
-                  </form>
-                  <form
-                    action={async (formData: FormData) => {
-                      "use server";
-                      await respondFriendRequestAction(undefined, formData);
-                    }}
-                  >
-                    <input
-                      type="hidden"
-                      name="friendshipId"
-                      value={request.friendshipId}
-                    />
-                    <input type="hidden" name="accept" value="false" />
-                    <Button type="submit" variant="outline" size="sm">
-                      Decline
-                    </Button>
-                  </form>
-                </div>
-              }
+              action={<RespondButtons friendshipId={request.friendshipId} />}
             />
           ))}
         </div>
@@ -149,22 +113,11 @@ export default async function FriendsPage() {
               name={request.to.name}
               image={request.to.image}
               action={
-                <form
-                  action={async (formData: FormData) => {
-                    "use server";
-                    await removeFriendshipAction(undefined, formData);
-                  }}
-                  className="shrink-0"
-                >
-                  <input
-                    type="hidden"
-                    name="friendshipId"
-                    value={request.friendshipId}
-                  />
-                  <Button type="submit" variant="outline" size="sm">
-                    Cancel
-                  </Button>
-                </form>
+                <RemoveFriendshipButton
+                  friendshipId={request.friendshipId}
+                  label="Cancel"
+                  successMessage="Request canceled"
+                />
               }
             />
           ))}
@@ -187,22 +140,11 @@ export default async function FriendsPage() {
               name={friend.name}
               image={friend.image}
               action={
-                <form
-                  action={async (formData: FormData) => {
-                    "use server";
-                    await removeFriendshipAction(undefined, formData);
-                  }}
-                  className="shrink-0"
-                >
-                  <input
-                    type="hidden"
-                    name="friendshipId"
-                    value={friendshipId}
-                  />
-                  <Button type="submit" variant="outline" size="sm">
-                    Remove
-                  </Button>
-                </form>
+                <RemoveFriendshipButton
+                  friendshipId={friendshipId}
+                  label="Remove"
+                  successMessage="Friend removed"
+                />
               }
             />
           ))

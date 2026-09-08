@@ -17,6 +17,7 @@ import {
   respondFriendRequestAction,
   sendFriendRequestAction,
 } from "@/lib/actions/friendships";
+import { withActionToast } from "@/lib/action-toast";
 import type { FriendshipStatus } from "@/lib/services/friendships/queries";
 
 export function FriendAction({
@@ -35,6 +36,7 @@ export function FriendAction({
         friendshipId={status.friendshipId}
         label="Request sent"
         cancelLabel="Cancel request"
+        successMessage="Request canceled"
       />
     );
   }
@@ -46,6 +48,7 @@ export function FriendAction({
       friendshipId={status.friendshipId}
       label="Friends"
       cancelLabel="Remove friend"
+      successMessage="Friend removed"
       confirm
     />
   );
@@ -53,7 +56,7 @@ export function FriendAction({
 
 function SendRequestForm({ targetHandle }: { targetHandle: string }) {
   const [state, formAction, isPending] = useActionState(
-    sendFriendRequestAction,
+    withActionToast(sendFriendRequestAction, "Friend request sent"),
     undefined,
   );
 
@@ -74,7 +77,11 @@ function SendRequestForm({ targetHandle }: { targetHandle: string }) {
 
 function RespondForm({ friendshipId }: { friendshipId: string }) {
   const [state, formAction, isPending] = useActionState(
-    respondFriendRequestAction,
+    withActionToast(respondFriendRequestAction, (_prevState, formData) =>
+      formData.get("accept") === "true"
+        ? "Friend request accepted"
+        : "Request declined",
+    ),
     undefined,
   );
 
@@ -109,16 +116,18 @@ function CancelForm({
   friendshipId,
   label,
   cancelLabel,
+  successMessage,
   confirm = false,
 }: {
   friendshipId: string;
   label: string;
   cancelLabel: string;
+  successMessage: string;
   confirm?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
-    removeFriendshipAction,
+    withActionToast(removeFriendshipAction, successMessage),
     undefined,
   );
 

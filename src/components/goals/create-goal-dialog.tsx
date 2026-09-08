@@ -23,13 +23,14 @@ import {
 import { createGoalAction } from "@/lib/actions/goals";
 import { ANY_MEDIA_TYPE } from "@/lib/schemas/goals";
 import { mediaTypeLabel } from "@/lib/media/labels";
+import { withActionToast } from "@/lib/action-toast";
 
 const MEDIA_TYPES = ["movie", "tv", "game", "book", "comic"] as const;
 
 export function CreateGoalDialog({ currentYear }: { currentYear: number }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
-    createGoalAction,
+    withActionToast(createGoalAction, "Goal added"),
     undefined,
   );
   // createGoalAction doesn't redirect (it stays on /goals), so close the

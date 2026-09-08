@@ -10,6 +10,7 @@ import "./globals.css";
 import { PwaUpdateManager } from "@/components/pwa/pwa-update-manager";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeSync } from "@/components/theme-sync";
+import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { auth } from "@/lib/auth";
 import { getUserPreferences } from "@/lib/services/users/queries";
@@ -90,6 +91,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <ThemeSync initialTheme={preferences?.theme} />
           <TooltipProvider>{children}</TooltipProvider>
           <PwaUpdateManager />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

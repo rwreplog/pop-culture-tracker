@@ -17,6 +17,7 @@ import {
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { deleteGoalAction } from "@/lib/actions/goals";
+import { withActionToast } from "@/lib/action-toast";
 
 function goalLabel(mediaType: MediaType | null, genre: string | null): string {
   if (mediaType && genre) return `${genre} ${mediaTypeLabel(mediaType)}s`;
@@ -42,7 +43,7 @@ export function GoalCard({
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
-    deleteGoalAction,
+    withActionToast(deleteGoalAction, "Goal deleted"),
     undefined,
   );
   const percent = Math.min(100, Math.round((completed / target) * 100));
