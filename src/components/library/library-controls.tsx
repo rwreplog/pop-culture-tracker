@@ -151,11 +151,19 @@ export function LibraryControls({
         <CardHeader>
           <CardTitle>Manage</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent>
           <CustomArtForm
             libraryItemId={libraryItem.id}
             hasCustomArt={Boolean(libraryItem.customImageKey)}
           />
+        </CardContent>
+      </Card>
+
+      <Card className="ring-destructive/20">
+        <CardHeader>
+          <CardTitle>Danger zone</CardTitle>
+        </CardHeader>
+        <CardContent>
           <RemoveForm libraryItemId={libraryItem.id} />
         </CardContent>
       </Card>
@@ -674,7 +682,7 @@ function RemoveForm({ libraryItemId }: { libraryItemId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        render={<Button variant="outline" className="self-start" />}
+        render={<Button variant="destructive" className="self-start" />}
       >
         Remove from Library
       </DialogTrigger>
