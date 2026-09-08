@@ -41,7 +41,7 @@ export function BackButton({
       variant="ghost"
       size={iconOnly ? "icon-sm" : "sm"}
       aria-label={iconOnly ? label : undefined}
-      className={cn("w-fit", className)}
+      className={cn(!iconOnly && "w-fit", className)}
       onClick={handleClick}
     >
       <ArrowLeft
