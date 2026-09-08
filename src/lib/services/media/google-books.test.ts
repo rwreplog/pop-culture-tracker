@@ -66,8 +66,7 @@ describe("googleBooksAdapter.search", () => {
               volumeInfo: {
                 title: "Project Hail Mary",
                 imageLinks: {
-                  thumbnail:
-                    "http://books.google.com/x.jpg?zoom=1&edge=curl",
+                  thumbnail: "http://books.google.com/x.jpg?zoom=1&edge=curl",
                   small: "http://books.google.com/x-small.jpg?zoom=1",
                 },
               },
