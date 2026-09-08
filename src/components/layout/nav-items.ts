@@ -9,6 +9,7 @@ import {
   Moon,
   Plus,
   Settings,
+  Sparkles,
   Target,
   User,
   Users,
@@ -26,6 +27,7 @@ export type NavItem = {
 export const desktopNavItems: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
   { href: "/tonight", label: "Tonight", icon: Moon },
+  { href: "/surprise", label: "Surprise", icon: Sparkles },
   { href: "/library", label: "Library", icon: Library },
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/discover", label: "Discover", icon: Compass },

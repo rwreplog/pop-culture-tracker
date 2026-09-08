@@ -81,6 +81,20 @@ function genreNames(
   return (genreIds ?? []).map((id) => table[id]).filter((name) => !!name);
 }
 
+function invertGenreTable(table: Record<number, string>): Map<string, number> {
+  return new Map(Object.entries(table).map(([id, name]) => [name, Number(id)]));
+}
+
+const MOVIE_GENRE_IDS = invertGenreTable(MOVIE_GENRES);
+const TV_GENRE_IDS = invertGenreTable(TV_GENRES);
+
+function genreIds(names: string[], mediaType: MediaType): number[] {
+  const table = mediaType === "tv" ? TV_GENRE_IDS : MOVIE_GENRE_IDS;
+  return names
+    .map((name) => table.get(name))
+    .filter((id): id is number => id !== undefined);
+}
+
 const searchResponseSchema = z.object({
   results: z.array(searchResultSchema).catch([]),
 });
@@ -158,5 +172,26 @@ export const tmdbAdapter: ProviderAdapter = {
       metadata: null,
     };
     return detail;
+  },
+
+  async discover(mediaType, genres) {
+    const apiKey = requireApiKey();
+    const endpoint = mediaType === "tv" ? "tv" : "movie";
+    const ids = genreIds(genres, mediaType);
+    // Vary the page so repeated calls (e.g. "show me something else")
+    // don't always surface the same handful of top-popularity results.
+    const page = 1 + Math.floor(Math.random() * 5);
+    const params = new URLSearchParams({
+      api_key: apiKey,
+      sort_by: "popularity.desc",
+      "vote_count.gte": "100",
+      page: String(page),
+    });
+    if (ids.length > 0) params.set("with_genres", ids.join(","));
+    const url = `${BASE_URL}/discover/${endpoint}?${params.toString()}`;
+    const json = await fetchProviderJson(url);
+    const parsed = searchResponseSchema.safeParse(json);
+    if (!parsed.success) return [];
+    return parsed.data.results.map((r) => toSearchResult(r, mediaType));
   },
 };

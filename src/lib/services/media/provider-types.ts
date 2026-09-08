@@ -39,6 +39,16 @@ export interface ProviderAdapter {
     externalId: string,
     mediaType: MediaType,
   ): Promise<NormalizedMediaDetail | null>;
+  /**
+   * Popular/well-regarded items for a media type, optionally narrowed to
+   * genres the caller knows the user likes. Only implemented by providers
+   * with a genre-browsable catalog (tmdb, igdb) — used for "surprise me"
+   * style discovery rather than a typed search query.
+   */
+  discover?(
+    mediaType: MediaType,
+    genres: string[],
+  ): Promise<NormalizedSearchResult[]>;
 }
 
 export type SearchMediaResult =

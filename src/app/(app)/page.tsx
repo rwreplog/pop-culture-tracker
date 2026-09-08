@@ -1,4 +1,5 @@
-import { Compass, Moon } from "lucide-react";
+import { Compass, Moon, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { ActivityItem } from "@/components/activity/activity-item";
@@ -9,6 +10,38 @@ import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getActivityFeed } from "@/lib/services/activity/queries";
 import { getDashboardSections } from "@/lib/services/library/queries";
+import { cn } from "@/lib/utils";
+
+/** Home page's "what next?" entry points — What should I do tonight? / Surprise me. */
+function HomeActionCard({
+  href,
+  icon: Icon,
+  title,
+  description,
+}: {
+  href: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl p-4 ring-1 transition-colors dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
+    >
+      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 shrink-0 items-center justify-center rounded-full dark:bg-linear-to-br">
+        <Icon
+          className="text-muted-foreground dark:text-foreground size-5"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="flex flex-col">
+        <span className="font-semibold">{title}</span>
+        <span className="text-muted-foreground text-sm">{description}</span>
+      </div>
+    </Link>
+  );
+}
 
 export default async function HomePage() {
   const session = await auth();
@@ -52,25 +85,27 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {sections.queue.length > 0 ? (
-        <Link
-          href="/tonight"
-          className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl p-4 ring-1 transition-colors dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
-        >
-          <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 shrink-0 items-center justify-center rounded-full dark:bg-linear-to-br">
-            <Moon
-              className="text-muted-foreground dark:text-foreground size-5"
-              aria-hidden="true"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold">What should I do tonight?</span>
-            <span className="text-muted-foreground text-sm">
-              Get a pick from your backlog
-            </span>
-          </div>
-        </Link>
-      ) : null}
+      <div
+        className={cn(
+          "grid gap-3",
+          sections.queue.length > 0 && "sm:grid-cols-2",
+        )}
+      >
+        {sections.queue.length > 0 ? (
+          <HomeActionCard
+            href="/tonight"
+            icon={Moon}
+            title="What should I do tonight?"
+            description="Get a pick from your backlog"
+          />
+        ) : null}
+        <HomeActionCard
+          href="/surprise"
+          icon={Sparkles}
+          title="Surprise me"
+          description="Discover something new"
+        />
+      </div>
 
       {sections.continueItems.length > 0 ? (
         <DashboardSection title="Continue">

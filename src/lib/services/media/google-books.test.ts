@@ -54,6 +54,35 @@ describe("googleBooksAdapter.search", () => {
     ]);
   });
 
+  it("prefers larger imageLinks sizes and bumps the zoom param", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: "abc123",
+              volumeInfo: {
+                title: "Project Hail Mary",
+                imageLinks: {
+                  thumbnail:
+                    "http://books.google.com/x.jpg?zoom=1&edge=curl",
+                  small: "http://books.google.com/x-small.jpg?zoom=1",
+                },
+              },
+            },
+          ],
+        }),
+      }),
+    );
+
+    const results = await googleBooksAdapter.search("hail mary", "book");
+    expect(results[0].imageUrl).toBe(
+      "https://books.google.com/x-small.jpg?zoom=3",
+    );
+  });
+
   it("pads a year-only publishedDate to a full ISO date", async () => {
     vi.stubGlobal(
       "fetch",

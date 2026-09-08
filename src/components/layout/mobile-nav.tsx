@@ -14,7 +14,7 @@ export function MobileNav() {
       aria-label="Primary"
       className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
     >
-      <div className="bg-background/85 ring-foreground/10 flex w-full max-w-sm items-center justify-around rounded-full py-1.5 shadow-lg ring-1 backdrop-blur-xl dark:bg-white/[0.06] dark:shadow-[0_20px_45px_-20px_oklch(0.1_0.04_var(--hue)/0.9)] dark:ring-white/12">
+      <div className="bg-background ring-foreground/10 flex w-full max-w-sm items-center justify-around rounded-full py-1.5 shadow-lg ring-1 dark:shadow-[0_20px_45px_-20px_oklch(0.1_0.04_var(--hue)/0.9)] dark:ring-white/12">
         {mobileNavItems.map((item) => {
           const path = item.href.split("?")[0];
           const isActive =
