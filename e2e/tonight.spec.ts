@@ -9,7 +9,6 @@ async function addToBacklog(
 ) {
   await page.goto(`/discover?type=${mediaType}`);
   await page.getByLabel("Search").fill(title);
-  await page.getByRole("button", { name: "Search" }).click();
   await page
     .getByRole("button", { name: new RegExp(title) })
     .first()

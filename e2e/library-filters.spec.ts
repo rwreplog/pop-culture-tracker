@@ -23,7 +23,6 @@ async function quickAdd(
   await page.goto(`/discover?type=${mediaType}`);
   const main = mainOf(page);
   await main.getByLabel("Search").fill(query);
-  await main.getByRole("button", { name: "Search" }).click();
   await waitForServerAction(page, () =>
     main.getByRole("button", { name: "Add" }).click(),
   );

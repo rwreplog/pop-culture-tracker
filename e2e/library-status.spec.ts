@@ -9,7 +9,6 @@ test("changing status on the media detail page is reflected in library and dashb
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("button", { name: /Severance/ }).click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
   const mediaUrl = page.url();
@@ -56,7 +55,6 @@ test("removing an item from the library clears it from Library and Dashboard", a
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("button", { name: /Severance/ }).click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
 

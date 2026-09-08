@@ -14,7 +14,6 @@ test("search, quick-add to library, and see it reflected on Library, Dashboard, 
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
 
   await expect(page.getByText("Severance", { exact: true })).toBeVisible();
 

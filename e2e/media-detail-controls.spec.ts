@@ -9,7 +9,6 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
 
   // Clicking the card itself (not "Add") resolves the result and navigates
   // to its detail page.
