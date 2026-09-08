@@ -105,4 +105,11 @@ export const fixtureAdapter: ProviderAdapter = {
     if (!result) return null;
     return { ...result, metadata: null };
   },
+
+  async discover(mediaType, genres) {
+    if (genres.length === 0) return FIXTURES[mediaType];
+    return FIXTURES[mediaType].filter((result) =>
+      result.genres.some((genre) => genres.includes(genre)),
+    );
+  },
 };

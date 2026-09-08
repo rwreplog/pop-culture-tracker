@@ -24,7 +24,7 @@ function daysSince(date: Date): number {
 }
 
 /** Genres pulled from the user's highly-rated or favorited completed items. */
-function buildGenreAffinity<T extends LibraryItemWithMedia>(
+export function buildGenreAffinity<T extends LibraryItemWithMedia>(
   items: T[],
 ): Map<string, number> {
   const affinity = new Map<string, number>();

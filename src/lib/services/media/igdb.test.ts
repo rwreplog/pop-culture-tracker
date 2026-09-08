@@ -147,3 +147,38 @@ describe("igdbAdapter.getDetails", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("igdbAdapter.discover", () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("filters by genre name in the Apicalypse query", async () => {
+    const fetchMock = mockFetchSequence(TOKEN_RESPONSE, [
+      {
+        id: 1942,
+        name: "The Witcher 3: Wild Hunt",
+        genres: [{ name: "RPG" }],
+      },
+    ]);
+
+    const igdbAdapter = await freshAdapter();
+    const results = await igdbAdapter.discover?.("game", ["RPG"]);
+
+    expect(results?.[0]?.title).toBe("The Witcher 3: Wild Hunt");
+    const [, apiInit] = fetchMock.mock.calls[1];
+    expect(String(apiInit.body)).toContain('genres.name = ("RPG")');
+  });
+
+  it("omits the genre filter and sorts by rating when there's no genre signal", async () => {
+    const fetchMock = mockFetchSequence(TOKEN_RESPONSE, []);
+
+    const igdbAdapter = await freshAdapter();
+    await igdbAdapter.discover?.("game", []);
+
+    const [, apiInit] = fetchMock.mock.calls[1];
+    expect(String(apiInit.body)).not.toContain("genres.name = (");
+    expect(String(apiInit.body)).toContain("where rating_count > 20;");
+    expect(String(apiInit.body)).toContain("sort rating desc");
+  });
+});

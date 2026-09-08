@@ -18,6 +18,10 @@ const volumeInfoSchema = z.object({
   categories: z.array(z.string()).optional(),
   imageLinks: z
     .object({
+      extraLarge: z.string().optional(),
+      large: z.string().optional(),
+      medium: z.string().optional(),
+      small: z.string().optional(),
       thumbnail: z.string().optional(),
       smallThumbnail: z.string().optional(),
     })
@@ -33,10 +37,18 @@ const searchResponseSchema = z.object({
   items: z.array(volumeSchema).catch([]).optional(),
 });
 
-/** Google's thumbnails are served over http:// and take an optional edge=curl page-curl effect; neither is wanted here. */
+/**
+ * Google's thumbnails are served over http:// and take an optional edge=curl
+ * page-curl effect; neither is wanted here. The `zoom` param also controls
+ * the rendered resolution of the *same* cover image (higher is larger, up to
+ * a cap around 3), so bump it up from the low default search results use.
+ */
 function normalizeImageUrl(url: string | undefined): string | null {
   if (!url) return null;
-  return url.replace(/^http:/, "https:").replace(/&edge=curl/, "");
+  return url
+    .replace(/^http:/, "https:")
+    .replace(/&edge=curl/, "")
+    .replace(/([?&])zoom=\d+/, "$1zoom=3");
 }
 
 /** publishedDate can be "YYYY", "YYYY-MM", or "YYYY-MM-DD" — pad to a full ISO date. */
@@ -57,7 +69,12 @@ function toSearchResult(
     title: info?.title ?? "Untitled",
     releaseDate: normalizeReleaseDate(info?.publishedDate),
     imageUrl: normalizeImageUrl(
-      info?.imageLinks?.thumbnail ?? info?.imageLinks?.smallThumbnail,
+      info?.imageLinks?.extraLarge ??
+        info?.imageLinks?.large ??
+        info?.imageLinks?.medium ??
+        info?.imageLinks?.small ??
+        info?.imageLinks?.thumbnail ??
+        info?.imageLinks?.smallThumbnail,
     ),
     creator: info?.authors?.join(", ") ?? null,
     description: info?.description ?? null,

@@ -32,7 +32,7 @@ function shouldUseFixtures(): boolean {
   return env.NODE_ENV === "test" || env.MEDIA_PROVIDER_MODE === "fixture";
 }
 
-function providerFor(mediaType: MediaType): ProviderAdapter {
+export function providerFor(mediaType: MediaType): ProviderAdapter {
   return (shouldUseFixtures() ? FIXTURE_PROVIDERS : LIVE_PROVIDERS)[mediaType];
 }
 
