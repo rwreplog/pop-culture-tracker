@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -48,77 +49,79 @@ export function GoalCard({
   const achieved = completed >= target;
 
   return (
-    <div className="border-border flex flex-col gap-3 rounded-lg border p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-0.5">
-          <span className="font-medium">
-            {target} {goalLabel(mediaType, genre)} in {year}
-          </span>
-          <span className="text-muted-foreground text-xs">
-            {completed} of {target} completed
-            {achieved ? " — achieved!" : ""}
-          </span>
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                type="button"
-                aria-label="Delete goal"
-              />
-            }
-          >
-            <X />
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete this goal?</DialogTitle>
-              <DialogDescription>
-                This removes the goal and its progress tracking. Titles
-                you&apos;ve already completed aren&apos;t affected.
-              </DialogDescription>
-            </DialogHeader>
-            <form action={formAction}>
-              <input type="hidden" name="goalId" value={id} />
-              {state?.error ? (
-                <p role="alert" className="text-destructive text-sm">
-                  {state.error}
-                </p>
-              ) : null}
-              <DialogFooter>
+    <Card variant="glass">
+      <CardContent className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-medium">
+              {target} {goalLabel(mediaType, genre)} in {year}
+            </span>
+            <span className="text-muted-foreground text-xs">
+              {completed} of {target} completed
+              {achieved ? " — achieved!" : ""}
+            </span>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger
+              render={
                 <Button
+                  variant="ghost"
+                  size="icon-sm"
                   type="button"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  disabled={isPending}
-                >
-                  Delete
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-      <div
-        className="bg-muted h-2 overflow-hidden rounded-full"
-        role="progressbar"
-        aria-valuenow={percent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
+                  aria-label="Delete goal"
+                />
+              }
+            >
+              <X />
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete this goal?</DialogTitle>
+                <DialogDescription>
+                  This removes the goal and its progress tracking. Titles
+                  you&apos;ve already completed aren&apos;t affected.
+                </DialogDescription>
+              </DialogHeader>
+              <form action={formAction}>
+                <input type="hidden" name="goalId" value={id} />
+                {state?.error ? (
+                  <p role="alert" className="text-destructive text-sm">
+                    {state.error}
+                  </p>
+                ) : null}
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="destructive"
+                    disabled={isPending}
+                  >
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
         <div
-          className={achieved ? "bg-primary h-full" : "bg-primary/70 h-full"}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-    </div>
+          className="bg-muted h-2 overflow-hidden rounded-full"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <div
+            className={achieved ? "bg-primary h-full" : "bg-primary/70 h-full"}
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -32,7 +32,7 @@ test("create a goal, track progress as items are completed, then delete it", asy
   await page.goto("/library");
   await page.getByRole("link", { name: /Dune/ }).first().click();
   await waitForServerAction(page, () =>
-    selectComboboxOption(page, "Status", "Completed"),
+    selectComboboxOption(page, "Status", "Watched"),
   );
 
   await page.goto("/goals");

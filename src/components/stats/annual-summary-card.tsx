@@ -23,7 +23,7 @@ export function AnnualSummaryCard({ summary }: { summary: AnnualSummary }) {
   }
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle>{summary.year} in review</CardTitle>
       </CardHeader>

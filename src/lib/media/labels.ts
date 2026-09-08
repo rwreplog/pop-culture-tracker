@@ -16,16 +16,32 @@ export function mediaTypeLabel(mediaType: MediaType): string {
 }
 
 /**
- * Friendly per-media-type verbs for the "in_progress" status, per
- * docs/PRODUCT.md (e.g. "Watching" for movie/tv, "Playing" for games).
- * Other statuses read fine as-is across every media type.
+ * Friendly per-media-type verbs, per docs/PRODUCT.md ("friendlier labels
+ * such as Want to Watch, Watching, Watched, Want to Play, Playing,
+ * Completed, etc."). Paused/abandoned read fine as-is across every type.
  */
+const WANT_LABELS: Record<MediaType, string> = {
+  movie: "Want to Watch",
+  tv: "Want to Watch",
+  game: "Want to Play",
+  book: "Want to Read",
+  comic: "Want to Read",
+};
+
 const IN_PROGRESS_LABELS: Record<MediaType, string> = {
   movie: "Watching",
   tv: "Watching",
   game: "Playing",
   book: "Reading",
   comic: "Reading",
+};
+
+const COMPLETED_LABELS: Record<MediaType, string> = {
+  movie: "Watched",
+  tv: "Watched",
+  game: "Completed",
+  book: "Read",
+  comic: "Read",
 };
 
 const STATUS_LABELS: Record<LibraryStatus, string> = {
@@ -40,6 +56,8 @@ export function libraryStatusLabel(
   status: LibraryStatus,
   mediaType: MediaType,
 ): string {
+  if (status === "want") return WANT_LABELS[mediaType];
   if (status === "in_progress") return IN_PROGRESS_LABELS[mediaType];
+  if (status === "completed") return COMPLETED_LABELS[mediaType];
   return STATUS_LABELS[status];
 }

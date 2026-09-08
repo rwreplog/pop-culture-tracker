@@ -19,10 +19,10 @@ test("changing status on the media detail page is reflected in library and dashb
     page
       .getByRole("combobox", { name: "Status" })
       .locator('[data-slot="select-value"]'),
-  ).toHaveText("Want to Experience");
+  ).toHaveText("Want to Watch");
 
   await page.goto("/library");
-  await expect(page.getByText("Want to Experience")).toBeVisible();
+  await expect(page.getByText("Want to Watch")).toBeVisible();
 
   await page.goto(mediaUrl);
   await page.getByRole("combobox", { name: "Status" }).click();
@@ -35,14 +35,12 @@ test("changing status on the media detail page is reflected in library and dashb
   await page.goto(mediaUrl);
   await page.getByRole("combobox", { name: "Status" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("option", { name: "Completed" }).click(),
+    page.getByRole("option", { name: "Watched" }).click(),
   );
 
   await page.goto("/library");
-  // "Completed" also appears as an <option> in the library's own status
-  // filter, so scope the match to the media card's badge.
   await expect(
-    page.getByRole("link", { name: /Severance/ }).getByText("Completed"),
+    page.getByRole("link", { name: /Severance/ }).getByText("Watched"),
   ).toBeVisible();
 
   await page.goto("/");

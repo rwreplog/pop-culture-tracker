@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaExternalIds } from "@/lib/db/schema/media";
 import { libraryItems } from "@/lib/db/schema/library";
+import { getMediaGenres } from "@/lib/media/metadata";
 import { rankBacklog } from "@/lib/services/recommendations/scoring";
 
 type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
@@ -49,16 +50,58 @@ export async function getLibraryStatusForResults(
   return new Set(rows.map((row) => `${row.provider}:${row.externalId}`));
 }
 
+export const LIBRARY_SORTS = [
+  "recent",
+  "added",
+  "title",
+  "rating",
+  "release",
+] as const;
+export type LibrarySort = (typeof LIBRARY_SORTS)[number];
+
 export type LibraryFilters = {
   mediaType?: MediaType;
   status?: LibraryStatus;
+  /** Case-insensitive substring match against the title. */
+  search?: string;
+  sort?: LibrarySort;
 };
+
+function sortItems<
+  T extends {
+    media: { title: string; releaseDate: string | null };
+    rating: number | null;
+    createdAt: Date;
+    updatedAt: Date;
+  },
+>(items: T[], sort: LibrarySort = "recent"): T[] {
+  const sorted = [...items];
+  switch (sort) {
+    case "added":
+      return sorted.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      );
+    case "title":
+      return sorted.sort((a, b) => a.media.title.localeCompare(b.media.title));
+    case "rating":
+      return sorted.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+    case "release":
+      return sorted.sort((a, b) =>
+        (b.media.releaseDate ?? "").localeCompare(a.media.releaseDate ?? ""),
+      );
+    case "recent":
+    default:
+      return sorted.sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
+      );
+  }
+}
 
 /**
  * Returns the user's library items with their Media joined in, optionally
- * filtered by media type and/or status. Filtering/sorting happens in
- * application code once fetched — fine at MVP scale (a single user's
- * library), revisit if this needs to scale further.
+ * filtered by media type, status, and title search, and sorted. Filtering/
+ * sorting happens in application code once fetched — fine at MVP scale (a
+ * single user's library), revisit if this needs to scale further.
  */
 export async function getLibraryItems(
   userId: string,
@@ -72,11 +115,21 @@ export async function getLibraryItems(
         )
       : eq(libraryItems.userId, userId),
     with: { media: true },
-    orderBy: (item, { desc }) => [desc(item.updatedAt)],
   });
 
-  if (!filters.mediaType) return items;
-  return items.filter((item) => item.media.mediaType === filters.mediaType);
+  let result = items;
+  if (filters.mediaType) {
+    result = result.filter(
+      (item) => item.media.mediaType === filters.mediaType,
+    );
+  }
+  if (filters.search?.trim()) {
+    const query = filters.search.trim().toLowerCase();
+    result = result.filter((item) =>
+      item.media.title.toLowerCase().includes(query),
+    );
+  }
+  return sortItems(result, filters.sort);
 }
 
 const SECTION_LIMIT = 8;
@@ -96,12 +149,54 @@ export async function getDashboardSections(userId: string) {
         (b.completedAt?.getTime() ?? 0) - (a.completedAt?.getTime() ?? 0),
     );
 
+  const queue = rankBacklog(items).slice(0, SECTION_LIMIT);
+  const queuedIds = new Set(queue.map((item) => item.id));
+
+  // "For you": genre-affinity picks not already surfaced in Queue, so the
+  // two rails don't just duplicate the same backlog slice.
+  const discovery = rankBacklog(items)
+    .filter((item) => item.hasGenreMatch && !queuedIds.has(item.id))
+    .slice(0, SECTION_LIMIT);
+
   return {
     continueItems: items
       .filter((item) => item.status === "in_progress")
       .slice(0, SECTION_LIMIT),
-    queue: rankBacklog(items).slice(0, SECTION_LIMIT),
+    queue,
     recentlyCompleted: completed.slice(0, SECTION_LIMIT),
     favorites: items.filter((item) => item.isFavorite).slice(0, SECTION_LIMIT),
+    discovery,
   };
+}
+
+const RELATED_LIMIT = 8;
+
+/**
+ * Other items of the same media type in the user's library that share a
+ * genre tag with `genres`, ranked by number of shared genres. Falls back to
+ * same-type items with no genre filter if `genres` is empty, since an
+ * empty-genre title still benefits from "more of this type" over nothing.
+ */
+export async function getRelatedLibraryItems(
+  userId: string,
+  excludeMediaId: string,
+  mediaType: MediaType,
+  genres: string[],
+) {
+  const items = await getLibraryItems(userId, { mediaType });
+  const genreSet = new Set(genres);
+
+  const scored = items
+    .filter((item) => item.mediaId !== excludeMediaId)
+    .map((item) => ({
+      item,
+      shared: getMediaGenres(item.media).filter((genre) => genreSet.has(genre))
+        .length,
+    }));
+
+  const relevant =
+    genreSet.size > 0 ? scored.filter(({ shared }) => shared > 0) : scored;
+  relevant.sort((a, b) => b.shared - a.shared);
+
+  return relevant.slice(0, RELATED_LIMIT).map(({ item }) => item);
 }

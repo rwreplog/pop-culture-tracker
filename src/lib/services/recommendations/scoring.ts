@@ -45,7 +45,7 @@ function scoreAndExplain(
   item: LibraryItemWithMedia,
   genreAffinity: Map<string, number>,
   mood: Mood | undefined,
-): { score: number; reason: string } {
+): { score: number; reason: string; hasGenreMatch: boolean } {
   let score = 0;
   const reasons: { weight: number; text: string }[] = [];
 
@@ -96,12 +96,14 @@ function scoreAndExplain(
   reasons.sort((a, b) => b.weight - a.weight);
   const reason = reasons[0]?.text ?? "Next up in your backlog";
 
-  return { score, reason };
+  return { score, reason, hasGenreMatch: matchedGenres.length > 0 };
 }
 
 export type ScoredBacklogItem<T extends LibraryItemWithMedia> = T & {
   score: number;
   reason: string;
+  /** Scored via shared genres with a highly-rated/favorited completed item. */
+  hasGenreMatch: boolean;
 };
 
 /**

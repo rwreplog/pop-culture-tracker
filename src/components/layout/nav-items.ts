@@ -6,6 +6,7 @@ import {
   Home,
   Library,
   ListChecks,
+  Moon,
   Plus,
   Settings,
   Target,
@@ -21,13 +22,10 @@ export type NavItem = {
   isPrimary?: boolean;
 };
 
-/**
- * Primary desktop navigation.
- * Discover currently renders a placeholder screen — see docs/UX.md and
- * docs/ROADMAP.md (Discover scope is not yet defined for MVP).
- */
+/** Primary desktop navigation. */
 export const desktopNavItems: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/tonight", label: "Tonight", icon: Moon },
   { href: "/library", label: "Library", icon: Library },
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/discover", label: "Discover", icon: Compass },

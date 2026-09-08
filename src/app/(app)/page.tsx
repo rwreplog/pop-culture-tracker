@@ -32,6 +32,7 @@ export default async function HomePage() {
     sections.queue.length === 0 &&
     sections.recentlyCompleted.length === 0 &&
     sections.favorites.length === 0 &&
+    sections.discovery.length === 0 &&
     recentActivity.length === 0;
 
   if (isEmpty) {
@@ -141,6 +142,26 @@ export default async function HomePage() {
                 status={item.status}
                 isFavorite={item.isFavorite}
                 libraryItemId={item.id}
+              />
+            </div>
+          ))}
+        </DashboardSection>
+      ) : null}
+
+      {sections.discovery.length > 0 ? (
+        <DashboardSection title="For you">
+          {sections.discovery.map((item) => (
+            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+              <MediaCard
+                href={`/media/${item.mediaId}`}
+                title={item.media.title}
+                mediaType={item.media.mediaType}
+                releaseDate={item.media.releaseDate}
+                imageUrl={item.media.imageUrl}
+                status={item.status}
+                isFavorite={item.isFavorite}
+                libraryItemId={item.id}
+                reason={item.reason}
               />
             </div>
           ))}

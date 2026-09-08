@@ -24,6 +24,7 @@ export function MediaCard({
   status,
   isFavorite,
   libraryItemId,
+  reason,
 }: {
   href: string;
   title: string;
@@ -34,6 +35,8 @@ export function MediaCard({
   isFavorite?: boolean;
   /** When set, the favorite badge becomes an interactive toggle. */
   libraryItemId?: string;
+  /** Short "why this pick" caption, e.g. for a personalized-recommendation rail. */
+  reason?: string;
 }) {
   return (
     <div className="group relative flex flex-col gap-2">
@@ -70,6 +73,11 @@ export function MediaCard({
             <Badge variant="secondary" className="w-fit">
               {libraryStatusLabel(status, mediaType)}
             </Badge>
+          ) : null}
+          {reason ? (
+            <span className="text-muted-foreground line-clamp-1 text-xs italic">
+              {reason}
+            </span>
           ) : null}
         </div>
       </Link>

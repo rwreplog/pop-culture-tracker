@@ -5,6 +5,7 @@ import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import {
   removeFriendshipAction,
@@ -32,7 +33,7 @@ function PersonRow({
   action: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+    <div className="bg-muted/40 ring-foreground/10 flex items-center justify-between gap-3 rounded-lg p-3 ring-1 dark:bg-white/[0.03] dark:ring-white/10">
       <Link
         href={handle ? `/u/${handle}` : "#"}
         className="flex min-w-0 items-center gap-3"
@@ -80,7 +81,11 @@ export default async function FriendsPage() {
         </p>
       </div>
 
-      <AddFriendForm />
+      <Card variant="glass">
+        <CardContent>
+          <AddFriendForm />
+        </CardContent>
+      </Card>
 
       {incoming.length > 0 ? (
         <div className="flex flex-col gap-2">
