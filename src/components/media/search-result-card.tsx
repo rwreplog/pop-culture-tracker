@@ -57,9 +57,11 @@ function HiddenResultFields({ result }: { result: NormalizedSearchResult }) {
 export function SearchResultCard({
   result,
   alreadyInLibrary = false,
+  onAdded,
 }: {
   result: NormalizedSearchResult;
   alreadyInLibrary?: boolean;
+  onAdded?: (mediaId: string) => void;
 }) {
   const [viewState, viewAction, viewPending] = useActionState(
     resolveMediaAction,
@@ -74,11 +76,12 @@ export function SearchResultCard({
   const wasPending = useRef(false);
 
   useEffect(() => {
-    if (wasPending.current && !addPending && !addState?.error) {
+    if (wasPending.current && !addPending && addState && !("error" in addState)) {
       setJustAdded(true);
+      onAdded?.(addState.mediaId);
     }
     wasPending.current = addPending;
-  }, [addPending, addState]);
+  }, [addPending, addState, onAdded]);
 
   const added = alreadyInLibrary || justAdded;
 
@@ -171,7 +174,7 @@ export function SearchResultCard({
           {viewState.error}
         </p>
       ) : null}
-      {addState?.error ? (
+      {addState && "error" in addState ? (
         <p role="alert" className="text-destructive text-xs">
           {addState.error}
         </p>

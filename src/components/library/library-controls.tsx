@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { RatingStars } from "@/components/library/rating-stars";
+import { AddToListDialog } from "@/components/lists/add-to-list-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -50,7 +51,9 @@ import {
   updateRatingAction,
   updateStatusAction,
   uploadCustomArtAction,
+  type LibraryActionState,
 } from "@/lib/actions/library";
+import { withActionToast } from "@/lib/action-toast";
 
 const STATUSES = [
   "want",
@@ -64,23 +67,42 @@ export function LibraryControls({
   mediaId,
   mediaType,
   libraryItem,
+  ownedLists,
 }: {
   mediaId: string;
   mediaType: MediaType;
   libraryItem: LibraryItem | null;
+  ownedLists: { id: string; name: string }[];
 }) {
+  const [showListPrompt, setShowListPrompt] = useState(false);
+
+  const listPrompt = (
+    <AddToListDialog
+      mediaId={mediaId}
+      ownedLists={ownedLists}
+      open={showListPrompt}
+      onOpenChange={setShowListPrompt}
+    />
+  );
+
   if (!libraryItem) {
     return (
       <Card variant="glass">
         <CardContent>
-          <AddToLibraryForm mediaId={mediaId} mediaType={mediaType} />
+          <AddToLibraryForm
+            mediaId={mediaId}
+            mediaType={mediaType}
+            onAdded={() => setShowListPrompt(true)}
+          />
         </CardContent>
+        {listPrompt}
       </Card>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
+      {listPrompt}
       <Card variant="glass">
         <CardHeader>
           <CardTitle>Your status</CardTitle>
@@ -144,12 +166,27 @@ export function LibraryControls({
 function AddToLibraryForm({
   mediaId,
   mediaType,
+  onAdded,
 }: {
   mediaId: string;
   mediaType: MediaType;
+  onAdded: () => void;
 }) {
+  // addToLibraryAction's revalidatePath swaps this whole form out for the
+  // "in library" management UI as soon as the action resolves, which can
+  // unmount this component in the same commit that would've flipped
+  // isPending to false — so an effect here can't be relied on to fire (see
+  // withActionToast's doc comment for the same race). Call onAdded from
+  // inside the action wrapper itself instead, before that swap happens.
   const [state, formAction, isPending] = useActionState(
-    addToLibraryAction,
+    async (prevState: LibraryActionState, formData: FormData) => {
+      const result = await withActionToast(
+        addToLibraryAction,
+        "Added to library",
+      )(prevState, formData);
+      if (!result?.error) onAdded();
+      return result;
+    },
     undefined,
   );
 
@@ -196,7 +233,10 @@ function StatusForm({
   mediaType: MediaType;
   status: (typeof STATUSES)[number];
 }) {
-  const [state, formAction] = useActionState(updateStatusAction, undefined);
+  const [state, formAction, isPending] = useActionState(
+    withActionToast(updateStatusAction, "Status updated"),
+    undefined,
+  );
 
   function handleValueChange(value: (typeof STATUSES)[number] | null) {
     if (!value) return;
@@ -214,7 +254,11 @@ function StatusForm({
       >
         Status
       </label>
-      <Select defaultValue={status} onValueChange={handleValueChange}>
+      <Select
+        defaultValue={status}
+        onValueChange={handleValueChange}
+        disabled={isPending}
+      >
         <SelectTrigger id="status" className="w-full sm:w-64">
           <SelectValue>
             {(value: (typeof STATUSES)[number]) =>
@@ -247,7 +291,7 @@ function RatingForm({
   rating: number | null;
 }) {
   const [state, formAction, isPending] = useActionState(
-    updateRatingAction,
+    withActionToast(updateRatingAction, "Rating saved"),
     undefined,
   );
 
@@ -287,8 +331,8 @@ function CompletedAtForm({
   libraryItemId: string;
   completedAt: Date | null;
 }) {
-  const [state, formAction] = useActionState(
-    updateCompletedAtAction,
+  const [state, formAction, isPending] = useActionState(
+    withActionToast(updateCompletedAtAction, "Date updated"),
     undefined,
   );
 
@@ -309,6 +353,7 @@ function CompletedAtForm({
         type="date"
         defaultValue={toDateInputValue(completedAt)}
         onChange={(event) => handleChange(event.target.value)}
+        disabled={isPending}
         className="w-40"
       />
       {state?.error ? (
@@ -328,7 +373,10 @@ function FavoriteForm({
   isFavorite: boolean;
 }) {
   const [, formAction, isPending] = useActionState(
-    toggleFavoriteAction,
+    withActionToast(
+      toggleFavoriteAction,
+      isFavorite ? "Removed from favorites" : "Added to favorites",
+    ),
     undefined,
   );
 
@@ -358,7 +406,7 @@ function NotesForm({
   notes: string | null;
 }) {
   const [state, formAction, isPending] = useActionState(
-    updateNotesAction,
+    withActionToast(updateNotesAction, "Notes saved"),
     undefined,
   );
 
@@ -399,7 +447,7 @@ function ProgressForm({
   progress: Record<string, unknown> | null;
 }) {
   const [state, formAction, isPending] = useActionState(
-    updateProgressAction,
+    withActionToast(updateProgressAction, "Progress saved"),
     undefined,
   );
 
@@ -493,11 +541,11 @@ function CustomArtForm({
   const [uploadOpen, setUploadOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [uploadState, uploadAction, isUploading] = useActionState(
-    uploadCustomArtAction,
+    withActionToast(uploadCustomArtAction, "Art uploaded"),
     undefined,
   );
   const [removeState, removeAction, isRemoving] = useActionState(
-    removeCustomArtAction,
+    withActionToast(removeCustomArtAction, "Art removed"),
     undefined,
   );
   const wasUploading = useRef(false);
@@ -619,7 +667,7 @@ function CustomArtForm({
 function RemoveForm({ libraryItemId }: { libraryItemId: string }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
-    removeFromLibraryAction,
+    withActionToast(removeFromLibraryAction, "Removed from library"),
     undefined,
   );
 
