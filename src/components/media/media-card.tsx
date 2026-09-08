@@ -61,7 +61,7 @@ export function MediaCard({
           ) : null}
         </div>
         <div className="flex flex-col gap-1">
-          <span className="line-clamp-2 text-sm leading-tight font-medium group-hover:underline">
+          <span className="line-clamp-2 min-h-9 text-sm leading-tight font-medium group-hover:underline">
             {title}
           </span>
           <span className="text-muted-foreground text-xs">

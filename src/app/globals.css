@@ -133,6 +133,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Suppress the native clear icon on search inputs — SearchInput renders
+     its own so both don't show up side by side in Chromium/Safari. */
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
   .dark body {
     background-image: radial-gradient(
       80rem 40rem at 50% -10%,

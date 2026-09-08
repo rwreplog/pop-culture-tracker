@@ -2,9 +2,8 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { DiscoverSearch } from "@/components/media/discover-search";
 import { SearchResultCard } from "@/components/media/search-result-card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
@@ -44,24 +43,7 @@ export default async function DiscoverPage({
         </p>
       </div>
 
-      <form method="get" className="flex gap-2">
-        <input type="hidden" name="type" value={mediaType} />
-        <label className="sr-only" htmlFor="discover-query">
-          Search
-        </label>
-        <Input
-          id="discover-query"
-          type="search"
-          name="q"
-          enterKeyHint="search"
-          defaultValue={query}
-          placeholder={`Search ${mediaTypeLabel(mediaType).toLowerCase()}s…`}
-        />
-        <Button type="submit" variant="outline">
-          <Search className="size-4" aria-hidden="true" />
-          Search
-        </Button>
-      </form>
+      <DiscoverSearch initialQuery={query} mediaType={mediaType} />
 
       <nav aria-label="Media type" className="flex flex-wrap gap-1">
         {MEDIA_TYPES.map((value) => (
