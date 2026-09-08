@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { removeItemFromListAction } from "@/lib/actions/lists";
+import { withActionToast } from "@/lib/action-toast";
 
 export function RemoveListItemButton({
   listId,
@@ -24,7 +25,7 @@ export function RemoveListItemButton({
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
-    removeItemFromListAction,
+    withActionToast(removeItemFromListAction, "Removed from list"),
     undefined,
   );
 

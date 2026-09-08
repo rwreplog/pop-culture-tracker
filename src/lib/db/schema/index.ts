@@ -6,3 +6,4 @@ export * from "@/lib/db/schema/lists";
 export * from "@/lib/db/schema/activity";
 export * from "@/lib/db/schema/goals";
 export * from "@/lib/db/schema/friendships";
+export * from "@/lib/db/schema/notifications";

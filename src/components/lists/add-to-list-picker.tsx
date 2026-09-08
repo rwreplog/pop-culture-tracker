@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addItemToListAction } from "@/lib/actions/lists";
+import { withActionToast } from "@/lib/action-toast";
 
 export function AddToListPicker({
   mediaId,
@@ -20,7 +21,7 @@ export function AddToListPicker({
   ownedLists: { id: string; name: string }[];
 }) {
   const [state, formAction, isPending] = useActionState(
-    addItemToListAction,
+    withActionToast(addItemToListAction, "Added to list"),
     undefined,
   );
 

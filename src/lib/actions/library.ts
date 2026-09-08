@@ -29,6 +29,9 @@ import { uploadCustomArt } from "@/lib/storage/custom-art";
 
 export type LibraryActionState = { error?: string } | undefined;
 
+export type QuickAddLibraryActionState =
+  { error: string } | { mediaId: string } | undefined;
+
 async function requireUserId(): Promise<
   { userId: string } | { error: string }
 > {
@@ -66,9 +69,9 @@ export async function addToLibraryAction(
  * docs/UX.md, invoked directly from a Discover result card.
  */
 export async function quickAddToLibraryAction(
-  _prevState: LibraryActionState,
+  _prevState: QuickAddLibraryActionState,
   formData: FormData,
-): Promise<LibraryActionState> {
+): Promise<QuickAddLibraryActionState> {
   const auth = await requireUserId();
   if ("error" in auth) return { error: auth.error };
 
@@ -91,6 +94,7 @@ export async function quickAddToLibraryAction(
 
   revalidatePath("/library");
   revalidatePath("/");
+  return { mediaId: mediaResult.mediaId };
 }
 
 export async function updateStatusAction(

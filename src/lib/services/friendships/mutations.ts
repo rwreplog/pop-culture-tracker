@@ -3,6 +3,10 @@ import { and, eq, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { friendships } from "@/lib/db/schema/friendships";
 import { users } from "@/lib/db/schema/users";
+import {
+  createFriendRequestNotification,
+  deleteNotificationForFriendship,
+} from "@/lib/services/notifications/mutations";
 
 export type SimpleResult =
   { success: true } | { success: false; error: string };
@@ -47,17 +51,28 @@ export async function sendFriendRequest(
       return { success: false, error: "Request already sent." };
     }
     // They'd already requested you — accept theirs instead of duplicating.
-    await db
-      .update(friendships)
-      .set({ status: "accepted", updatedAt: new Date() })
-      .where(eq(friendships.id, existing.id));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(friendships)
+        .set({ status: "accepted", updatedAt: new Date() })
+        .where(eq(friendships.id, existing.id));
+      await deleteNotificationForFriendship(tx, existing.id);
+    });
     return { success: true };
   }
 
   try {
-    await db
-      .insert(friendships)
-      .values({ requesterId, addresseeId: target.id });
+    await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(friendships)
+        .values({ requesterId, addresseeId: target.id })
+        .returning({ id: friendships.id });
+      await createFriendRequestNotification(tx, {
+        userId: target.id,
+        actorId: requesterId,
+        friendshipId: inserted.id,
+      });
+    });
     return { success: true };
   } catch {
     return { success: false, error: "Couldn't send the request right now." };
@@ -86,22 +101,25 @@ export async function respondToFriendRequest(
     return { success: true };
   }
 
-  const updated = await db
-    .update(friendships)
-    .set({ status: "accepted", updatedAt: new Date() })
-    .where(
-      and(
-        eq(friendships.id, friendshipId),
-        eq(friendships.addresseeId, userId),
-        eq(friendships.status, "pending"),
-      ),
-    )
-    .returning({ id: friendships.id });
+  return db.transaction(async (tx) => {
+    const updated = await tx
+      .update(friendships)
+      .set({ status: "accepted", updatedAt: new Date() })
+      .where(
+        and(
+          eq(friendships.id, friendshipId),
+          eq(friendships.addresseeId, userId),
+          eq(friendships.status, "pending"),
+        ),
+      )
+      .returning({ id: friendships.id });
 
-  if (updated.length === 0) {
-    return { success: false, error: "That request couldn't be found." };
-  }
-  return { success: true };
+    if (updated.length === 0) {
+      return { success: false, error: "That request couldn't be found." };
+    }
+    await deleteNotificationForFriendship(tx, friendshipId);
+    return { success: true };
+  });
 }
 
 /** Cancels an outgoing request, or ends an accepted friendship — either way, from either side. */

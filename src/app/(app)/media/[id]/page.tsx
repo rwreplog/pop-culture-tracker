@@ -128,6 +128,10 @@ export default async function MediaDetailPage({
             mediaId={item.id}
             mediaType={item.mediaType}
             libraryItem={libraryItem}
+            ownedLists={ownedLists.map((list) => ({
+              id: list.id,
+              name: list.name,
+            }))}
           />
 
           {ownedLists.length > 0 ? (

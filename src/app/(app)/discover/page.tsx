@@ -2,12 +2,13 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { DiscoverResultsGrid } from "@/components/media/discover-results-grid";
 import { DiscoverSearch } from "@/components/media/discover-search";
-import { SearchResultCard } from "@/components/media/search-result-card";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getLibraryStatusForResults } from "@/lib/services/library/queries";
+import { getListsForUser } from "@/lib/services/lists/queries";
 import { searchMedia } from "@/lib/services/media/search";
 import { cn } from "@/lib/utils";
 
@@ -29,10 +30,13 @@ export default async function DiscoverPage({
     : { success: true as const, results: [] };
 
   const session = await auth();
-  const alreadyInLibrary =
-    session?.user?.id && result.success
-      ? await getLibraryStatusForResults(session.user.id, result.results)
-      : new Set<string>();
+  const userId = session?.user?.id;
+  const [alreadyInLibrary, ownedLists] = await Promise.all([
+    userId && result.success
+      ? getLibraryStatusForResults(userId, result.results)
+      : Promise.resolve(new Set<string>()),
+    userId ? getListsForUser(userId) : Promise.resolve([]),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,17 +85,14 @@ export default async function DiscoverPage({
           description={`Nothing matched "${query}". Try a different search term.`}
         />
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {result.results.map((item) => (
-            <SearchResultCard
-              key={`${item.provider}:${item.externalId}`}
-              result={item}
-              alreadyInLibrary={alreadyInLibrary.has(
-                `${item.provider}:${item.externalId}`,
-              )}
-            />
-          ))}
-        </div>
+        <DiscoverResultsGrid
+          results={result.results}
+          alreadyInLibraryKeys={[...alreadyInLibrary]}
+          ownedLists={ownedLists.map((list) => ({
+            id: list.id,
+            name: list.name,
+          }))}
+        />
       )}
     </div>
   );

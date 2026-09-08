@@ -27,6 +27,19 @@ test("two users become friends and see each other's public list", async ({
     page.getByRole("button", { name: "Add" }).click(),
   );
   await expect(page.getByText("Sent requests")).toBeVisible();
+  await expect(page.getByText("Friend request sent")).toBeVisible();
+
+  // B's notification bell shows an unread badge for the incoming request,
+  // and it clears once the panel is opened (marks-read on open).
+  await pageB.goto("/");
+  const bellButtonB = pageB.getByRole("button", { name: "Notifications" });
+  await expect(bellButtonB.locator("span")).toBeVisible();
+  await bellButtonB.click();
+  await expect(
+    pageB.getByRole("menuitem", { name: /sent you a friend request/ }),
+  ).toBeVisible();
+  await pageB.keyboard.press("Escape");
+  await expect(bellButtonB.locator("span")).not.toBeVisible();
 
   // B sees it under Requests and accepts.
   await pageB.goto("/friends");
@@ -35,6 +48,7 @@ test("two users become friends and see each other's public list", async ({
     pageB.getByRole("button", { name: "Accept" }).click(),
   );
   await expect(pageB.getByText("Friends (1)")).toBeVisible();
+  await expect(pageB.getByText("Friend request accepted")).toBeVisible();
 
   // A's own view reflects the now-accepted friendship too.
   await page.goto("/friends");
