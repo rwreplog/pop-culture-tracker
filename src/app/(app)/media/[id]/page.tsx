@@ -73,7 +73,7 @@ export default async function MediaDetailPage({
           <MediaArtwork
             src={artUrl}
             title={item.title}
-            className="h-full max-h-56 w-auto rounded-2xl shadow-[0_24px_48px_-16px_rgba(0,0,0,0.7)] ring-1 ring-white/10 md:max-h-52"
+            className="aspect-2/3 h-full max-h-56 rounded-2xl shadow-[0_24px_48px_-16px_rgba(0,0,0,0.7)] ring-1 ring-white/10 md:max-h-52"
           />
         </div>
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 md:p-6">
