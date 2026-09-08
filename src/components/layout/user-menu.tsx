@@ -48,12 +48,14 @@ export function UserMenu({ user }: { user?: HeaderUser }) {
           </Button>
         }
       />
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col">
-            <span className="font-medium">{user.name ?? "Account"}</span>
+          <DropdownMenuLabel className="flex min-w-0 flex-col">
+            <span className="truncate font-medium">
+              {user.name ?? "Account"}
+            </span>
             {user.email ? (
-              <span className="text-muted-foreground text-xs font-normal">
+              <span className="text-muted-foreground truncate text-xs font-normal">
                 {user.email}
               </span>
             ) : null}
