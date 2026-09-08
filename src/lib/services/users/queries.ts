@@ -26,6 +26,15 @@ export async function getUserById(userId: string) {
   });
 }
 
+/** Whether the account has a password set (false for OAuth-only sign-in). */
+export async function userHasPassword(userId: string): Promise<boolean> {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { passwordHash: true },
+  });
+  return !!user?.passwordHash;
+}
+
 export async function isHandleTaken(
   handle: string,
   excludingUserId: string,
