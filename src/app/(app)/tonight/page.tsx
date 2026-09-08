@@ -6,6 +6,7 @@ import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
 import { skipTonightPickAction } from "@/lib/actions/tonight";
@@ -172,65 +173,69 @@ export default async function TonightPage({
           const genres = getMediaGenres(pick.media);
 
           return (
-            <div className="flex flex-col gap-4 rounded-xl border p-4">
-              <div className="flex gap-4">
-                <MediaArtwork
-                  src={pick.media.imageUrl}
-                  title={pick.media.title}
-                  className="h-40 w-28 shrink-0"
-                />
-                <div className="flex min-w-0 flex-col gap-1.5">
-                  <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                    {mediaTypeLabel(pick.media.mediaType)}
-                    {releaseYear ? ` · ${releaseYear}` : ""}
-                  </span>
+            <Card variant="glass">
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex gap-4">
+                  <MediaArtwork
+                    src={pick.media.imageUrl}
+                    title={pick.media.title}
+                    className="h-40 w-28 shrink-0"
+                  />
+                  <div className="flex min-w-0 flex-col gap-1.5">
+                    <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      {mediaTypeLabel(pick.media.mediaType)}
+                      {releaseYear ? ` · ${releaseYear}` : ""}
+                    </span>
+                    <Link
+                      href={`/media/${pick.mediaId}`}
+                      className="font-semibold hover:underline"
+                    >
+                      {pick.media.title}
+                    </Link>
+                    {genres.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {genres.slice(0, 3).map((genre) => (
+                          <Badge key={genre} variant="secondary">
+                            {genre}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
+                    <p className="text-muted-foreground text-sm">
+                      {pick.reason}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <form
+                    action={async (formData: FormData) => {
+                      "use server";
+                      await updateStatusAction(undefined, formData);
+                    }}
+                  >
+                    <input type="hidden" name="libraryItemId" value={pick.id} />
+                    <input type="hidden" name="status" value="in_progress" />
+                    <Button type="submit">Start tonight</Button>
+                  </form>
+                  <form action={skipTonightPickAction}>
+                    <input type="hidden" name="libraryItemId" value={pick.id} />
+                    <button
+                      type="submit"
+                      className={cn(buttonVariants({ variant: "outline" }))}
+                    >
+                      Show me something else
+                    </button>
+                  </form>
                   <Link
                     href={`/media/${pick.mediaId}`}
-                    className="font-semibold hover:underline"
+                    className="text-muted-foreground text-sm hover:underline"
                   >
-                    {pick.media.title}
+                    View details
                   </Link>
-                  {genres.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {genres.slice(0, 3).map((genre) => (
-                        <Badge key={genre} variant="secondary">
-                          {genre}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : null}
-                  <p className="text-muted-foreground text-sm">{pick.reason}</p>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <form
-                  action={async (formData: FormData) => {
-                    "use server";
-                    await updateStatusAction(undefined, formData);
-                  }}
-                >
-                  <input type="hidden" name="libraryItemId" value={pick.id} />
-                  <input type="hidden" name="status" value="in_progress" />
-                  <Button type="submit">Start tonight</Button>
-                </form>
-                <form action={skipTonightPickAction}>
-                  <input type="hidden" name="libraryItemId" value={pick.id} />
-                  <button
-                    type="submit"
-                    className={cn(buttonVariants({ variant: "outline" }))}
-                  >
-                    Show me something else
-                  </button>
-                </form>
-                <Link
-                  href={`/media/${pick.mediaId}`}
-                  className="text-muted-foreground text-sm hover:underline"
-                >
-                  View details
-                </Link>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           );
         })()
       )}

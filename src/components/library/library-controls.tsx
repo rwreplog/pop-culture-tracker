@@ -116,7 +116,7 @@ export function LibraryControls({
         progress={libraryItem.progress as Record<string, unknown> | null}
       />
 
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Notes</CardTitle>
         </CardHeader>
@@ -125,7 +125,7 @@ export function LibraryControls({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Manage</CardTitle>
         </CardHeader>
@@ -407,7 +407,7 @@ function ProgressForm({
   if (fields.length === 0) return null;
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle>Progress</CardTitle>
       </CardHeader>

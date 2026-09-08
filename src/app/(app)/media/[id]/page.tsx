@@ -1,16 +1,23 @@
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
+import { ActivityItem } from "@/components/activity/activity-item";
 import { LibraryControls } from "@/components/library/library-controls";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
+import { MediaCard } from "@/components/media/media-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
-import { getLibraryItemForUser } from "@/lib/services/library/queries";
+import { getActivityForMedia } from "@/lib/services/activity/queries";
+import {
+  getLibraryItemForUser,
+  getRelatedLibraryItems,
+} from "@/lib/services/library/queries";
 import { getListsForUser } from "@/lib/services/lists/queries";
 import { presignCustomArtUrl } from "@/lib/storage/custom-art";
 
@@ -29,18 +36,27 @@ export default async function MediaDetailPage({
 
   if (!item) notFound();
 
-  const libraryItem = session?.user?.id
-    ? ((await getLibraryItemForUser(session.user.id, item.id)) ?? null)
-    : null;
-  const ownedLists = session?.user?.id
-    ? await getListsForUser(session.user.id)
-    : [];
+  const metadata = item.metadata as MediaMetadata | null;
+  const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
+
+  const userId = session?.user?.id;
+  const [libraryItemResult, ownedLists, activity, related] = await Promise.all([
+    userId ? getLibraryItemForUser(userId, item.id) : null,
+    userId ? getListsForUser(userId) : [],
+    userId ? getActivityForMedia(userId, item.id) : [],
+    userId
+      ? getRelatedLibraryItems(
+          userId,
+          item.id,
+          item.mediaType,
+          metadata?.genres ?? [],
+        )
+      : [],
+  ]);
+  const libraryItem = libraryItemResult ?? null;
   const customArtUrl = libraryItem?.customImageKey
     ? await presignCustomArtUrl(libraryItem.customImageKey)
     : null;
-
-  const metadata = item.metadata as MediaMetadata | null;
-  const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
   const artUrl = customArtUrl ?? item.imageUrl;
 
@@ -83,41 +99,97 @@ export default async function MediaDetailPage({
           ) : null}
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        {item.description ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm">{item.description}</p>
-            </CardContent>
-          </Card>
-        ) : null}
+      <Tabs defaultValue="overview">
+        <TabsList className="w-full sm:w-fit">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="related">Related</TabsTrigger>
+        </TabsList>
 
-        <LibraryControls
-          mediaId={item.id}
-          mediaType={item.mediaType}
-          libraryItem={libraryItem}
-        />
+        <TabsContent value="overview" className="flex flex-col gap-4 pt-4">
+          {item.description ? (
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle>Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">{item.description}</p>
+              </CardContent>
+            </Card>
+          ) : null}
 
-        {ownedLists.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Lists</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <AddToListPicker
-                mediaId={item.id}
-                ownedLists={ownedLists.map((list) => ({
-                  id: list.id,
-                  name: list.name,
-                }))}
-              />
-            </CardContent>
-          </Card>
-        ) : null}
-      </div>
+          <LibraryControls
+            mediaId={item.id}
+            mediaType={item.mediaType}
+            libraryItem={libraryItem}
+          />
+
+          {ownedLists.length > 0 ? (
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle>Lists</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AddToListPicker
+                  mediaId={item.id}
+                  ownedLists={ownedLists.map((list) => ({
+                    id: list.id,
+                    name: list.name,
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          ) : null}
+        </TabsContent>
+
+        <TabsContent value="activity" className="pt-4">
+          {activity.length > 0 ? (
+            <ul className="flex flex-col gap-3">
+              {activity.map((event) => (
+                <ActivityItem
+                  key={event.id}
+                  type={event.type}
+                  mediaId={event.mediaId}
+                  title={event.media.title}
+                  mediaType={event.media.mediaType}
+                  imageUrl={event.media.imageUrl}
+                  metadata={event.metadata as Record<string, unknown> | null}
+                  createdAt={event.createdAt.toISOString()}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              No activity yet for this title.
+            </p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="related" className="pt-4">
+          {related.length > 0 ? (
+            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 [&>*]:snap-start">
+              {related.map((relatedItem) => (
+                <div key={relatedItem.id} className="w-32 shrink-0 sm:w-40">
+                  <MediaCard
+                    href={`/media/${relatedItem.mediaId}`}
+                    title={relatedItem.media.title}
+                    mediaType={relatedItem.media.mediaType}
+                    releaseDate={relatedItem.media.releaseDate}
+                    imageUrl={relatedItem.media.imageUrl}
+                    status={relatedItem.status}
+                    isFavorite={relatedItem.isFavorite}
+                    libraryItemId={relatedItem.id}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              No related titles in your library yet.
+            </p>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

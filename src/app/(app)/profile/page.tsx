@@ -1,6 +1,7 @@
 import {
   Activity,
   ListChecks,
+  Moon,
   Settings,
   Target,
   User,
@@ -18,6 +19,7 @@ import { getUserById } from "@/lib/services/users/queries";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "/tonight", label: "Tonight", icon: Moon },
   { href: "/friends", label: "Friends", icon: Users },
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/goals", label: "Goals", icon: Target },
