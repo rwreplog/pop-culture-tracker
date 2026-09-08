@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import type { LibraryItem } from "@/lib/db/schema/library";
 import type { Media } from "@/lib/db/schema/media";
-import { rankBacklog } from "@/lib/services/recommendations/scoring";
+import {
+  buildGenreAffinity,
+  rankBacklog,
+} from "@/lib/services/recommendations/scoring";
 
 type LibraryItemWithMedia = LibraryItem & { media: Media };
 
@@ -89,5 +92,41 @@ describe("rankBacklog mood boost", () => {
     expect(
       ranked.every((item) => item.reason === "Next up in your backlog"),
     ).toBe(true);
+  });
+});
+
+describe("buildGenreAffinity", () => {
+  it("counts genres from favorited or highly-rated completed items", () => {
+    const favorited = backlogItem({
+      status: "completed",
+      isFavorite: true,
+      media: { genres: ["Comedy", "Drama"] },
+    });
+    const highlyRated = backlogItem({
+      status: "completed",
+      rating: 8,
+      media: { genres: ["Comedy"] },
+    });
+
+    const affinity = buildGenreAffinity([favorited, highlyRated]);
+
+    expect(affinity.get("Comedy")).toBe(2);
+    expect(affinity.get("Drama")).toBe(1);
+  });
+
+  it("ignores items that aren't completed, favorited, or highly rated", () => {
+    const inProgress = backlogItem({
+      status: "in_progress",
+      media: { genres: ["Horror"] },
+    });
+    const lowRated = backlogItem({
+      status: "completed",
+      rating: 4,
+      media: { genres: ["Horror"] },
+    });
+
+    const affinity = buildGenreAffinity([inProgress, lowRated]);
+
+    expect(affinity.size).toBe(0);
   });
 });

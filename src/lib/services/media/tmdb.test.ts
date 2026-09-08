@@ -156,3 +156,63 @@ describe("tmdbAdapter.getDetails", () => {
     expect(detail?.creator).toBe("Dan Erickson");
   });
 });
+
+describe("tmdbAdapter.discover", () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("maps a genre name to its TMDB id in the request", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await tmdbAdapter.discover?.("movie", ["Science Fiction"]);
+
+    const url = fetchMock.mock.calls[0][0] as string;
+    expect(url).toContain("/discover/movie");
+    expect(url).toContain("with_genres=878");
+  });
+
+  it("maps a tv genre name using the tv genre table", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await tmdbAdapter.discover?.("tv", ["Drama"]);
+
+    const url = fetchMock.mock.calls[0][0] as string;
+    expect(url).toContain("/discover/tv");
+    expect(url).toContain("with_genres=18");
+  });
+
+  it("omits with_genres and falls back to popularity when there's no genre signal", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [
+          {
+            id: 1,
+            title: "Dune",
+            release_date: "2021-10-22",
+            poster_path: "/x.jpg",
+            overview: "A desert planet.",
+            genre_ids: [878],
+          },
+        ],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const results = await tmdbAdapter.discover?.("movie", []);
+
+    const url = fetchMock.mock.calls[0][0] as string;
+    expect(url).not.toContain("with_genres");
+    expect(url).toContain("sort_by=popularity.desc");
+    expect(results?.[0]?.title).toBe("Dune");
+  });
+});

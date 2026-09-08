@@ -1,4 +1,6 @@
 export const SKIP_COOKIE_NAME = "tonight_skips";
+/** Keyed by "provider:externalId" rather than a library item id — see external.ts. */
+export const SURPRISE_SKIP_COOKIE_NAME = "surprise_skips";
 
 const SKIP_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 const MAX_ENTRIES = 50;

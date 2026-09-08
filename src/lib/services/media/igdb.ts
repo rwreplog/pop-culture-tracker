@@ -146,4 +146,17 @@ export const igdbAdapter: ProviderAdapter = {
     };
     return detail;
   },
+
+  async discover(_mediaType, genres) {
+    const genreClause =
+      genres.length > 0
+        ? `genres.name = (${genres.map((name) => `"${name.replace(/"/g, '\\"')}"`).join(",")}) & `
+        : "";
+    // Randomize the offset so repeated calls surface different games
+    // instead of always the same top-rated handful.
+    const offset = Math.floor(Math.random() * 100);
+    const body = `fields ${FIELDS}; where ${genreClause}rating_count > 20; sort rating desc; limit 20; offset ${offset};`;
+    const games = await queryGames(body);
+    return games.map(toSearchResult);
+  },
 };
