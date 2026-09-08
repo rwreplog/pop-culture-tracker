@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,7 +44,6 @@ export function Header({ user }: { user?: HeaderUser }) {
             Add
           </Link>
         ) : null}
-        <ThemeToggle />
         <UserMenu user={user} />
       </div>
     </header>

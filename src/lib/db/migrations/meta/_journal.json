@@ -36,6 +36,13 @@
       "when": 1788782458327,
       "tag": "0004_melted_masque",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788834249798,
+      "tag": "0005_ordinary_vargas",
+      "breakpoints": true
     }
   ]
 }

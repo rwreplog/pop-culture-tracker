@@ -1,10 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Manrope,
+  Space_Grotesk,
+  Sora,
+} from "next/font/google";
 import "./globals.css";
 
 import { PwaUpdateManager } from "@/components/pwa/pwa-update-manager";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeSync } from "@/components/theme-sync";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { auth } from "@/lib/auth";
+import { getUserPreferences } from "@/lib/services/users/queries";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -13,6 +21,16 @@ const spaceGrotesk = Space_Grotesk({
 
 const bricolageGrotesque = Bricolage_Grotesque({
   variable: "--font-bricolage-grotesque",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+});
+
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -48,20 +66,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const session = await auth();
+  const preferences = session?.user?.id
+    ? await getUserPreferences(session.user.id)
+    : null;
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${bricolageGrotesque.variable} h-full antialiased`}
+      data-accent={preferences?.accentColor ?? "blue"}
+      data-font={preferences?.fontFamily ?? "space-grotesk"}
+      className={`${spaceGrotesk.variable} ${bricolageGrotesque.variable} ${manrope.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme={preferences?.theme ?? "dark"}
           enableSystem
           disableTransitionOnChange
         >
+          <ThemeSync initialTheme={preferences?.theme} />
           <TooltipProvider>{children}</TooltipProvider>
           <PwaUpdateManager />
         </ThemeProvider>

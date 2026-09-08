@@ -1,9 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { auth } from "@/lib/auth";
 import { isRateLimited, recordFailedAttempt } from "@/lib/auth/rate-limit";
+import {
+  appearanceSchema,
+  type AppearanceInput,
+} from "@/lib/schemas/appearance";
 import { changePasswordSchema } from "@/lib/schemas/auth";
 import { changePassword } from "@/lib/services/auth/change-password";
+import { updateAppearance } from "@/lib/services/users/mutations";
 
 export type ChangePasswordActionState =
   { error?: string; success?: boolean } | undefined;
@@ -32,4 +39,17 @@ export async function changePasswordAction(
   }
 
   return { success: true };
+}
+
+export async function updateAppearanceAction(
+  input: AppearanceInput,
+): Promise<{ error?: string } | undefined> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "You must be signed in." };
+
+  const parsed = appearanceSchema.safeParse(input);
+  if (!parsed.success) return { error: "Invalid appearance settings." };
+
+  await updateAppearance(session.user.id, parsed.data);
+  revalidatePath("/", "layout");
 }

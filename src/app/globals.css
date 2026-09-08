@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-space-grotesk);
-  --font-heading: var(--font-bricolage-grotesque);
+  --font-sans: var(--font-app);
+  --font-mono: var(--font-app);
+  --font-heading: var(--font-app);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,80 +50,119 @@
 }
 
 /*
- * Brand hue: the deep night-sky blue from the Geekery logo (~264°).
- * Used to tint neutrals instead of leaving them pure grayscale, and as
- * the accent color for primary actions.
+ * Brand hue: a single --hue custom property drives every brand-tinted
+ * token below (same lightness/chroma, hue only) so an accent theme is a
+ * one-line override — see [data-accent] rules and "Accent themes" in
+ * docs/DESIGN_SYSTEM.md. Default "blue" (264°) is the deep night-sky blue
+ * from the Geekery logo. --chart-2/3/4/5 and --destructive intentionally
+ * use their own fixed hues (data-viz variety, semantic red) and don't
+ * follow --hue.
  */
 :root {
-  --background: oklch(0.99 0.003 264);
-  --foreground: oklch(0.18 0.02 264);
+  --hue: 264;
+  --font-app: var(--font-space-grotesk);
+  --background: oklch(0.99 0.003 var(--hue));
+  --foreground: oklch(0.18 0.02 var(--hue));
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 264);
+  --card-foreground: oklch(0.18 0.02 var(--hue));
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 264);
-  --primary: oklch(0.5 0.18 264);
-  --primary-foreground: oklch(0.985 0.005 264);
-  --secondary: oklch(0.96 0.01 264);
-  --secondary-foreground: oklch(0.3 0.03 264);
-  --muted: oklch(0.96 0.01 264);
-  --muted-foreground: oklch(0.5 0.03 264);
-  --accent: oklch(0.94 0.03 264);
-  --accent-foreground: oklch(0.3 0.05 264);
+  --popover-foreground: oklch(0.18 0.02 var(--hue));
+  --primary: oklch(0.5 0.18 var(--hue));
+  --primary-foreground: oklch(0.985 0.005 var(--hue));
+  --secondary: oklch(0.96 0.01 var(--hue));
+  --secondary-foreground: oklch(0.3 0.03 var(--hue));
+  --muted: oklch(0.96 0.01 var(--hue));
+  --muted-foreground: oklch(0.5 0.03 var(--hue));
+  --accent: oklch(0.94 0.03 var(--hue));
+  --accent-foreground: oklch(0.3 0.05 var(--hue));
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.01 264);
-  --input: oklch(0.9 0.01 264);
-  --ring: oklch(0.5 0.18 264);
-  --chart-1: oklch(0.7 0.18 264);
+  --border: oklch(0.9 0.01 var(--hue));
+  --input: oklch(0.9 0.01 var(--hue));
+  --ring: oklch(0.5 0.18 var(--hue));
+  --chart-1: oklch(0.7 0.18 var(--hue));
   --chart-2: oklch(0.65 0.17 200);
   --chart-3: oklch(0.6 0.2 330);
   --chart-4: oklch(0.75 0.18 140);
   --chart-5: oklch(0.75 0.18 60);
-  /* Deeper, more saturated blue than --primary, for two-tone gradient accents. */
-  --accent-2: oklch(0.4 0.16 264);
+  /* Deeper, more saturated than --primary, for two-tone gradient accents. */
+  --accent-2: oklch(0.4 0.16 var(--hue));
   --radius: 0.875rem;
-  --sidebar: oklch(0.98 0.006 264);
-  --sidebar-foreground: oklch(0.18 0.02 264);
-  --sidebar-primary: oklch(0.5 0.18 264);
-  --sidebar-primary-foreground: oklch(0.985 0.005 264);
-  --sidebar-accent: oklch(0.94 0.03 264);
-  --sidebar-accent-foreground: oklch(0.3 0.05 264);
-  --sidebar-border: oklch(0.9 0.01 264);
-  --sidebar-ring: oklch(0.5 0.18 264);
+  --sidebar: oklch(0.98 0.006 var(--hue));
+  --sidebar-foreground: oklch(0.18 0.02 var(--hue));
+  --sidebar-primary: oklch(0.5 0.18 var(--hue));
+  --sidebar-primary-foreground: oklch(0.985 0.005 var(--hue));
+  --sidebar-accent: oklch(0.94 0.03 var(--hue));
+  --sidebar-accent-foreground: oklch(0.3 0.05 var(--hue));
+  --sidebar-border: oklch(0.9 0.01 var(--hue));
+  --sidebar-ring: oklch(0.5 0.18 var(--hue));
 }
 
 .dark {
-  --background: oklch(0.11 0.024 264);
-  --foreground: oklch(0.96 0.008 264);
-  --card: oklch(0.17 0.028 264);
-  --card-foreground: oklch(0.96 0.008 264);
-  --popover: oklch(0.18 0.028 264);
-  --popover-foreground: oklch(0.96 0.008 264);
-  --primary: oklch(0.75 0.15 264);
-  --primary-foreground: oklch(0.11 0.024 264);
-  --secondary: oklch(0.24 0.032 264);
-  --secondary-foreground: oklch(0.96 0.008 264);
-  --muted: oklch(0.24 0.032 264);
-  --muted-foreground: oklch(0.68 0.028 264);
-  --accent: oklch(0.28 0.042 264);
-  --accent-foreground: oklch(0.96 0.008 264);
-  --accent-2: oklch(0.55 0.19 264);
+  --background: oklch(0.11 0.024 var(--hue));
+  --foreground: oklch(0.96 0.008 var(--hue));
+  --card: oklch(0.17 0.028 var(--hue));
+  --card-foreground: oklch(0.96 0.008 var(--hue));
+  --popover: oklch(0.18 0.028 var(--hue));
+  --popover-foreground: oklch(0.96 0.008 var(--hue));
+  --primary: oklch(0.75 0.15 var(--hue));
+  --primary-foreground: oklch(0.11 0.024 var(--hue));
+  --secondary: oklch(0.24 0.032 var(--hue));
+  --secondary-foreground: oklch(0.96 0.008 var(--hue));
+  --muted: oklch(0.24 0.032 var(--hue));
+  --muted-foreground: oklch(0.68 0.028 var(--hue));
+  --accent: oklch(0.28 0.042 var(--hue));
+  --accent-foreground: oklch(0.96 0.008 var(--hue));
+  --accent-2: oklch(0.55 0.19 var(--hue));
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.75 0.15 264);
-  --chart-1: oklch(0.7 0.18 264);
+  --ring: oklch(0.75 0.15 var(--hue));
+  --chart-1: oklch(0.7 0.18 var(--hue));
   --chart-2: oklch(0.65 0.17 200);
   --chart-3: oklch(0.65 0.2 330);
   --chart-4: oklch(0.75 0.18 140);
   --chart-5: oklch(0.75 0.18 60);
-  --sidebar: oklch(0.15 0.026 264);
-  --sidebar-foreground: oklch(0.96 0.008 264);
-  --sidebar-primary: oklch(0.75 0.15 264);
-  --sidebar-primary-foreground: oklch(0.11 0.024 264);
-  --sidebar-accent: oklch(0.28 0.042 264);
-  --sidebar-accent-foreground: oklch(0.96 0.008 264);
+  --sidebar: oklch(0.15 0.026 var(--hue));
+  --sidebar-foreground: oklch(0.96 0.008 var(--hue));
+  --sidebar-primary: oklch(0.75 0.15 var(--hue));
+  --sidebar-primary-foreground: oklch(0.11 0.024 var(--hue));
+  --sidebar-accent: oklch(0.28 0.042 var(--hue));
+  --sidebar-accent-foreground: oklch(0.96 0.008 var(--hue));
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.75 0.15 264);
+  --sidebar-ring: oklch(0.75 0.15 var(--hue));
+}
+
+/* Accent themes: each is a single hue override, applied via a data-accent
+   attribute on <html> (see AppearanceForm / RootLayout). "blue" is spelled
+   out explicitly so it's self-documenting rather than relying on the
+   :root default. */
+[data-accent="blue"] {
+  --hue: 264;
+}
+[data-accent="violet"] {
+  --hue: 292;
+}
+[data-accent="emerald"] {
+  --hue: 158;
+}
+[data-accent="amber"] {
+  --hue: 75;
+}
+
+/* Fonts: --font-app is the single font used for both headings and body
+   (see AppearanceForm / RootLayout's data-font attribute). Each of the
+   four options is loaded as its own CSS variable in layout.tsx. */
+[data-font="space-grotesk"] {
+  --font-app: var(--font-space-grotesk);
+}
+[data-font="bricolage-grotesque"] {
+  --font-app: var(--font-bricolage-grotesque);
+}
+[data-font="manrope"] {
+  --font-app: var(--font-manrope);
+}
+[data-font="sora"] {
+  --font-app: var(--font-sora);
 }
 
 @layer base {
@@ -136,7 +175,7 @@
   .dark body {
     background-image: radial-gradient(
       80rem 40rem at 50% -10%,
-      oklch(0.32 0.06 264 / 55%),
+      oklch(0.32 0.06 var(--hue) / 55%),
       transparent 60%
     );
     background-repeat: no-repeat;
