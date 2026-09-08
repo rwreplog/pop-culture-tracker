@@ -20,6 +20,8 @@ const serverSchema = z.object({
   IGDB_CLIENT_ID: z.string().min(1).optional(),
   IGDB_CLIENT_SECRET: z.string().min(1).optional(),
   COMICVINE_API_KEY: z.string().min(1).optional(),
+  /** Google Books works unauthenticated; setting this only raises the rate limit. */
+  GOOGLE_BOOKS_API_KEY: z.string().min(1).optional(),
   /** Forces MediaSearchService to use deterministic fixture data instead of calling real provider APIs (used in tests). */
   MEDIA_PROVIDER_MODE: z.enum(["live", "fixture"]).optional(),
 });

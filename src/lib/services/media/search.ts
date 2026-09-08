@@ -2,9 +2,9 @@ import { env } from "@/lib/env";
 import type { MediaType } from "@/lib/db/schema/media";
 import { comicVineAdapter } from "@/lib/services/media/comicvine";
 import { fixtureAdapter } from "@/lib/services/media/fixture";
+import { googleBooksAdapter } from "@/lib/services/media/google-books";
 import { ProviderNotConfiguredError } from "@/lib/services/media/http";
 import { igdbAdapter } from "@/lib/services/media/igdb";
-import { openLibraryAdapter } from "@/lib/services/media/open-library";
 import type {
   GetMediaDetailsResult,
   ProviderAdapter,
@@ -16,7 +16,7 @@ const LIVE_PROVIDERS: Record<MediaType, ProviderAdapter> = {
   movie: tmdbAdapter,
   tv: tmdbAdapter,
   game: igdbAdapter,
-  book: openLibraryAdapter,
+  book: googleBooksAdapter,
   comic: comicVineAdapter,
 };
 
