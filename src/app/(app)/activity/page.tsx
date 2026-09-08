@@ -2,6 +2,7 @@ import { History } from "lucide-react";
 import Link from "next/link";
 
 import { ActivityFeed } from "@/components/activity/activity-feed";
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
@@ -23,21 +24,25 @@ export default async function ActivityPage() {
 
   if (feed.length === 0) {
     return (
-      <PlaceholderScreen
-        icon={History}
-        title="No activity yet"
-        description="Adding, rating, and updating media you're tracking will show up here."
-        action={
-          <Link href="/discover" className={buttonVariants()}>
-            Go to Discover
-          </Link>
-        }
-      />
+      <div className="mx-auto flex max-w-2xl flex-col gap-6">
+        <BackButton fallbackHref="/profile" />
+        <PlaceholderScreen
+          icon={History}
+          title="No activity yet"
+          description="Adding, rating, and updating media you're tracking will show up here."
+          action={
+            <Link href="/discover" className={buttonVariants()}>
+              Go to Discover
+            </Link>
+          }
+        />
+      </div>
     );
   }
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
+      <BackButton fallbackHref="/profile" />
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold tracking-tight">Activity</h1>
         <p className="text-muted-foreground text-sm">

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { DesktopNav } from "@/components/layout/desktop-nav";
 import { Header, type HeaderUser } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { NavigationHistoryTracker } from "@/components/layout/navigation-history-tracker";
 
 export function AppShell({
   children,
@@ -13,6 +14,7 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-full flex-col">
+      <NavigationHistoryTracker />
       <Header user={user} />
       <div className="mx-auto flex w-full max-w-7xl flex-1">
         <DesktopNav />

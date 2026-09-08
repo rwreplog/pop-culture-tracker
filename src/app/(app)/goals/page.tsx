@@ -1,5 +1,6 @@
 import { Target } from "lucide-react";
 
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { CreateGoalDialog } from "@/components/goals/create-goal-dialog";
 import { GoalCard } from "@/components/goals/goal-card";
@@ -23,6 +24,7 @@ export default async function GoalsPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <BackButton fallbackHref="/profile" />
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold tracking-tight">Your goals</h1>

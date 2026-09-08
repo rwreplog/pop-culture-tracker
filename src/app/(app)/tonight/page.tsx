@@ -2,6 +2,7 @@ import { Moon } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +81,7 @@ export default async function TonightPage({
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
+      <BackButton fallbackHref="/profile" />
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold tracking-tight">
           What should I do tonight?

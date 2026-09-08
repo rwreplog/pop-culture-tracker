@@ -1,6 +1,7 @@
 import { Users } from "lucide-react";
 import Link from "next/link";
 
+import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -74,6 +75,7 @@ export default async function FriendsPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
+      <BackButton fallbackHref="/profile" />
       <div className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold tracking-tight">Friends</h1>
         <p className="text-muted-foreground text-sm">
