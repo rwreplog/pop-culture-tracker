@@ -54,6 +54,10 @@ export function ActivityChart({ data }: { data: MonthlyActivity[] }) {
           <BarChart
             data={data}
             margin={{ top: 24, right: 4, left: 4, bottom: 0 }}
+            // The sr-only table below already covers accessibility; Recharts'
+            // own layer just adds a focusable group per bar that shows a
+            // stray outline on tap/click with nothing useful to announce.
+            accessibilityLayer={false}
           >
             <CartesianGrid
               vertical={false}
