@@ -18,14 +18,16 @@ import { signOutAction } from "@/lib/auth/actions";
 import { getUserById } from "@/lib/services/users/queries";
 import { cn } from "@/lib/utils";
 
-const LINKS = [
+const CONTENT_LINKS = [
   { href: "/tonight", label: "Tonight", icon: Moon },
   { href: "/friends", label: "Friends", icon: Users },
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/activity", label: "Activity", icon: Activity },
-  { href: "/settings", label: "Settings", icon: Settings },
 ];
+
+const LINK_ROW_CLASSES =
+  "border-border hover:bg-muted flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors";
 
 function initials(name?: string | null, email?: string | null) {
   const source = name ?? email ?? "?";
@@ -83,13 +85,11 @@ export default async function ProfilePage() {
       />
 
       <nav aria-label="Profile" className="flex flex-col gap-2">
-        {LINKS.map((link) => (
+        {CONTENT_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className={cn(
-              "border-border hover:bg-muted flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
-            )}
+            className={cn(LINK_ROW_CLASSES)}
           >
             <link.icon className="text-muted-foreground size-4" />
             {link.label}
@@ -97,14 +97,20 @@ export default async function ProfilePage() {
         ))}
       </nav>
 
-      <form action={signOutAction}>
-        <button
-          type="submit"
-          className={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        >
-          Sign out
-        </button>
-      </form>
+      <div className="border-border flex flex-col gap-2 border-t pt-4">
+        <Link href="/settings" className={cn(LINK_ROW_CLASSES)}>
+          <Settings className="text-muted-foreground size-4" />
+          Settings
+        </Link>
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
