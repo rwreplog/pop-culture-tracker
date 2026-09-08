@@ -2,10 +2,26 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema/users";
+import type {
+  accentColorEnum,
+  fontFamilyEnum,
+  themeEnum,
+} from "@/lib/db/schema/users";
 import { isHandleTaken } from "@/lib/services/users/queries";
 
 export type SimpleResult =
   { success: true } | { success: false; error: string };
+
+export async function updateAppearance(
+  userId: string,
+  appearance: {
+    theme: (typeof themeEnum.enumValues)[number];
+    accentColor: (typeof accentColorEnum.enumValues)[number];
+    fontFamily: (typeof fontFamilyEnum.enumValues)[number];
+  },
+): Promise<void> {
+  await db.update(users).set(appearance).where(eq(users.id, userId));
+}
 
 export async function updateProfile(
   userId: string,

@@ -1,10 +1,14 @@
-import { Settings, User } from "lucide-react";
+import { Palette, Settings, User } from "lucide-react";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { AppearanceForm } from "@/components/settings/appearance-form";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { ReleasedAt } from "@/components/settings/released-at";
 import { auth } from "@/lib/auth";
-import { userHasPassword } from "@/lib/services/users/queries";
+import {
+  getUserPreferences,
+  userHasPassword,
+} from "@/lib/services/users/queries";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -19,7 +23,10 @@ export default async function SettingsPage() {
     );
   }
 
-  const hasPassword = await userHasPassword(session.user.id);
+  const [hasPassword, preferences] = await Promise.all([
+    userHasPassword(session.user.id),
+    getUserPreferences(session.user.id),
+  ]);
   const version = process.env.NEXT_PUBLIC_APP_VERSION;
   const commit = process.env.NEXT_PUBLIC_APP_COMMIT;
   const releasedAt = process.env.NEXT_PUBLIC_APP_RELEASED_AT;
@@ -27,6 +34,18 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 px-4 py-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Palette className="text-muted-foreground size-4" />
+          <h2 className="font-medium">Appearance</h2>
+        </div>
+        <AppearanceForm
+          initialTheme={preferences?.theme ?? "system"}
+          initialAccentColor={preferences?.accentColor ?? "blue"}
+          initialFontFamily={preferences?.fontFamily ?? "space-grotesk"}
+        />
+      </div>
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
