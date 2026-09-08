@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import {
   Select,
   SelectContent,
@@ -254,6 +254,11 @@ export function LibraryFilters({
     return params;
   }
 
+  function pushSearch(value: string) {
+    const params = setParam(searchParamsRef.current, "search", value, "");
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
   // Debounce the search box so we're not pushing a navigation on every
   // keystroke; other filters below still update immediately on change.
   useEffect(() => {
@@ -261,21 +266,20 @@ export function LibraryFilters({
       isFirstRender.current = false;
       return;
     }
-    const timeout = setTimeout(() => {
-      const params = setParam(
-        searchParamsRef.current,
-        "search",
-        searchInput.trim(),
-        "",
-      );
-      router.replace(`${pathname}?${params.toString()}`);
-    }, 300);
+    const timeout = setTimeout(() => pushSearch(searchInput.trim()), 300);
     return () => clearTimeout(timeout);
     // Only the debounced value should retrigger this — pathname/router are
     // stable, and searchParamsRef.current is read fresh when the timeout
     // fires rather than closed over here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
+
+  // Clearing (backspacing to empty, or the clear button) updates the URL
+  // immediately instead of waiting out the debounce.
+  function updateSearchInput(value: string) {
+    setSearchInput(value);
+    if (!value) pushSearch("");
+  }
 
   function pushParam(
     key: "mediaType" | "status" | "sort",
@@ -304,11 +308,10 @@ export function LibraryFilters({
       <label className="sr-only" htmlFor="library-search">
         Search your library
       </label>
-      <Input
+      <SearchInput
         id="library-search"
-        type="search"
         value={searchInput}
-        onChange={(event) => setSearchInput(event.target.value)}
+        onChange={updateSearchInput}
         placeholder="Search your library…"
         className="max-w-sm"
       />

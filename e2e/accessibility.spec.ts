@@ -51,7 +51,6 @@ test("signed-in app screens have no serious accessibility violations", async ({
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
   await expect(page.getByText("Severance", { exact: true })).toBeVisible();
   await expectNoSeriousViolations(page);
 

@@ -9,7 +9,6 @@ async function resolveSearchResult(
 ) {
   await page.goto(`/discover?type=${type}`);
   await page.getByLabel("Search").fill(query);
-  await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("button", { name: new RegExp(query, "i") }).click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
 }

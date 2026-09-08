@@ -15,7 +15,6 @@ test("activity shows an empty state, then entries after adding and rating an ite
 
   await page.goto("/discover?type=tv");
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("button", { name: /Severance/ }).click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
 

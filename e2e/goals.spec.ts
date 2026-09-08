@@ -14,7 +14,6 @@ test("create a goal, track progress as items are completed, then delete it", asy
 
   await page.goto("/discover?type=movie");
   await page.getByLabel("Search").fill("Dune");
-  await page.getByRole("button", { name: "Search" }).click();
   await page.getByRole("button", { name: /Dune/ }).first().click();
   await page.waitForURL(/\/media\/[0-9a-f-]+/);
   await page.getByRole("button", { name: "Add to Library" }).click();

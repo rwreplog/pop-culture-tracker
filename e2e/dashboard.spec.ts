@@ -24,7 +24,6 @@ test("dashboard shows a welcome empty state, then populated sections after addin
 
   await page.getByRole("link", { name: "TV" }).click();
   await page.getByLabel("Search").fill("severance");
-  await page.getByRole("button", { name: "Search" }).click();
   await selectComboboxOption(page, "Status", "Watching");
   await waitForServerAction(page, () =>
     page.getByRole("button", { name: "Add" }).click(),
