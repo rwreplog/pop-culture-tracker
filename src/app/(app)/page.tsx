@@ -86,10 +86,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-8">
       <div
-        className={cn(
-          "grid gap-3",
-          sections.queue.length > 0 && "grid-cols-2",
-        )}
+        className={cn("grid gap-3", sections.queue.length > 0 && "grid-cols-2")}
       >
         {sections.queue.length > 0 ? (
           <HomeActionCard
