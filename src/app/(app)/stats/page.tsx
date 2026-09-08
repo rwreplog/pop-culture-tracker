@@ -7,6 +7,7 @@ import { AnnualSummaryCard } from "@/components/stats/annual-summary-card";
 import { CountBarList } from "@/components/stats/count-bar-list";
 import { StatsOverviewCards } from "@/components/stats/stats-overview-cards";
 import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import {
   getActivityChartData,
@@ -52,17 +53,35 @@ export default async function StatsPage() {
       <ActivityChart data={activityChart} />
 
       {insights.genreBreakdown.length > 0 ? (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Top genres</h2>
-          <CountBarList entries={insights.genreBreakdown} />
-        </section>
+        <Card variant="glass">
+          <CardHeader>
+            <CardTitle
+              as="h2"
+              className="text-base font-semibold tracking-tight"
+            >
+              Top genres
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CountBarList entries={insights.genreBreakdown} />
+          </CardContent>
+        </Card>
       ) : null}
 
       {insights.topCreators.length > 0 ? (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Top creators</h2>
-          <CountBarList entries={insights.topCreators} />
-        </section>
+        <Card variant="glass">
+          <CardHeader>
+            <CardTitle
+              as="h2"
+              className="text-base font-semibold tracking-tight"
+            >
+              Top creators
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CountBarList entries={insights.topCreators} />
+          </CardContent>
+        </Card>
       ) : null}
 
       <AnnualSummaryCard summary={insights.annualSummary} />

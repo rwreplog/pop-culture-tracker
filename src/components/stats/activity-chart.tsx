@@ -1,3 +1,17 @@
+"use client";
+
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
+
+import { chartTooltipContent } from "@/components/stats/chart-tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MonthlyActivity } from "@/lib/services/insights/queries";
 
@@ -22,11 +36,11 @@ function monthLabel(month: string): string {
 }
 
 export function ActivityChart({ data }: { data: MonthlyActivity[] }) {
-  const max = Math.max(1, ...data.map((bucket) => bucket.count));
   const peakIndex = data.reduce(
     (best, bucket, i) => (bucket.count > data[best].count ? i : best),
     0,
   );
+  const hasActivity = data[peakIndex]?.count > 0;
 
   return (
     <Card variant="glass">
@@ -36,31 +50,85 @@ export function ActivityChart({ data }: { data: MonthlyActivity[] }) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex h-32 items-end gap-2">
-          {data.map((bucket, i) => (
-            <div
-              key={bucket.month}
-              className="relative flex flex-1 flex-col items-center gap-1.5"
+        <ResponsiveContainer width="100%" height={160}>
+          <BarChart
+            data={data}
+            margin={{ top: 24, right: 4, left: 4, bottom: 0 }}
+          >
+            <CartesianGrid
+              vertical={false}
+              stroke="var(--color-border)"
+              strokeDasharray="4 4"
+            />
+            <XAxis
+              dataKey="month"
+              tickFormatter={monthLabel}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
+            />
+            <Tooltip
+              cursor={{ fill: "var(--color-muted)" }}
+              content={chartTooltipContent({
+                formatLabel: monthLabel,
+                formatValue: (value) =>
+                  `${value} activity event${value === 1 ? "" : "s"}`,
+              })}
+            />
+            <Bar
+              dataKey="count"
+              radius={[6, 6, 0, 0]}
+              maxBarSize={40}
+              isAnimationActive={false}
             >
-              {i === peakIndex && bucket.count > 0 ? (
-                <span className="bg-foreground text-background dark:from-primary dark:to-accent-2 dark:text-primary-foreground absolute -top-7 rounded-full px-2 py-0.5 text-xs font-medium shadow-sm dark:bg-linear-to-br">
-                  {bucket.count}
-                </span>
-              ) : null}
-              <div className="bg-muted flex h-24 w-full items-end overflow-hidden rounded-md">
-                <div
-                  className="bg-primary dark:from-primary dark:to-accent-2 w-full rounded-md transition-[height] dark:bg-linear-to-t"
-                  style={{ height: `${(bucket.count / max) * 100}%` }}
-                  role="img"
-                  aria-label={`${bucket.count} activity events`}
+              {data.map((bucket, i) => (
+                <Cell
+                  key={bucket.month}
+                  fill={
+                    hasActivity && i === peakIndex
+                      ? "var(--color-accent-2)"
+                      : "var(--color-chart-1)"
+                  }
                 />
-              </div>
-              <span className="text-muted-foreground text-xs">
-                {monthLabel(bucket.month)}
-              </span>
-            </div>
-          ))}
-        </div>
+              ))}
+              <LabelList
+                dataKey="count"
+                content={(props) => {
+                  const { x, y, width, value, index } = props;
+                  if (!hasActivity || index !== peakIndex) return null;
+                  return (
+                    <text
+                      x={Number(x) + Number(width) / 2}
+                      y={Number(y) - 8}
+                      textAnchor="middle"
+                      className="fill-foreground text-xs font-medium"
+                    >
+                      {value}
+                    </text>
+                  );
+                }}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+
+        <table className="sr-only">
+          <caption>Activity events by month</caption>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((bucket) => (
+              <tr key={bucket.month}>
+                <td>{monthLabel(bucket.month)}</td>
+                <td>{bucket.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </CardContent>
     </Card>
   );

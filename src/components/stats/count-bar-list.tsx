@@ -1,27 +1,85 @@
+"use client";
+
+import {
+  Bar,
+  BarChart,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { chartTooltipContent } from "@/components/stats/chart-tooltip";
 import type { CountEntry } from "@/lib/services/insights/queries";
 
-/** A horizontal bar list for ranked name/count pairs (genres, creators). */
-export function CountBarList({ entries }: { entries: CountEntry[] }) {
-  const max = Math.max(1, ...entries.map((entry) => entry.count));
+const NAME_AXIS_WIDTH = 112;
+const ROW_HEIGHT = 32;
 
+function truncateName(name: string): string {
+  return name.length > 18 ? `${name.slice(0, 17)}…` : name;
+}
+
+/** A horizontal bar chart for ranked name/count pairs (genres, creators). */
+export function CountBarList({ entries }: { entries: CountEntry[] }) {
   return (
-    <ul className="flex flex-col gap-2">
-      {entries.map((entry) => (
-        <li key={entry.name} className="flex items-center gap-3">
-          <span className="w-28 shrink-0 truncate text-sm sm:w-40">
-            {entry.name}
-          </span>
-          <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
-            <div
-              className="bg-primary h-full rounded-full"
-              style={{ width: `${(entry.count / max) * 100}%` }}
+    <>
+      <ResponsiveContainer width="100%" height={entries.length * ROW_HEIGHT}>
+        <BarChart
+          data={entries}
+          layout="vertical"
+          margin={{ top: 0, right: 28, left: 0, bottom: 0 }}
+          barCategoryGap="28%"
+        >
+          <XAxis type="number" hide />
+          <YAxis
+            type="category"
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            width={NAME_AXIS_WIDTH}
+            tickFormatter={truncateName}
+            tick={{ fill: "var(--color-foreground)", fontSize: 13 }}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--color-muted)" }}
+            content={chartTooltipContent({
+              formatValue: (value) => `${value} item${value === 1 ? "" : "s"}`,
+            })}
+          />
+          <Bar
+            dataKey="count"
+            fill="var(--color-chart-1)"
+            radius={[0, 4, 4, 0]}
+            maxBarSize={18}
+            isAnimationActive={false}
+          >
+            <LabelList
+              dataKey="count"
+              position="right"
+              className="fill-muted-foreground text-xs"
             />
-          </div>
-          <span className="text-muted-foreground w-6 shrink-0 text-right text-sm">
-            {entry.count}
-          </span>
-        </li>
-      ))}
-    </ul>
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+
+      <table className="sr-only">
+        <caption>Counts by name</caption>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((entry) => (
+            <tr key={entry.name}>
+              <td>{entry.name}</td>
+              <td>{entry.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
