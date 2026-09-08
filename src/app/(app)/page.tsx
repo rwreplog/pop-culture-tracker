@@ -27,15 +27,15 @@ function HomeActionCard({
   return (
     <Link
       href={href}
-      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex items-center gap-4 rounded-xl p-4 ring-1 transition-colors dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
+      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex min-w-0 items-center gap-3 rounded-xl p-3 ring-1 transition-colors sm:gap-4 sm:p-4 dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
     >
-      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 shrink-0 items-center justify-center rounded-full dark:bg-linear-to-br">
+      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10 dark:bg-linear-to-br">
         <Icon
-          className="text-muted-foreground dark:text-foreground size-5"
+          className="text-muted-foreground dark:text-foreground size-4.5 sm:size-5"
           aria-hidden="true"
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex min-w-0 flex-col">
         <span className="font-semibold">{title}</span>
         <span className="text-muted-foreground text-sm">{description}</span>
       </div>
@@ -86,10 +86,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-8">
       <div
-        className={cn(
-          "grid gap-3",
-          sections.queue.length > 0 && "sm:grid-cols-2",
-        )}
+        className={cn("grid gap-3", sections.queue.length > 0 && "grid-cols-2")}
       >
         {sections.queue.length > 0 ? (
           <HomeActionCard
