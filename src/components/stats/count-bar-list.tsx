@@ -30,6 +30,9 @@ export function CountBarList({ entries }: { entries: CountEntry[] }) {
           layout="vertical"
           margin={{ top: 0, right: 28, left: 0, bottom: 0 }}
           barCategoryGap="28%"
+          // The sr-only table below already covers accessibility; see
+          // activity-chart.tsx for why the built-in layer is disabled.
+          accessibilityLayer={false}
         >
           <XAxis type="number" hide />
           <YAxis
