@@ -67,7 +67,7 @@ export default async function SurprisePage({
             key={value}
             href={buildHref(value)}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-medium",
+              "rounded-full px-3 py-2 text-sm font-medium",
               value === mediaType
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",

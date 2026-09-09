@@ -40,6 +40,10 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#fbfcfe" },
     { media: "(prefers-color-scheme: dark)", color: "#090b12" },
   ],
+  // Lets content draw under the iOS status bar/home indicator so the
+  // safe-area-inset-* padding used in header/mobile-nav/toast actually has
+  // something to react to — without it those insets stay 0 in standalone.
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -82,6 +86,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${spaceGrotesk.variable} ${bricolageGrotesque.variable} ${manrope.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Warm up the connection to each provider's image CDN ahead of the
+            first poster request — these are separate subdomains from the
+            APIs we call, so the browser hasn't connected to them yet. */}
+        <link rel="preconnect" href="https://image.tmdb.org" />
+        <link rel="preconnect" href="https://images.igdb.com" />
+        <link rel="preconnect" href="https://comicvine.gamespot.com" />
+        <link rel="preconnect" href="https://books.google.com" />
         <ThemeProvider
           attribute="class"
           defaultTheme={preferences?.theme ?? "dark"}

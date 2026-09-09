@@ -56,6 +56,7 @@ export function SurprisePickCard({
             src={result.imageUrl}
             title={result.title}
             className="h-40 w-28 shrink-0"
+            priority
           />
           <div className="flex min-w-0 flex-col gap-1.5">
             <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
