@@ -56,12 +56,6 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Geekery",
   },
-  icons: {
-    // The manifest's icons are transparent-cornered "any" purpose PNGs —
-    // fine for Android, but iOS composites apple-touch-icon on a black
-    // home-screen background, so a dedicated opaque one is needed here.
-    apple: "/apple-touch-icon.png",
-  },
   openGraph: {
     title: "Geekery",
     description:
