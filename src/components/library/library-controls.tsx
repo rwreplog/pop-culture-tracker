@@ -68,11 +68,17 @@ export function LibraryControls({
   mediaId,
   mediaType,
   libraryItem,
+  pageCount,
+  issueCount,
   ownedLists,
 }: {
   mediaId: string;
   mediaType: MediaType;
   libraryItem: LibraryItem | null;
+  /** Total pages, from Google Books — gives the book progress form a denominator. */
+  pageCount?: number;
+  /** Total issues in the series, from ComicVine — same, for comics. */
+  issueCount?: number;
   ownedLists: { id: string; name: string }[];
 }) {
   const [showListPrompt, setShowListPrompt] = useState(false);
@@ -141,6 +147,8 @@ export function LibraryControls({
         libraryItemId={libraryItem.id}
         mediaType={mediaType}
         progress={libraryItem.progress as Record<string, unknown> | null}
+        pageCount={pageCount}
+        issueCount={issueCount}
       />
 
       <Card variant="glass">
@@ -488,29 +496,72 @@ function NotesForm({
   );
 }
 
+/** The progress field a known total (pageCount/issueCount) applies to, per media type. */
+const PRIMARY_PROGRESS_FIELD: Partial<Record<MediaType, string>> = {
+  book: "page",
+  comic: "issue",
+};
+
 function ProgressForm({
   libraryItemId,
   mediaType,
   progress,
+  pageCount,
+  issueCount,
 }: {
   libraryItemId: string;
   mediaType: MediaType;
   progress: Record<string, unknown> | null;
+  /** Total pages, from Google Books — lets the "page" field show a total and a bar. */
+  pageCount?: number;
+  /** Total issues in the series, from ComicVine — same, for the "issue" field. */
+  issueCount?: number;
 }) {
   const [state, formAction, isPending] = useActionState(
     withActionToast(updateProgressAction, "Progress saved"),
     undefined,
   );
 
-  const fields = progressFieldsFor(mediaType);
+  const total = mediaType === "book" ? pageCount : issueCount;
+  const fields = progressFieldsFor(mediaType, total);
   if (fields.length === 0) return null;
+
+  const primaryField = PRIMARY_PROGRESS_FIELD[mediaType];
+  const current =
+    primaryField && progress?.[primaryField] != null
+      ? Number(progress[primaryField])
+      : null;
+  const percent =
+    total && current != null
+      ? Math.min(100, Math.round((current / total) * 100))
+      : null;
 
   return (
     <Card variant="glass">
       <CardHeader>
         <CardTitle>Progress</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
+        {total ? (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-muted-foreground text-xs">
+              {current ?? 0} of {total}
+              {percent != null ? ` (${percent}%)` : ""}
+            </span>
+            <div
+              className="bg-muted h-1.5 overflow-hidden rounded-full"
+              role="progressbar"
+              aria-valuenow={percent ?? 0}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div
+                className="bg-primary h-full"
+                style={{ width: `${percent ?? 0}%` }}
+              />
+            </div>
+          </div>
+        ) : null}
         <form
           action={formAction}
           className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
@@ -530,6 +581,7 @@ function ProgressForm({
                 name={field.name}
                 type={field.type}
                 inputMode={field.type === "number" ? "numeric" : undefined}
+                max={field.max}
                 defaultValue={
                   progress?.[field.name] != null
                     ? String(progress[field.name])
@@ -555,7 +607,8 @@ function ProgressForm({
 
 function progressFieldsFor(
   mediaType: MediaType,
-): { name: string; label: string; type: "number" | "text" }[] {
+  total?: number,
+): { name: string; label: string; type: "number" | "text"; max?: number }[] {
   switch (mediaType) {
     case "tv":
       return [
@@ -564,7 +617,12 @@ function progressFieldsFor(
       ];
     case "book":
       return [
-        { name: "page", label: "Page", type: "number" },
+        {
+          name: "page",
+          label: total ? `Page (of ${total})` : "Page",
+          type: "number",
+          max: total,
+        },
         { name: "percent", label: "Percent", type: "number" },
       ];
     case "game":
@@ -574,7 +632,12 @@ function progressFieldsFor(
       ];
     case "comic":
       return [
-        { name: "issue", label: "Issue", type: "number" },
+        {
+          name: "issue",
+          label: total ? `Issue (of ${total})` : "Issue",
+          type: "number",
+          max: total,
+        },
         { name: "volume", label: "Volume", type: "number" },
       ];
     case "movie":

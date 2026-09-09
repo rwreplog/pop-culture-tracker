@@ -16,6 +16,7 @@ const volumeInfoSchema = z.object({
   publishedDate: z.string().optional(),
   description: z.string().optional(),
   categories: z.array(z.string()).optional(),
+  pageCount: z.number().optional(),
   imageLinks: z
     .object({
       extraLarge: z.string().optional(),
@@ -79,6 +80,7 @@ function toSearchResult(
     creator: info?.authors?.join(", ") ?? null,
     description: info?.description ?? null,
     genres: info?.categories ?? [],
+    pageCount: info?.pageCount ?? null,
   };
 }
 

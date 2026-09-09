@@ -20,6 +20,7 @@ const volumeSchema = z.object({
   image: z.object({ medium_url: z.string().nullable().optional() }).optional(),
   deck: z.string().nullable().optional(),
   publisher: z.object({ name: z.string() }).nullable().optional(),
+  count_of_issues: z.number().nullable().optional(),
 });
 
 const searchResponseSchema = z.object({
@@ -60,6 +61,7 @@ function toSearchResult(
     description: stripHtml(raw.deck),
     // ComicVine doesn't expose genre. See docs/ROADMAP.md Phase 3.
     genres: [],
+    issueCount: raw.count_of_issues ?? null,
   };
 }
 

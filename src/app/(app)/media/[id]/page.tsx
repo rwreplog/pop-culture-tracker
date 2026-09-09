@@ -15,6 +15,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
+import { getMediaIssueCount, getMediaPageCount } from "@/lib/media/metadata";
 import { getActivityForMedia } from "@/lib/services/activity/queries";
 import { getFriends } from "@/lib/services/friendships/queries";
 import {
@@ -141,6 +142,8 @@ export default async function MediaDetailPage({
             mediaId={item.id}
             mediaType={item.mediaType}
             libraryItem={libraryItem}
+            pageCount={getMediaPageCount(item)}
+            issueCount={getMediaIssueCount(item)}
             ownedLists={ownedLists.map((list) => ({
               id: list.id,
               name: list.name,
