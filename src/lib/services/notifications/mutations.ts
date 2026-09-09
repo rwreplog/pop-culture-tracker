@@ -23,6 +23,26 @@ export async function createFriendRequestNotification(
   });
 }
 
+export async function createRecommendationNotification(
+  tx: Transaction,
+  {
+    userId,
+    actorId,
+    recommendationId,
+  }: {
+    userId: string;
+    actorId: string;
+    recommendationId: string;
+  },
+) {
+  await tx.insert(notifications).values({
+    userId,
+    actorId,
+    type: "recommendation",
+    recommendationId,
+  });
+}
+
 /** Called when a friendship row is updated (not deleted) — accept and auto-accept. */
 export async function deleteNotificationForFriendship(
   tx: Transaction,

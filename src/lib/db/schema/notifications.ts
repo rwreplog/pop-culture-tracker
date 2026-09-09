@@ -2,18 +2,21 @@ import { relations } from "drizzle-orm";
 import { index, pgEnum, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { friendships } from "@/lib/db/schema/friendships";
+import { recommendations } from "@/lib/db/schema/recommendations";
 import { users } from "@/lib/db/schema/users";
 
 export const notificationTypeEnum = pgEnum("notification_type", [
   "friend_request",
+  "recommendation",
 ]);
 
 /**
- * `friendshipId` cascades on delete so canceling/declining a request (both
- * modeled as deleting the friendship row, see friendships.ts) automatically
- * clears the notification too — no manual cleanup needed for those paths.
- * Accepting updates the row instead of deleting it, so that path does need
- * an explicit delete; see friendships/mutations.ts.
+ * `friendshipId`/`recommendationId` cascade on delete so removing the row
+ * they point to (canceling/declining a friend request, both modeled as
+ * deleting the friendship row — see friendships.ts) automatically clears
+ * the notification too — no manual cleanup needed for those paths.
+ * Accepting a friend request updates the row instead of deleting it, so
+ * that path does need an explicit delete; see friendships/mutations.ts.
  */
 export const notifications = pgTable(
   "notifications",
@@ -29,6 +32,10 @@ export const notifications = pgTable(
     friendshipId: uuid("friendship_id").references(() => friendships.id, {
       onDelete: "cascade",
     }),
+    recommendationId: uuid("recommendation_id").references(
+      () => recommendations.id,
+      { onDelete: "cascade" },
+    ),
     readAt: timestamp("read_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
@@ -48,6 +55,10 @@ export const notificationRelations = relations(notifications, ({ one }) => ({
     fields: [notifications.actorId],
     references: [users.id],
     relationName: "actor",
+  }),
+  recommendation: one(recommendations, {
+    fields: [notifications.recommendationId],
+    references: [recommendations.id],
   }),
 }));
 
