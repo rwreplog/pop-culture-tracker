@@ -16,6 +16,7 @@ import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getMediaIssueCount, getMediaPageCount } from "@/lib/media/metadata";
+import { sanitizeDescription } from "@/lib/media/sanitize-description";
 import { getActivityForMedia } from "@/lib/services/activity/queries";
 import { getFriends } from "@/lib/services/friendships/queries";
 import {
@@ -133,7 +134,16 @@ export default async function MediaDetailPage({
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm">{item.description}</p>
+                {/* Descriptions come from external provider APIs (Google
+                Books in particular often returns real markup); always
+                sanitized before rendering so a provider response can't
+                inject a script tag or event handler attribute. */}
+                <div
+                  className="[&_a:hover]:text-foreground flex flex-col gap-3 text-sm [&_a]:underline [&_a]:underline-offset-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeDescription(item.description),
+                  }}
+                />
               </CardContent>
             </Card>
           ) : null}

@@ -1,4 +1,4 @@
-import { count, sql } from "drizzle-orm";
+import { count, notIlike, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { activity } from "@/lib/db/schema/activity";
@@ -26,6 +26,12 @@ export async function getAdminAccountsOverview(): Promise<
 > {
   const [accounts, itemCounts, listCounts, lastActive] = await Promise.all([
     db.query.users.findMany({
+      // e2e/manual test accounts are all registered under @example.com
+      // (see e2e/helpers.ts's uniqueTestUser), sometimes with a variant
+      // suffix tacked on after it (e.g. "...@example.com.dark") — filter
+      // anything containing that domain so they don't crowd out real
+      // accounts on the overview.
+      where: (user) => notIlike(user.email, "%@example.com%"),
       orderBy: (user, { desc }) => [desc(user.createdAt)],
     }),
     db
