@@ -39,7 +39,12 @@ export async function getAdminAccountsOverview(): Promise<
     db
       .select({
         userId: activity.userId,
-        lastActiveAt: sql<Date>`max(${activity.createdAt})`,
+        // Raw sql fragments get no drizzle column mapping, so without an
+        // explicit decoder this comes back as the driver's native timestamp
+        // string (e.g. "2026-09-09 12:38:32.99204"), not a Date.
+        lastActiveAt: sql<Date>`max(${activity.createdAt})`.mapWith(
+          (value: string) => new Date(value),
+        ),
       })
       .from(activity)
       .groupBy(activity.userId),
