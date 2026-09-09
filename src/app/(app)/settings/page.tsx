@@ -70,9 +70,9 @@ export default async function SettingsPage() {
           <h2 className="font-medium">Storage</h2>
         </div>
         <p className="text-muted-foreground text-sm">
-          Posters and cover art are cached on this device for faster
-          loading. If artwork looks stale or broken, clear it and it&apos;ll
-          refetch as you browse.
+          Posters and cover art are cached on this device for faster loading. If
+          artwork looks stale or broken, clear it and it&apos;ll refetch as you
+          browse.
         </p>
         <ClearImageCacheButton />
       </div>

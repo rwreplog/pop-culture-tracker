@@ -40,9 +40,7 @@ export function ClearImageCacheButton() {
           clearTimeout(timeout);
           resolve();
         };
-        controller.postMessage({ type: "CLEAR_IMAGE_CACHE" }, [
-          channel.port2,
-        ]);
+        controller.postMessage({ type: "CLEAR_IMAGE_CACHE" }, [channel.port2]);
       });
 
       toast.success("Cleared cached images — they'll refetch as you browse.");
