@@ -29,6 +29,11 @@ function parseGenres(value: unknown): string[] {
   }
 }
 
+/** FormData values are always strings — empty string stands in for a missing count. */
+function emptyToUndefined(value: unknown) {
+  return typeof value === "string" && value === "" ? undefined : value;
+}
+
 /**
  * A NormalizedSearchResult, as submitted from a search-result form (hidden
  * inputs) back to a server action. Used to resolve/create the canonical
@@ -44,6 +49,14 @@ export const normalizedSearchResultSchema = z.object({
   creator: z.preprocess(emptyToNull, z.string().nullable()),
   description: z.preprocess(emptyToNull, z.string().nullable()),
   genres: z.preprocess(parseGenres, z.array(z.string())),
+  pageCount: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().positive().optional(),
+  ),
+  issueCount: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().positive().optional(),
+  ),
 });
 
 export type NormalizedSearchResultInput = z.infer<

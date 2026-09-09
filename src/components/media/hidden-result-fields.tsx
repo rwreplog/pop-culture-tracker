@@ -29,6 +29,8 @@ export function HiddenResultFields({
         name="genres"
         value={JSON.stringify(result.genres)}
       />
+      <input type="hidden" name="pageCount" value={result.pageCount ?? ""} />
+      <input type="hidden" name="issueCount" value={result.issueCount ?? ""} />
     </>
   );
 }
