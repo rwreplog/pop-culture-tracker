@@ -62,3 +62,7 @@ export const normalizedSearchResultSchema = z.object({
 export type NormalizedSearchResultInput = z.infer<
   typeof normalizedSearchResultSchema
 >;
+
+export const refreshMediaSchema = z.object({
+  mediaId: z.string().min(1),
+});

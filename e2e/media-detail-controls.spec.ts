@@ -40,6 +40,11 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
     page.getByRole("button", { name: "Save progress" }).click(),
   );
 
+  await waitForServerAction(page, () =>
+    page.getByRole("button", { name: "Refresh details" }).click(),
+  );
+  await expect(page.getByText("Details refreshed")).toBeVisible();
+
   // Reload to confirm the changes were actually persisted, not just
   // reflected optimistically in the client.
   await page.reload();
