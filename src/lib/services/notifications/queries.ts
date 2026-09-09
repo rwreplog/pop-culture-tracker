@@ -26,7 +26,12 @@ export async function getUnreadNotificationCount(
 export async function getRecentNotifications(userId: string, limit = 20) {
   const rows = await db.query.notifications.findMany({
     where: eq(notifications.userId, userId),
-    with: { actor: { columns: PUBLIC_USER_COLUMNS } },
+    with: {
+      actor: { columns: PUBLIC_USER_COLUMNS },
+      recommendation: {
+        with: { media: { columns: { id: true, title: true } } },
+      },
+    },
     orderBy: (notification, { desc }) => [desc(notification.createdAt)],
     limit,
   });
@@ -36,6 +41,8 @@ export async function getRecentNotifications(userId: string, limit = 20) {
     type: row.type,
     actor: row.actor,
     friendshipId: row.friendshipId,
+    mediaId: row.recommendation?.media.id ?? null,
+    mediaTitle: row.recommendation?.media.title ?? null,
     read: row.readAt !== null,
     createdAt: row.createdAt,
   }));

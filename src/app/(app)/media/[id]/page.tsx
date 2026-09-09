@@ -7,6 +7,7 @@ import { LibraryControls } from "@/components/library/library-controls";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { MediaCard } from "@/components/media/media-card";
+import { RecommendDialog } from "@/components/media/recommend-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +16,7 @@ import { db } from "@/lib/db";
 import { media } from "@/lib/db/schema";
 import { mediaTypeLabel } from "@/lib/media/labels";
 import { getActivityForMedia } from "@/lib/services/activity/queries";
+import { getFriends } from "@/lib/services/friendships/queries";
 import {
   getLibraryItemForUser,
   getRelatedLibraryItems,
@@ -41,19 +43,21 @@ export default async function MediaDetailPage({
   const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
   const userId = session?.user?.id;
-  const [libraryItemResult, ownedLists, activity, related] = await Promise.all([
-    userId ? getLibraryItemForUser(userId, item.id) : null,
-    userId ? getListsForUser(userId) : [],
-    userId ? getActivityForMedia(userId, item.id) : [],
-    userId
-      ? getRelatedLibraryItems(
-          userId,
-          item.id,
-          item.mediaType,
-          metadata?.genres ?? [],
-        )
-      : [],
-  ]);
+  const [libraryItemResult, ownedLists, activity, related, friends] =
+    await Promise.all([
+      userId ? getLibraryItemForUser(userId, item.id) : null,
+      userId ? getListsForUser(userId) : [],
+      userId ? getActivityForMedia(userId, item.id) : [],
+      userId
+        ? getRelatedLibraryItems(
+            userId,
+            item.id,
+            item.mediaType,
+            metadata?.genres ?? [],
+          )
+        : [],
+      userId ? getFriends(userId) : [],
+    ]);
   const libraryItem = libraryItemResult ?? null;
   const customArtUrl = libraryItem?.customImageKey
     ? await presignCustomArtUrl(libraryItem.customImageKey)
@@ -113,6 +117,15 @@ export default async function MediaDetailPage({
         </TabsList>
 
         <TabsContent value="overview" className="flex flex-col gap-4 pt-4">
+          {userId ? (
+            <div className="flex justify-end">
+              <RecommendDialog
+                mediaId={item.id}
+                friends={friends.map(({ friend }) => friend)}
+              />
+            </div>
+          ) : null}
+
           {item.description ? (
             <Card variant="glass">
               <CardHeader>

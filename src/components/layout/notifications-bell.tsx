@@ -18,8 +18,10 @@ import { markAllNotificationsReadAction } from "@/lib/actions/notifications";
 
 type NotificationItem = {
   id: string;
-  type: "friend_request";
+  type: "friend_request" | "recommendation";
   actor: { id: string; name: string | null; handle: string | null } | null;
+  mediaId: string | null;
+  mediaTitle: string | null;
   createdAt: string;
 };
 
@@ -97,19 +99,43 @@ export function NotificationsBell({
             {loaded ? "No notifications yet." : "Loading…"}
           </p>
         ) : (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              render={<Link href="/friends" className="w-full" />}
-            >
-              <span className="truncate">
-                <strong className="font-medium">
-                  {notification.actor?.name ?? "Someone"}
-                </strong>{" "}
-                sent you a friend request
-              </span>
-            </DropdownMenuItem>
-          ))
+          notifications.map((notification) => {
+            const actorName = notification.actor?.name ?? "Someone";
+
+            if (notification.type === "recommendation") {
+              return (
+                <DropdownMenuItem
+                  key={notification.id}
+                  render={
+                    <Link
+                      href={`/media/${notification.mediaId}`}
+                      className="w-full"
+                    />
+                  }
+                >
+                  <span className="truncate">
+                    <strong className="font-medium">{actorName}</strong>{" "}
+                    recommended{" "}
+                    <strong className="font-medium">
+                      {notification.mediaTitle}
+                    </strong>
+                  </span>
+                </DropdownMenuItem>
+              );
+            }
+
+            return (
+              <DropdownMenuItem
+                key={notification.id}
+                render={<Link href="/friends" className="w-full" />}
+              >
+                <span className="truncate">
+                  <strong className="font-medium">{actorName}</strong> sent you
+                  a friend request
+                </span>
+              </DropdownMenuItem>
+            );
+          })
         )}
       </DropdownMenuContent>
     </DropdownMenu>
