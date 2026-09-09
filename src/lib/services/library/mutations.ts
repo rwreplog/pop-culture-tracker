@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { libraryItems } from "@/lib/db/schema/library";
 import type { LibraryProgress } from "@/lib/schemas/library";
 import { recordActivity } from "@/lib/services/activity/log";
+import { notifyGoalAchievements } from "@/lib/services/goals/achievements";
 import { deleteCustomArt } from "@/lib/storage/custom-art";
 
 type LibraryStatus = (typeof libraryItems.$inferSelect)["status"];
@@ -61,6 +62,7 @@ export async function addToLibrary(
       }
       if (status === "completed") {
         await recordActivity(tx, userId, "completed", mediaId);
+        await notifyGoalAchievements(tx, userId, now.getFullYear());
       }
 
       return { success: true, libraryItemId: inserted.id, mediaId };
@@ -135,6 +137,7 @@ export async function updateLibraryItem(
       }
       if (statusChanged && patch.status === "completed") {
         await recordActivity(tx, userId, "completed", existing.mediaId);
+        await notifyGoalAchievements(tx, userId, now.getFullYear());
       }
       if (patch.rating !== undefined && patch.rating !== existing.rating) {
         await recordActivity(tx, userId, "rated", existing.mediaId, {

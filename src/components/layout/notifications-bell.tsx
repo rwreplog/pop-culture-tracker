@@ -18,10 +18,12 @@ import { markAllNotificationsReadAction } from "@/lib/actions/notifications";
 
 type NotificationItem = {
   id: string;
-  type: "friend_request" | "recommendation";
+  type: "friend_request" | "recommendation" | "goal_achieved";
   actor: { id: string; name: string | null; handle: string | null } | null;
   mediaId: string | null;
   mediaTitle: string | null;
+  goalTarget: number | null;
+  goalYear: number | null;
   createdAt: string;
 };
 
@@ -119,6 +121,23 @@ export function NotificationsBell({
                     <strong className="font-medium">
                       {notification.mediaTitle}
                     </strong>
+                  </span>
+                </DropdownMenuItem>
+              );
+            }
+
+            if (notification.type === "goal_achieved") {
+              return (
+                <DropdownMenuItem
+                  key={notification.id}
+                  render={<Link href="/goals" className="w-full" />}
+                >
+                  <span className="truncate">
+                    You hit your goal of{" "}
+                    <strong className="font-medium">
+                      {notification.goalTarget}
+                    </strong>{" "}
+                    for {notification.goalYear}!
                   </span>
                 </DropdownMenuItem>
               );

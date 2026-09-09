@@ -43,6 +43,19 @@ export async function createRecommendationNotification(
   });
 }
 
+export async function createGoalAchievedNotification(
+  tx: Transaction,
+  { userId, goalId }: { userId: string; goalId: string },
+) {
+  await tx.insert(notifications).values({
+    userId,
+    // Self-triggered — the acting user is also the notification's actor.
+    actorId: userId,
+    type: "goal_achieved",
+    goalId,
+  });
+}
+
 /** Called when a friendship row is updated (not deleted) — accept and auto-accept. */
 export async function deleteNotificationForFriendship(
   tx: Transaction,

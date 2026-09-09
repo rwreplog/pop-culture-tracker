@@ -57,6 +57,13 @@
       "when": 1788918447233,
       "tag": "0007_add_recommendations",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788920864359,
+      "tag": "0008_add_goal_celebrations",
+      "breakpoints": true
     }
   ]
 }

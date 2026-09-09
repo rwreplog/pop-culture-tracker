@@ -31,6 +31,7 @@ export async function getRecentNotifications(userId: string, limit = 20) {
       recommendation: {
         with: { media: { columns: { id: true, title: true } } },
       },
+      goal: { columns: { target: true, year: true } },
     },
     orderBy: (notification, { desc }) => [desc(notification.createdAt)],
     limit,
@@ -43,6 +44,8 @@ export async function getRecentNotifications(userId: string, limit = 20) {
     friendshipId: row.friendshipId,
     mediaId: row.recommendation?.media.id ?? null,
     mediaTitle: row.recommendation?.media.title ?? null,
+    goalTarget: row.goal?.target ?? null,
+    goalYear: row.goal?.year ?? null,
     read: row.readAt !== null,
     createdAt: row.createdAt,
   }));
