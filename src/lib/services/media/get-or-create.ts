@@ -48,11 +48,20 @@ export async function getOrCreateMedia(
           releaseDate: result.releaseDate,
           imageUrl: result.imageUrl,
           metadata:
-            result.creator || result.genres.length > 0
+            result.creator ||
+            result.genres.length > 0 ||
+            result.pageCount ||
+            result.issueCount
               ? {
                   ...(result.creator ? { creator: result.creator } : null),
                   ...(result.genres.length > 0
                     ? { genres: result.genres }
+                    : null),
+                  ...(result.pageCount
+                    ? { pageCount: result.pageCount }
+                    : null),
+                  ...(result.issueCount
+                    ? { issueCount: result.issueCount }
                     : null),
                 }
               : null,

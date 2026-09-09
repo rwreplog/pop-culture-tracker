@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const findFirstMock = vi.fn();
+const mediaValuesMock = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   db: {
@@ -11,10 +12,11 @@ vi.mock("@/lib/db", () => ({
       let insertCallCount = 0;
       const tx = {
         insert: () => ({
-          values: () => {
+          values: (vals: unknown) => {
             insertCallCount += 1;
             if (insertCallCount === 1) {
               // First insert: the `media` row.
+              mediaValuesMock(vals);
               return { returning: async () => [{ id: "new-media-id" }] };
             }
             // Second insert: the `mediaExternalIds` link row.
@@ -44,6 +46,7 @@ const searchResult = {
 describe("getOrCreateMedia", () => {
   beforeEach(() => {
     findFirstMock.mockReset();
+    mediaValuesMock.mockReset();
   });
 
   it("returns the existing media id when already linked", async () => {
@@ -76,6 +79,32 @@ describe("getOrCreateMedia", () => {
     const result = await getOrCreateMedia(searchResult);
 
     expect(result).toEqual({ success: true, mediaId: "raced-media-id" });
+  });
+
+  it("folds pageCount/issueCount into metadata alongside creator/genres", async () => {
+    findFirstMock.mockResolvedValue(undefined);
+
+    await getOrCreateMedia({
+      ...searchResult,
+      mediaType: "book",
+      pageCount: 320,
+    });
+
+    expect(mediaValuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: expect.objectContaining({ pageCount: 320 }),
+      }),
+    );
+  });
+
+  it("omits pageCount/issueCount from metadata when absent", async () => {
+    findFirstMock.mockResolvedValue(undefined);
+
+    await getOrCreateMedia(searchResult);
+
+    const [{ metadata }] = mediaValuesMock.mock.calls[0];
+    expect(metadata).not.toHaveProperty("pageCount");
+    expect(metadata).not.toHaveProperty("issueCount");
   });
 
   it("returns a friendly error for unexpected failures", async () => {

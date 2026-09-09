@@ -50,8 +50,29 @@ describe("googleBooksAdapter.search", () => {
         creator: "Andy Weir",
         description: "A lone astronaut must save the earth.",
         genres: ["Fiction"],
+        pageCount: null,
       },
     ]);
+  });
+
+  it("carries pageCount through when present", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: "abc123",
+              volumeInfo: { title: "Project Hail Mary", pageCount: 476 },
+            },
+          ],
+        }),
+      }),
+    );
+
+    const results = await googleBooksAdapter.search("hail mary", "book");
+    expect(results[0].pageCount).toBe(476);
   });
 
   it("prefers larger imageLinks sizes and bumps the zoom param", async () => {

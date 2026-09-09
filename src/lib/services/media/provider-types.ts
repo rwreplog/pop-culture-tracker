@@ -22,6 +22,10 @@ export type NormalizedSearchResult = {
    * docs/ROADMAP.md Phase 3: genre analysis only covers movie/tv/game.
    */
   genres: string[];
+  /** Total page count, from Google Books — gives progress tracking a denominator. */
+  pageCount?: number | null;
+  /** Total issues in the series, from ComicVine — gives progress tracking a denominator. */
+  issueCount?: number | null;
 };
 
 /** A search result plus any type-specific extra fields for Media.metadata. */
