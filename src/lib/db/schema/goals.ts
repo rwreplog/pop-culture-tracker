@@ -30,6 +30,13 @@ export const goals = pgTable(
     mediaType: mediaTypeEnum("media_type"),
     /** Null matches any genre. Freeform, matched case-insensitively against Media.metadata.genres. */
     genre: text("genre"),
+    /**
+     * Set once a completion has pushed this goal's progress to (or past)
+     * its target and a celebratory notification has been sent for it — so
+     * a goal is only ever celebrated once, not re-fired on every future
+     * read. See services/goals/achievements.ts.
+     */
+    achievedNotifiedAt: timestamp("achieved_notified_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => [index("goals_user_id_idx").on(table.userId)],

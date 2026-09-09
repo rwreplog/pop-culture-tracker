@@ -8,6 +8,10 @@ const libraryInsertReturningMock = vi.fn();
 const updateSetMock = vi.fn();
 const topLevelUpdateSetMock = vi.fn();
 const deleteCustomArtMock = vi.fn();
+// notifyGoalAchievements' own reads within the same transaction — default
+// to "no un-celebrated goals" so it's a no-op for tests unrelated to goals.
+const goalsFindManyMock = vi.fn();
+const libraryItemsFindManyMock = vi.fn();
 
 vi.mock("@/lib/storage/custom-art", () => ({
   deleteCustomArt: deleteCustomArtMock,
@@ -17,7 +21,13 @@ vi.mock("@/lib/db", () => ({
   db: {
     transaction: vi.fn(async (callback: (tx: unknown) => unknown) => {
       const tx = {
-        query: { libraryItems: { findFirst: findFirstMock } },
+        query: {
+          libraryItems: {
+            findFirst: findFirstMock,
+            findMany: libraryItemsFindManyMock,
+          },
+          goals: { findMany: goalsFindManyMock },
+        },
         insert: (table: unknown) => ({
           values: (vals: unknown) => {
             if (table === activity) {
@@ -69,6 +79,8 @@ beforeEach(() => {
   updateSetMock.mockReset();
   topLevelUpdateSetMock.mockReset();
   deleteCustomArtMock.mockReset();
+  goalsFindManyMock.mockReset().mockResolvedValue([]);
+  libraryItemsFindManyMock.mockReset();
 });
 
 describe("addToLibrary", () => {
