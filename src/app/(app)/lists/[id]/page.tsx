@@ -5,6 +5,7 @@ import { BackButton } from "@/components/layout/back-button";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteListButton } from "@/components/lists/delete-list-button";
+import { EditListDialog } from "@/components/lists/edit-list-dialog";
 import { ListItemRow } from "@/components/lists/list-item-row";
 import { ListVisibilityToggle } from "@/components/lists/list-visibility-toggle";
 import { auth } from "@/lib/auth";
@@ -26,10 +27,10 @@ export default async function ListDetailPage({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <BackButton fallbackHref="/lists" />
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="truncate text-xl font-semibold tracking-tight">
+            <h1 className="text-xl font-semibold tracking-tight break-words">
               {list.name}
             </h1>
             {list.isPublic ? <Badge variant="secondary">Public</Badge> : null}
@@ -39,7 +40,12 @@ export default async function ListDetailPage({
           ) : null}
         </div>
         {isOwner ? (
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <EditListDialog
+              listId={list.id}
+              name={list.name}
+              description={list.description}
+            />
             <ListVisibilityToggle listId={list.id} isPublic={list.isPublic} />
             <DeleteListButton listId={list.id} />
           </div>
