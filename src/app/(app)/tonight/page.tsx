@@ -95,7 +95,7 @@ export default async function TonightPage({
         <Link
           href={buildHref({ mood })}
           className={cn(
-            "rounded-full px-3 py-1.5 text-sm font-medium",
+            "rounded-full px-3 py-2 text-sm font-medium",
             !mediaType
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -108,7 +108,7 @@ export default async function TonightPage({
             key={value}
             href={buildHref({ type: value, mood })}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-medium",
+              "rounded-full px-3 py-2 text-sm font-medium",
               value === mediaType
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -123,7 +123,7 @@ export default async function TonightPage({
         <Link
           href={buildHref({ type: mediaType, mood: NO_MOOD })}
           className={cn(
-            "rounded-full border px-3 py-1.5 text-sm font-medium",
+            "rounded-full border px-3 py-2 text-sm font-medium",
             !mood
               ? "border-primary text-primary"
               : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent",
@@ -136,7 +136,7 @@ export default async function TonightPage({
             key={value}
             href={buildHref({ type: mediaType, mood: value })}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-sm font-medium",
+              "rounded-full border px-3 py-2 text-sm font-medium",
               value === mood
                 ? "border-primary text-primary"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent",
@@ -182,6 +182,7 @@ export default async function TonightPage({
                     src={pick.media.imageUrl}
                     title={pick.media.title}
                     className="h-40 w-28 shrink-0"
+                    priority
                   />
                   <div className="flex min-w-0 flex-col gap-1.5">
                     <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">

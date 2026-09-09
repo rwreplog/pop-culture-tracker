@@ -171,6 +171,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Keep vertical overscroll from chaining into the standalone PWA's
+       native bounce/refresh gesture — momentum scroll stays, but a scroll
+       that hits the top/bottom edge doesn't rubber-band the whole page. */
+    overscroll-behavior-y: contain;
+  }
+  a,
+  button {
+    /* Removes the ~300ms tap delay and disables double-tap-to-zoom on
+       interactive elements, and the default grey tap-highlight flash —
+       custom :active states (see Button, HomeActionCard) take its place. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   /* Suppress the native clear icon on search inputs — SearchInput renders
      its own so both don't show up side by side in Chromium/Safari. */

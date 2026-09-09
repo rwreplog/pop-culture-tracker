@@ -1,9 +1,10 @@
-import { Palette, Settings, User } from "lucide-react";
+import { Database, Palette, Settings, User } from "lucide-react";
 
 import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { AppearanceForm } from "@/components/settings/appearance-form";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
+import { ClearImageCacheButton } from "@/components/settings/clear-image-cache-button";
 import { ReleasedAt } from "@/components/settings/released-at";
 import { auth } from "@/lib/auth";
 import {
@@ -61,6 +62,19 @@ export default async function SettingsPage() {
             This account doesn&apos;t use a password.
           </p>
         )}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Database className="text-muted-foreground size-4" />
+          <h2 className="font-medium">Storage</h2>
+        </div>
+        <p className="text-muted-foreground text-sm">
+          Posters and cover art are cached on this device for faster
+          loading. If artwork looks stale or broken, clear it and it&apos;ll
+          refetch as you browse.
+        </p>
+        <ClearImageCacheButton />
       </div>
 
       {version ? (

@@ -12,7 +12,12 @@ import { getActivityFeed } from "@/lib/services/activity/queries";
 import { getDashboardSections } from "@/lib/services/library/queries";
 import { cn } from "@/lib/utils";
 
-/** Home page's "what next?" entry points — What should I do tonight? / Surprise me. */
+/**
+ * Home page's "what next?" entry points — What should I do tonight? /
+ * Surprise me. Stacked full-width below `sm` (a forced 2-up grid squeezed
+ * the icon+title+description row into an unreadably narrow column on
+ * phones); side by side from `sm` up where there's room for it.
+ */
 function HomeActionCard({
   href,
   icon: Icon,
@@ -27,11 +32,11 @@ function HomeActionCard({
   return (
     <Link
       href={href}
-      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 flex min-w-0 items-center gap-3 rounded-xl p-3 ring-1 transition-colors sm:gap-4 sm:p-4 dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
+      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 active:bg-muted/70 flex min-w-0 touch-manipulation items-center gap-3 rounded-xl p-3.5 ring-1 transition-colors active:scale-[0.98] sm:gap-4 sm:p-4 dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:active:bg-white/[0.07] dark:supports-[backdrop-filter]:backdrop-blur-xl"
     >
-      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10 dark:bg-linear-to-br">
+      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 shrink-0 items-center justify-center rounded-full dark:bg-linear-to-br">
         <Icon
-          className="text-muted-foreground dark:text-foreground size-4.5 sm:size-5"
+          className="text-muted-foreground dark:text-foreground size-5"
           aria-hidden="true"
         />
       </div>
@@ -86,7 +91,10 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-8">
       <div
-        className={cn("grid gap-3", sections.queue.length > 0 && "grid-cols-2")}
+        className={cn(
+          "grid grid-cols-1 gap-3",
+          sections.queue.length > 0 && "sm:grid-cols-2",
+        )}
       >
         {sections.queue.length > 0 ? (
           <HomeActionCard
