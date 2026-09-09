@@ -39,9 +39,11 @@ export default async function LibraryPage({
     search?: string;
     sort?: string;
     view?: string;
+    wantToOwn?: string;
   }>;
 }) {
-  const { mediaType, status, search, sort, view } = await searchParams;
+  const { mediaType, status, search, sort, view, wantToOwn } =
+    await searchParams;
   const session = await auth();
   if (!session?.user?.id) {
     return (
@@ -63,10 +65,13 @@ export default async function LibraryPage({
       : undefined,
     search,
     sort: SORTS.has(sort ?? "") ? (sort as LibrarySort) : undefined,
+    wantToOwn: wantToOwn === "true" ? true : undefined,
   });
 
   const isListView = view === "list";
-  const isFiltered = Boolean(mediaType || status || search?.trim());
+  const isFiltered = Boolean(
+    mediaType || status || search?.trim() || wantToOwn === "true",
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -83,6 +88,7 @@ export default async function LibraryPage({
         search={search}
         sort={sort}
         view={view}
+        wantToOwn={wantToOwn}
       />
 
       {items.length === 0 ? (

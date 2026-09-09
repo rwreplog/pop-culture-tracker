@@ -67,6 +67,11 @@ export const toggleFavoriteSchema = z.object({
   isFavorite: z.enum(["true", "false"]).transform((v) => v === "true"),
 });
 
+export const toggleWantToOwnSchema = z.object({
+  libraryItemId: z.uuid(),
+  wantToOwn: z.enum(["true", "false"]).transform((v) => v === "true"),
+});
+
 export const updateProgressSchema = z.object({
   libraryItemId: z.uuid(),
   progress: libraryProgressSchema,

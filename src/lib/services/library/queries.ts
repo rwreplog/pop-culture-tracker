@@ -65,6 +65,7 @@ export type LibraryFilters = {
   /** Case-insensitive substring match against the title. */
   search?: string;
   sort?: LibrarySort;
+  wantToOwn?: boolean;
 };
 
 function sortItems<
@@ -107,13 +108,12 @@ export async function getLibraryItems(
   userId: string,
   filters: LibraryFilters = {},
 ) {
+  const conditions = [eq(libraryItems.userId, userId)];
+  if (filters.status) conditions.push(eq(libraryItems.status, filters.status));
+  if (filters.wantToOwn) conditions.push(eq(libraryItems.wantToOwn, true));
+
   const items = await db.query.libraryItems.findMany({
-    where: filters.status
-      ? and(
-          eq(libraryItems.userId, userId),
-          eq(libraryItems.status, filters.status),
-        )
-      : eq(libraryItems.userId, userId),
+    where: and(...conditions),
     with: { media: true },
   });
 

@@ -64,6 +64,13 @@
       "when": 1788920864359,
       "tag": "0008_add_goal_celebrations",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788921478498,
+      "tag": "0009_add_want_to_own",
+      "breakpoints": true
     }
   ]
 }

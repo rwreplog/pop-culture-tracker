@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import {
   startTransition,
   useActionState,
@@ -45,6 +45,7 @@ import {
   removeCustomArtAction,
   removeFromLibraryAction,
   toggleFavoriteAction,
+  toggleWantToOwnAction,
   updateCompletedAtAction,
   updateNotesAction,
   updateProgressAction,
@@ -106,7 +107,11 @@ export function LibraryControls({
       <Card variant="glass">
         <CardHeader>
           <CardTitle>Your status</CardTitle>
-          <CardAction>
+          <CardAction className="flex gap-2">
+            <WantToOwnForm
+              libraryItemId={libraryItem.id}
+              wantToOwn={libraryItem.wantToOwn}
+            />
             <FavoriteForm
               libraryItemId={libraryItem.id}
               isFavorite={libraryItem.isFavorite}
@@ -401,6 +406,44 @@ function FavoriteForm({
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
         <Heart className="size-4" fill={isFavorite ? "currentColor" : "none"} />
+      </Button>
+    </form>
+  );
+}
+
+function WantToOwnForm({
+  libraryItemId,
+  wantToOwn,
+}: {
+  libraryItemId: string;
+  wantToOwn: boolean;
+}) {
+  const [, formAction, isPending] = useActionState(
+    withActionToast(
+      toggleWantToOwnAction,
+      wantToOwn ? "Removed from want-to-own list" : "Added to want-to-own list",
+    ),
+    undefined,
+  );
+
+  return (
+    <form action={formAction}>
+      <input type="hidden" name="libraryItemId" value={libraryItemId} />
+      <input type="hidden" name="wantToOwn" value={String(!wantToOwn)} />
+      <Button
+        type="submit"
+        variant="outline"
+        size="icon"
+        disabled={isPending}
+        aria-pressed={wantToOwn}
+        aria-label={
+          wantToOwn ? "Remove from want-to-own list" : "Add to want-to-own list"
+        }
+      >
+        <ShoppingBag
+          className="size-4"
+          fill={wantToOwn ? "currentColor" : "none"}
+        />
       </Button>
     </form>
   );

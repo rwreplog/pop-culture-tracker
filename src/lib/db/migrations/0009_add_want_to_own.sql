@@ -1,0 +1,1 @@
+ALTER TABLE "library_items" ADD COLUMN "want_to_own" boolean DEFAULT false NOT NULL;

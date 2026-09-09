@@ -201,6 +201,16 @@ describe("updateLibraryItem", () => {
       expect.objectContaining({ completedAt: backdate }),
     );
   });
+
+  it("applies wantToOwn, same as isFavorite", async () => {
+    findFirstMock.mockResolvedValue(existingItem);
+
+    await updateLibraryItem("user-1", "item-1", { wantToOwn: true });
+
+    expect(updateSetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ wantToOwn: true }),
+    );
+  });
 });
 
 describe("setCustomArt", () => {
