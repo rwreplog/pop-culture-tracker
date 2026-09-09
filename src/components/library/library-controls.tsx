@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart, RefreshCw, ShoppingBag } from "lucide-react";
 import {
   startTransition,
   useActionState,
@@ -54,6 +54,7 @@ import {
   uploadCustomArtAction,
   type LibraryActionState,
 } from "@/lib/actions/library";
+import { refreshMediaAction } from "@/lib/actions/media";
 import { withActionToast } from "@/lib/action-toast";
 
 const STATUSES = [
@@ -164,11 +165,12 @@ export function LibraryControls({
         <CardHeader>
           <CardTitle>Manage</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           <CustomArtForm
             libraryItemId={libraryItem.id}
             hasCustomArt={Boolean(libraryItem.customImageKey)}
           />
+          <RefreshDetailsForm mediaId={mediaId} />
         </CardContent>
       </Card>
 
@@ -775,6 +777,30 @@ function CustomArtForm({
         ) : null}
       </div>
     </div>
+  );
+}
+
+function RefreshDetailsForm({ mediaId }: { mediaId: string }) {
+  const [state, formAction, isPending] = useActionState(
+    withActionToast(refreshMediaAction, "Details refreshed"),
+    undefined,
+  );
+
+  return (
+    <form action={formAction} className="flex flex-col gap-2">
+      <input type="hidden" name="mediaId" value={mediaId} />
+      <div className="flex items-center gap-2">
+        <Button type="submit" variant="outline" disabled={isPending}>
+          <RefreshCw className={`size-4 ${isPending ? "animate-spin" : ""}`} />
+          Refresh details
+        </Button>
+        {state?.error ? (
+          <p role="alert" className="text-destructive text-sm">
+            {state.error}
+          </p>
+        ) : null}
+      </div>
+    </form>
   );
 }
 
