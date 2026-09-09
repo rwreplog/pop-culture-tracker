@@ -40,8 +40,9 @@ test("media detail: add, rate, favorite, add notes, and set progress", async ({
     page.getByRole("button", { name: "Save progress" }).click(),
   );
 
+  await page.getByRole("button", { name: "Manage" }).click();
   await waitForServerAction(page, () =>
-    page.getByRole("button", { name: "Refresh details" }).click(),
+    page.getByRole("menuitem", { name: "Refresh details" }).click(),
   );
   await expect(page.getByText("Details refreshed")).toBeVisible();
 

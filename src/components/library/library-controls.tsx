@@ -1,14 +1,9 @@
 "use client";
 
-import { Heart, RefreshCw, ShoppingBag } from "lucide-react";
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Heart, ShoppingBag } from "lucide-react";
+import { startTransition, useActionState, useState } from "react";
 
+import { ManageMenu } from "@/components/library/manage-menu";
 import { RatingStars } from "@/components/library/rating-stars";
 import { AddToListDialog } from "@/components/lists/add-to-list-dialog";
 import { Button } from "@/components/ui/button";
@@ -19,15 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -42,8 +28,6 @@ import type { MediaType } from "@/lib/db/schema/media";
 import { libraryStatusLabel } from "@/lib/media/labels";
 import {
   addToLibraryAction,
-  removeCustomArtAction,
-  removeFromLibraryAction,
   toggleFavoriteAction,
   toggleWantToOwnAction,
   updateCompletedAtAction,
@@ -51,10 +35,8 @@ import {
   updateProgressAction,
   updateRatingAction,
   updateStatusAction,
-  uploadCustomArtAction,
   type LibraryActionState,
 } from "@/lib/actions/library";
-import { refreshMediaAction } from "@/lib/actions/media";
 import { withActionToast } from "@/lib/action-toast";
 
 const STATUSES = [
@@ -123,6 +105,11 @@ export function LibraryControls({
               libraryItemId={libraryItem.id}
               isFavorite={libraryItem.isFavorite}
             />
+            <ManageMenu
+              libraryItemId={libraryItem.id}
+              mediaId={mediaId}
+              hasCustomArt={Boolean(libraryItem.customImageKey)}
+            />
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -158,28 +145,6 @@ export function LibraryControls({
         </CardHeader>
         <CardContent>
           <NotesForm libraryItemId={libraryItem.id} notes={libraryItem.notes} />
-        </CardContent>
-      </Card>
-
-      <Card variant="glass">
-        <CardHeader>
-          <CardTitle>Manage</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <CustomArtForm
-            libraryItemId={libraryItem.id}
-            hasCustomArt={Boolean(libraryItem.customImageKey)}
-          />
-          <RefreshDetailsForm mediaId={mediaId} />
-        </CardContent>
-      </Card>
-
-      <Card className="ring-destructive/20">
-        <CardHeader>
-          <CardTitle>Danger zone</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <RemoveForm libraryItemId={libraryItem.id} />
         </CardContent>
       </Card>
     </div>
@@ -645,208 +610,4 @@ function progressFieldsFor(
     case "movie":
       return [];
   }
-}
-
-function CustomArtForm({
-  libraryItemId,
-  hasCustomArt,
-}: {
-  libraryItemId: string;
-  hasCustomArt: boolean;
-}) {
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [removeOpen, setRemoveOpen] = useState(false);
-  const [uploadState, uploadAction, isUploading] = useActionState(
-    withActionToast(uploadCustomArtAction, "Art uploaded"),
-    undefined,
-  );
-  const [removeState, removeAction, isRemoving] = useActionState(
-    withActionToast(removeCustomArtAction, "Art removed"),
-    undefined,
-  );
-  const wasUploading = useRef(false);
-  const wasRemoving = useRef(false);
-
-  useEffect(() => {
-    if (wasUploading.current && !isUploading && !uploadState?.error) {
-      setUploadOpen(false);
-    }
-    wasUploading.current = isUploading;
-  }, [isUploading, uploadState]);
-
-  useEffect(() => {
-    if (wasRemoving.current && !isRemoving && !removeState?.error) {
-      setRemoveOpen(false);
-    }
-    wasRemoving.current = isRemoving;
-  }, [isRemoving, removeState]);
-
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium">Custom art</span>
-      <div className="flex items-center gap-2">
-        <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger render={<Button variant="outline" type="button" />}>
-            {hasCustomArt ? "Replace art" : "Upload art"}
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {hasCustomArt ? "Replace custom art" : "Upload custom art"}
-              </DialogTitle>
-              <DialogDescription>
-                Only you will see this artwork. JPEG, PNG, WEBP, or GIF, up to
-                5MB.
-              </DialogDescription>
-            </DialogHeader>
-            <form action={uploadAction} className="flex flex-col gap-3">
-              <input type="hidden" name="libraryItemId" value={libraryItemId} />
-              <label className="sr-only" htmlFor="customArtFile">
-                Image file
-              </label>
-              <input
-                id="customArtFile"
-                name="file"
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                required
-              />
-              {uploadState?.error ? (
-                <p role="alert" className="text-destructive text-sm">
-                  {uploadState.error}
-                </p>
-              ) : null}
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setUploadOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isUploading}>
-                  Upload
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-        {hasCustomArt ? (
-          <Dialog open={removeOpen} onOpenChange={setRemoveOpen}>
-            <DialogTrigger render={<Button variant="outline" type="button" />}>
-              Remove custom art
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Remove custom art?</DialogTitle>
-                <DialogDescription>
-                  This deletes your uploaded image. The title will go back to
-                  showing its default artwork.
-                </DialogDescription>
-              </DialogHeader>
-              <form action={removeAction}>
-                <input
-                  type="hidden"
-                  name="libraryItemId"
-                  value={libraryItemId}
-                />
-                {removeState?.error ? (
-                  <p role="alert" className="text-destructive text-sm">
-                    {removeState.error}
-                  </p>
-                ) : null}
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setRemoveOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    disabled={isRemoving}
-                  >
-                    Remove
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function RefreshDetailsForm({ mediaId }: { mediaId: string }) {
-  const [state, formAction, isPending] = useActionState(
-    withActionToast(refreshMediaAction, "Details refreshed"),
-    undefined,
-  );
-
-  return (
-    <form action={formAction} className="flex flex-col gap-2">
-      <input type="hidden" name="mediaId" value={mediaId} />
-      <div className="flex items-center gap-2">
-        <Button type="submit" variant="outline" disabled={isPending}>
-          <RefreshCw className={`size-4 ${isPending ? "animate-spin" : ""}`} />
-          Refresh details
-        </Button>
-        {state?.error ? (
-          <p role="alert" className="text-destructive text-sm">
-            {state.error}
-          </p>
-        ) : null}
-      </div>
-    </form>
-  );
-}
-
-function RemoveForm({ libraryItemId }: { libraryItemId: string }) {
-  const [open, setOpen] = useState(false);
-  const [state, formAction, isPending] = useActionState(
-    withActionToast(removeFromLibraryAction, "Removed from library"),
-    undefined,
-  );
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={<Button variant="destructive" className="self-start" />}
-      >
-        Remove from Library
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Remove from library?</DialogTitle>
-          <DialogDescription>
-            This deletes your status, rating, notes, and progress for this
-            title. This can&apos;t be undone.
-          </DialogDescription>
-        </DialogHeader>
-        <form action={formAction}>
-          <input type="hidden" name="libraryItemId" value={libraryItemId} />
-          {state?.error ? (
-            <p role="alert" className="text-destructive text-sm">
-              {state.error}
-            </p>
-          ) : null}
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="destructive" disabled={isPending}>
-              Remove
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
 }

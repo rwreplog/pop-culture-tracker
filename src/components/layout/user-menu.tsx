@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOutAction } from "@/lib/auth/actions";
+import { isAdminEmail } from "@/lib/auth/admin";
 import type { HeaderUser } from "@/components/layout/header";
 
 function initials(user: HeaderUser) {
@@ -69,6 +70,15 @@ export function UserMenu({ user }: { user?: HeaderUser }) {
             </Link>
           }
         />
+        {isAdminEmail(user.email) ? (
+          <DropdownMenuItem
+            render={
+              <Link href="/admin" className="w-full">
+                Admin
+              </Link>
+            }
+          />
+        ) : null}
         <form action={signOutAction}>
           <DropdownMenuItem
             nativeButton
