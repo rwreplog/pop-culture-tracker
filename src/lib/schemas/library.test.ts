@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   libraryProgressSchema,
   toggleFavoriteSchema,
+  toggleWantToOwnSchema,
   updateNotesSchema,
   updateRatingSchema,
 } from "@/lib/schemas/library";
@@ -94,5 +95,16 @@ describe("toggleFavoriteSchema", () => {
     });
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.isFavorite).toBe(true);
+  });
+});
+
+describe("toggleWantToOwnSchema", () => {
+  it("parses the string 'true'/'false' into a boolean", () => {
+    const result = toggleWantToOwnSchema.safeParse({
+      libraryItemId: "11111111-1111-4111-8111-111111111111",
+      wantToOwn: "true",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.wantToOwn).toBe(true);
   });
 });
