@@ -94,6 +94,7 @@ export default async function TonightPage({
       <nav aria-label="Media type" className="flex flex-wrap gap-1">
         <Link
           href={buildHref({ mood })}
+          replace
           className={cn(
             "rounded-full px-3 py-2 text-sm font-medium",
             !mediaType
@@ -107,6 +108,7 @@ export default async function TonightPage({
           <Link
             key={value}
             href={buildHref({ type: value, mood })}
+            replace
             className={cn(
               "rounded-full px-3 py-2 text-sm font-medium",
               value === mediaType
@@ -122,6 +124,7 @@ export default async function TonightPage({
       <nav aria-label="Mood" className="flex flex-wrap gap-1">
         <Link
           href={buildHref({ type: mediaType, mood: NO_MOOD })}
+          replace
           className={cn(
             "rounded-full border px-3 py-2 text-sm font-medium",
             !mood
@@ -135,6 +138,7 @@ export default async function TonightPage({
           <Link
             key={value}
             href={buildHref({ type: mediaType, mood: value })}
+            replace
             className={cn(
               "rounded-full border px-3 py-2 text-sm font-medium",
               value === mood

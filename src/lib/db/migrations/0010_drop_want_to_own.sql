@@ -1,0 +1,1 @@
+ALTER TABLE "library_items" DROP COLUMN "want_to_own";

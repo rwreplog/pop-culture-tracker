@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { ActivityItem } from "@/components/activity/activity-item";
 import { BackButton } from "@/components/layout/back-button";
 import { LibraryControls } from "@/components/library/library-controls";
+import { ManageMenu } from "@/components/library/manage-menu";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
 import { MediaArtwork } from "@/components/media/media-artwork";
 import { MediaCard } from "@/components/media/media-card";
+import { MediaDescription } from "@/components/media/media-description";
 import { RecommendDialog } from "@/components/media/recommend-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +27,7 @@ import {
 } from "@/lib/services/library/queries";
 import { getListsForUser } from "@/lib/services/lists/queries";
 import { presignCustomArtUrl } from "@/lib/storage/custom-art";
+import { cn } from "@/lib/utils";
 
 type MediaMetadata = { creator?: string; genres?: string[] };
 
@@ -61,11 +64,14 @@ export default async function MediaDetailPage({
       userId ? getFriends(userId) : [],
     ]);
   const libraryItem = libraryItemResult ?? null;
+  const hasCustomArt = Boolean(libraryItem?.customImageKey);
   const customArtUrl = libraryItem?.customImageKey
     ? await presignCustomArtUrl(libraryItem.customImageKey)
     : null;
 
   const artUrl = customArtUrl ?? item.imageUrl;
+  const heroIconButtonClassName =
+    "rounded-full bg-black/55 text-white backdrop-blur-sm hover:bg-black/70 hover:text-white";
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -79,8 +85,31 @@ export default async function MediaDetailPage({
         <BackButton
           fallbackHref="/library"
           iconOnly
-          className="absolute top-4 left-4 z-10 rounded-full bg-black/55 text-white backdrop-blur-sm hover:bg-black/70 hover:text-white"
+          className={cn("absolute top-4 left-4 z-10", heroIconButtonClassName)}
         />
+        {userId || libraryItem ? (
+          // Mobile only: on desktop these live inline above the description
+          // (Recommend) and in the status card (Manage) instead, so they
+          // don't collide with a top-right toast.
+          <div className="absolute top-4 right-4 z-10 flex gap-2 md:hidden">
+            {userId ? (
+              <RecommendDialog
+                mediaId={item.id}
+                friends={friends.map(({ friend }) => friend)}
+                iconOnly
+                className={heroIconButtonClassName}
+              />
+            ) : null}
+            {libraryItem ? (
+              <ManageMenu
+                libraryItemId={libraryItem.id}
+                mediaId={item.id}
+                hasCustomArt={hasCustomArt}
+                className={heroIconButtonClassName}
+              />
+            ) : null}
+          </div>
+        ) : null}
         <div className="absolute inset-0 flex items-end justify-center pt-10 pb-36 md:pb-28">
           <MediaArtwork
             src={artUrl}
@@ -120,7 +149,8 @@ export default async function MediaDetailPage({
 
         <TabsContent value="overview" className="flex flex-col gap-4 pt-4">
           {userId ? (
-            <div className="flex justify-end">
+            // Desktop only — see the mobile-only hero overlay above.
+            <div className="hidden justify-end md:flex">
               <RecommendDialog
                 mediaId={item.id}
                 friends={friends.map(({ friend }) => friend)}
@@ -138,11 +168,8 @@ export default async function MediaDetailPage({
                 Books in particular often returns real markup); always
                 sanitized before rendering so a provider response can't
                 inject a script tag or event handler attribute. */}
-                <div
-                  className="[&_a:hover]:text-foreground flex flex-col gap-3 text-sm [&_a]:underline [&_a]:underline-offset-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeDescription(item.description),
-                  }}
+                <MediaDescription
+                  html={sanitizeDescription(item.description)}
                 />
               </CardContent>
             </Card>

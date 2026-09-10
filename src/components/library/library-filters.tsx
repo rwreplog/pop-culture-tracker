@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, List, ShoppingBag, SlidersHorizontal } from "lucide-react";
+import { LayoutGrid, List, SlidersHorizontal } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -215,14 +215,12 @@ export function LibraryFilters({
   search,
   sort,
   view,
-  wantToOwn,
 }: {
   mediaType?: string;
   status?: string;
   search?: string;
   sort?: string;
   view?: string;
-  wantToOwn?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -298,27 +296,11 @@ export function LibraryFilters({
     router.push(`${pathname}?${params.toString()}`);
   }
 
-  const wantToOwnActive = wantToOwn === "true";
-  function toggleWantToOwn() {
-    // Not routed through pushParam — that helper no-ops on a null value
-    // (fine for Selects, which never emit one), but clearing this toggle
-    // needs exactly that: pass a defaultValue no real value ever matches
-    // so setParam's own equality check does the deleting.
-    const params = setParam(
-      searchParams,
-      "wantToOwn",
-      wantToOwnActive ? null : "true",
-      "__unset__",
-    );
-    router.push(`${pathname}?${params.toString()}`);
-  }
-
   const currentView = view === "list" ? "list" : "grid";
   const activeFilterCount = [
     mediaType,
     status,
     sort && sort !== DEFAULT_SORT ? sort : undefined,
-    wantToOwnActive ? "wantToOwn" : undefined,
   ].filter(Boolean).length;
 
   return (
@@ -365,18 +347,6 @@ export function LibraryFilters({
           value={sort || DEFAULT_SORT}
           onValueChange={(value) => pushParam("sort", value, DEFAULT_SORT)}
         />
-
-        <Button
-          type="button"
-          variant={wantToOwnActive ? "default" : "outline"}
-          size="sm"
-          className="gap-1.5"
-          aria-pressed={wantToOwnActive}
-          onClick={toggleWantToOwn}
-        >
-          <ShoppingBag className="size-3.5" aria-hidden="true" />
-          Want to own
-        </Button>
 
         <div className="ml-auto">
           <ViewToggle view={currentView} onChange={setView} />
@@ -457,17 +427,6 @@ export function LibraryFilters({
                   }
                 />
               </div>
-
-              <Button
-                type="button"
-                variant={wantToOwnActive ? "default" : "outline"}
-                className="w-full gap-1.5"
-                aria-pressed={wantToOwnActive}
-                onClick={toggleWantToOwn}
-              >
-                <ShoppingBag className="size-4" aria-hidden="true" />
-                Want to own
-              </Button>
             </div>
             <SheetFooter>
               <SheetClose render={<Button className="w-full" />}>

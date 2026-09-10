@@ -52,8 +52,6 @@ export const libraryItems = pgTable(
     status: libraryStatusEnum("status").notNull().default("want"),
     rating: smallint("rating"),
     isFavorite: boolean("is_favorite").notNull().default(false),
-    /** A physical/digital ownership wishlist, independent of watch/read status. */
-    wantToOwn: boolean("want_to_own").notNull().default(false),
     notes: text("notes"),
     progress: jsonb("progress"),
     /** Object key in the `custom-art` bucket for this user's custom artwork override, if set. */

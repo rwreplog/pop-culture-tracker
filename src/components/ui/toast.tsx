@@ -58,7 +58,15 @@ export function Toaster() {
       <ToastPrimitive.Portal>
         <ToastPrimitive.Viewport
           data-slot="toast-viewport"
-          className="fixed top-[calc(env(safe-area-inset-top)+4.5rem)] right-4 z-100 flex w-72 flex-col gap-2 outline-none"
+          className={cn(
+            "fixed z-100 flex flex-col gap-2 outline-none",
+            // Mobile: bottom-anchored above the floating tab bar, full-width
+            // within margins — top-right (the md+ position) would sit under
+            // the header and, on media detail, behind the hero's own
+            // top-right controls.
+            "inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)]",
+            "md:inset-x-auto md:top-[calc(env(safe-area-inset-top)+4.5rem)] md:right-4 md:bottom-auto md:w-72",
+          )}
         >
           <ToastList />
         </ToastPrimitive.Viewport>

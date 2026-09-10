@@ -53,10 +53,12 @@ export function ManageMenu({
   libraryItemId,
   mediaId,
   hasCustomArt,
+  className,
 }: {
   libraryItemId: string;
   mediaId: string;
   hasCustomArt: boolean;
+  className?: string;
 }) {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [removeArtOpen, setRemoveArtOpen] = useState(false);
@@ -113,7 +115,14 @@ export function ManageMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="outline" size="icon" aria-label="Manage" />}
+        render={
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Manage"
+            className={className}
+          />
+        }
       >
         <MoreHorizontal className="size-4" />
       </DropdownMenuTrigger>

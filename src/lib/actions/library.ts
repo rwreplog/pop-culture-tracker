@@ -9,7 +9,6 @@ import {
   removeCustomArtSchema,
   removeFromLibrarySchema,
   toggleFavoriteSchema,
-  toggleWantToOwnSchema,
   updateCompletedAtSchema,
   updateNotesSchema,
   updateProgressSchema,
@@ -162,30 +161,6 @@ export async function toggleFavoriteAction(
     parsed.data.libraryItemId,
     {
       isFavorite: parsed.data.isFavorite,
-    },
-  );
-  if (!result.success) return { error: result.error };
-
-  revalidatePath(`/media/${result.mediaId}`);
-  revalidatePath("/");
-  revalidatePath("/library");
-}
-
-export async function toggleWantToOwnAction(
-  _prevState: LibraryActionState,
-  formData: FormData,
-): Promise<LibraryActionState> {
-  const auth = await requireUserId();
-  if ("error" in auth) return { error: auth.error };
-
-  const parsed = toggleWantToOwnSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: "Invalid request." };
-
-  const result = await updateLibraryItem(
-    auth.userId,
-    parsed.data.libraryItemId,
-    {
-      wantToOwn: parsed.data.wantToOwn,
     },
   );
   if (!result.success) return { error: result.error };
