@@ -41,7 +41,7 @@ export default async function ListsPage() {
           description="Create a list to start grouping media together."
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {lists.map((list) => (
             <ListCard
               key={list.id}
