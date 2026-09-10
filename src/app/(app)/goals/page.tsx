@@ -42,7 +42,7 @@ export default async function GoalsPage() {
           description="Add a goal to start tracking progress toward it."
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {goals.map((goal) => (
             <GoalCard
               key={goal.id}

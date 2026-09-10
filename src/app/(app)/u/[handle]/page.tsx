@@ -34,37 +34,42 @@ export default async function PublicProfilePage({
   ]);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6">
+    <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <BackButton fallbackHref="/friends" />
-      <div className="flex items-center gap-4">
-        <Avatar className="size-14">
-          {profileUser.image ? (
-            <AvatarImage src={profileUser.image} alt="" />
-          ) : null}
-          <AvatarFallback className="text-lg">
-            {initials(profileUser.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-semibold">
-            {profileUser.name ?? profileUser.handle}
-          </p>
-          <p className="text-muted-foreground truncate text-sm">
-            @{profileUser.handle}
-          </p>
+
+      {/* Header stays a readable prose-width measure even once the page
+          (and the lists grid below) widen for desktop. */}
+      <div className="flex max-w-xl flex-col gap-6">
+        <div className="flex items-center gap-4">
+          <Avatar className="size-14">
+            {profileUser.image ? (
+              <AvatarImage src={profileUser.image} alt="" />
+            ) : null}
+            <AvatarFallback className="text-lg">
+              {initials(profileUser.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-lg font-semibold">
+              {profileUser.name ?? profileUser.handle}
+            </p>
+            <p className="text-muted-foreground truncate text-sm">
+              @{profileUser.handle}
+            </p>
+          </div>
         </div>
+
+        {profileUser.bio ? (
+          <p className="text-sm whitespace-pre-wrap">{profileUser.bio}</p>
+        ) : null}
+
+        {!isSelf && friendshipStatus ? (
+          <FriendAction
+            status={friendshipStatus}
+            targetHandle={profileUser.handle ?? handle}
+          />
+        ) : null}
       </div>
-
-      {profileUser.bio ? (
-        <p className="text-sm whitespace-pre-wrap">{profileUser.bio}</p>
-      ) : null}
-
-      {!isSelf && friendshipStatus ? (
-        <FriendAction
-          status={friendshipStatus}
-          targetHandle={profileUser.handle ?? handle}
-        />
-      ) : null}
 
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-medium">Public lists</h2>
@@ -73,7 +78,7 @@ export default async function PublicProfilePage({
             {isSelf ? "You haven't" : "They haven't"} made any lists public yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {lists.map((list) => (
               <ListCard
                 key={list.id}
