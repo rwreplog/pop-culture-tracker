@@ -31,9 +31,14 @@ type Friend = { id: string; name: string | null; handle: string | null };
 export function RecommendDialog({
   mediaId,
   friends,
+  iconOnly = false,
+  className,
 }: {
   mediaId: string;
   friends: Friend[];
+  /** Renders as an unlabeled icon button — for floating over a hero image, say. */
+  iconOnly?: boolean;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
@@ -50,9 +55,23 @@ export function RecommendDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="outline" type="button" />}>
-        <Send className="size-4" data-icon="inline-start" aria-hidden="true" />
-        Recommend
+      <DialogTrigger
+        render={
+          <Button
+            variant="outline"
+            type="button"
+            size={iconOnly ? "icon" : undefined}
+            aria-label={iconOnly ? "Recommend" : undefined}
+            className={className}
+          />
+        }
+      >
+        <Send
+          className="size-4"
+          data-icon={iconOnly ? undefined : "inline-start"}
+          aria-hidden="true"
+        />
+        {iconOnly ? null : "Recommend"}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

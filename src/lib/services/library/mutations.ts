@@ -76,7 +76,6 @@ export type LibraryItemPatch = {
   status?: LibraryStatus;
   rating?: number | null;
   isFavorite?: boolean;
-  wantToOwn?: boolean;
   notes?: string | null;
   progress?: LibraryProgress | null;
   completedAt?: Date | null;
@@ -122,7 +121,6 @@ export async function updateLibraryItem(
       }
       if (patch.rating !== undefined) updates.rating = patch.rating;
       if (patch.isFavorite !== undefined) updates.isFavorite = patch.isFavorite;
-      if (patch.wantToOwn !== undefined) updates.wantToOwn = patch.wantToOwn;
       if (patch.notes !== undefined) updates.notes = patch.notes;
       if (patch.progress !== undefined) updates.progress = patch.progress;
       // Explicit completedAt overrides the auto-stamp above, e.g. backdating.

@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart } from "lucide-react";
 import { startTransition, useActionState, useState } from "react";
 
 import { ManageMenu } from "@/components/library/manage-menu";
@@ -29,7 +29,6 @@ import { libraryStatusLabel } from "@/lib/media/labels";
 import {
   addToLibraryAction,
   toggleFavoriteAction,
-  toggleWantToOwnAction,
   updateCompletedAtAction,
   updateNotesAction,
   updateProgressAction,
@@ -97,19 +96,21 @@ export function LibraryControls({
         <CardHeader>
           <CardTitle>Your status</CardTitle>
           <CardAction className="flex gap-2">
-            <WantToOwnForm
-              libraryItemId={libraryItem.id}
-              wantToOwn={libraryItem.wantToOwn}
-            />
             <FavoriteForm
               libraryItemId={libraryItem.id}
               isFavorite={libraryItem.isFavorite}
             />
-            <ManageMenu
-              libraryItemId={libraryItem.id}
-              mediaId={mediaId}
-              hasCustomArt={Boolean(libraryItem.customImageKey)}
-            />
+            {/* Mirrors the mobile-only copy floating over the hero image
+                (see the media detail page) — shown here instead on desktop,
+                where that hero overlay would otherwise collide with a
+                top-right toast. */}
+            <div className="hidden md:block">
+              <ManageMenu
+                libraryItemId={libraryItem.id}
+                mediaId={mediaId}
+                hasCustomArt={Boolean(libraryItem.customImageKey)}
+              />
+            </div>
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -381,44 +382,6 @@ function FavoriteForm({
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
         <Heart className="size-4" fill={isFavorite ? "currentColor" : "none"} />
-      </Button>
-    </form>
-  );
-}
-
-function WantToOwnForm({
-  libraryItemId,
-  wantToOwn,
-}: {
-  libraryItemId: string;
-  wantToOwn: boolean;
-}) {
-  const [, formAction, isPending] = useActionState(
-    withActionToast(
-      toggleWantToOwnAction,
-      wantToOwn ? "Removed from want-to-own list" : "Added to want-to-own list",
-    ),
-    undefined,
-  );
-
-  return (
-    <form action={formAction}>
-      <input type="hidden" name="libraryItemId" value={libraryItemId} />
-      <input type="hidden" name="wantToOwn" value={String(!wantToOwn)} />
-      <Button
-        type="submit"
-        variant="outline"
-        size="icon"
-        disabled={isPending}
-        aria-pressed={wantToOwn}
-        aria-label={
-          wantToOwn ? "Remove from want-to-own list" : "Add to want-to-own list"
-        }
-      >
-        <ShoppingBag
-          className="size-4"
-          fill={wantToOwn ? "currentColor" : "none"}
-        />
       </Button>
     </form>
   );
