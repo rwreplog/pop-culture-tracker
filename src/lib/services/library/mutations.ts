@@ -2,6 +2,8 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { libraryItems } from "@/lib/db/schema/library";
+import { media } from "@/lib/db/schema/media";
+import { users } from "@/lib/db/schema/users";
 import type { LibraryProgress } from "@/lib/schemas/library";
 import { recordActivity } from "@/lib/services/activity/log";
 import { notifyGoalAchievements } from "@/lib/services/goals/achievements";
@@ -17,6 +19,15 @@ export type LibraryMutationResult =
  * Adds a media item to the user's library. Idempotent: if it's already
  * there (unique on userId+mediaId, per docs/DATA_MODEL.md), returns the
  * existing row instead of erroring.
+ *
+ * In "unified" series-grouping mode, adding a series member (a media row
+ * with `seriesId` set) adds the series itself instead — one library item
+ * for the whole set, with `seriesCurrentPosition` set to this member's
+ * position. Adding a *second* member of a series you already have in
+ * unified mode is a no-op here (same idempotency as any other repeat
+ * add) rather than advancing the position — "Currently on" in
+ * LibraryControls is the explicit way to move it forward, so re-adding
+ * never silently jumps your progress.
  */
 export async function addToLibrary(
   userId: string,
@@ -26,12 +37,31 @@ export async function addToLibrary(
   const now = new Date();
   try {
     return await db.transaction(async (tx) => {
+      const item = await tx.query.media.findFirst({
+        where: eq(media.id, mediaId),
+        columns: { seriesId: true, seriesPosition: true },
+      });
+
+      let targetMediaId = mediaId;
+      let seriesCurrentPosition: number | undefined;
+      if (item?.seriesId) {
+        const user = await tx.query.users.findFirst({
+          where: eq(users.id, userId),
+          columns: { seriesGroupingMode: true },
+        });
+        if (user?.seriesGroupingMode === "unified") {
+          targetMediaId = item.seriesId;
+          seriesCurrentPosition = item.seriesPosition ?? undefined;
+        }
+      }
+
       const [inserted] = await tx
         .insert(libraryItems)
         .values({
           userId,
-          mediaId,
+          mediaId: targetMediaId,
           status,
+          seriesCurrentPosition,
           startedAt: status === "in_progress" ? now : undefined,
           completedAt: status === "completed" ? now : undefined,
         })
@@ -44,7 +74,7 @@ export async function addToLibrary(
         const existing = await tx.query.libraryItems.findFirst({
           where: and(
             eq(libraryItems.userId, userId),
-            eq(libraryItems.mediaId, mediaId),
+            eq(libraryItems.mediaId, targetMediaId),
           ),
         });
         if (!existing) {
@@ -53,19 +83,19 @@ export async function addToLibrary(
             error: "Couldn't add this item right now.",
           };
         }
-        return { success: true, libraryItemId: existing.id, mediaId };
+        return { success: true, libraryItemId: existing.id, mediaId: targetMediaId };
       }
 
-      await recordActivity(tx, userId, "added", mediaId, { status });
+      await recordActivity(tx, userId, "added", targetMediaId, { status });
       if (status === "in_progress") {
-        await recordActivity(tx, userId, "started", mediaId);
+        await recordActivity(tx, userId, "started", targetMediaId);
       }
       if (status === "completed") {
-        await recordActivity(tx, userId, "completed", mediaId);
+        await recordActivity(tx, userId, "completed", targetMediaId);
         await notifyGoalAchievements(tx, userId, now.getFullYear());
       }
 
-      return { success: true, libraryItemId: inserted.id, mediaId };
+      return { success: true, libraryItemId: inserted.id, mediaId: targetMediaId };
     });
   } catch {
     return { success: false, error: "Couldn't add this item right now." };
@@ -79,6 +109,8 @@ export type LibraryItemPatch = {
   notes?: string | null;
   progress?: LibraryProgress | null;
   completedAt?: Date | null;
+  /** "Unified" series-grouping mode only — see library.ts's schema comment. */
+  seriesCurrentPosition?: number;
 };
 
 /**
@@ -123,6 +155,9 @@ export async function updateLibraryItem(
       if (patch.isFavorite !== undefined) updates.isFavorite = patch.isFavorite;
       if (patch.notes !== undefined) updates.notes = patch.notes;
       if (patch.progress !== undefined) updates.progress = patch.progress;
+      if (patch.seriesCurrentPosition !== undefined) {
+        updates.seriesCurrentPosition = patch.seriesCurrentPosition;
+      }
       // Explicit completedAt overrides the auto-stamp above, e.g. backdating.
       if (patch.completedAt !== undefined)
         updates.completedAt = patch.completedAt;

@@ -23,6 +23,23 @@ export const fontFamilyEnum = pgEnum("font_family", [
 ]);
 
 /**
+ * How adding a series member to the library behaves — see docs/DATA_MODEL.md
+ * (Media.seriesId). Both modes read the same series data; switching this
+ * only changes future adds/display, never merges or discards existing
+ * library items either direction.
+ *
+ * - "grouped": each item keeps its own library item (status/rating/notes);
+ *   2+ present in the same view collapse into one summary card.
+ * - "unified": adding a series member adds the series itself instead, with
+ *   one status/rating/notes for the whole set — tracked like a TV show's
+ *   season/episode, but "book 2 of 3" instead.
+ */
+export const seriesGroupingModeEnum = pgEnum("series_grouping_mode", [
+  "grouped",
+  "unified",
+]);
+
+/**
  * Column names follow Auth.js's Drizzle adapter conventions
  * (name/email/emailVerified/image) so authentication can be wired up
  * without a custom adapter mapping. See docs/DATA_MODEL.md (User).
@@ -47,6 +64,9 @@ export const users = pgTable("users", {
   theme: themeEnum("theme").notNull().default("system"),
   accentColor: accentColorEnum("accent_color").notNull().default("blue"),
   fontFamily: fontFamilyEnum("font_family").notNull().default("space-grotesk"),
+  seriesGroupingMode: seriesGroupingModeEnum("series_grouping_mode")
+    .notNull()
+    .default("grouped"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

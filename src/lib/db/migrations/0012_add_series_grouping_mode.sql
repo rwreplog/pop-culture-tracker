@@ -1,0 +1,2 @@
+CREATE TYPE "public"."series_grouping_mode" AS ENUM('grouped', 'unified');--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN "series_grouping_mode" "series_grouping_mode" DEFAULT 'grouped' NOT NULL;

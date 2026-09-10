@@ -9,8 +9,12 @@ import {
   type AppearanceInput,
 } from "@/lib/schemas/appearance";
 import { changePasswordSchema } from "@/lib/schemas/auth";
+import { seriesGroupingModeSchema } from "@/lib/schemas/series";
 import { changePassword } from "@/lib/services/auth/change-password";
-import { updateAppearance } from "@/lib/services/users/mutations";
+import {
+  updateAppearance,
+  updateSeriesGroupingMode,
+} from "@/lib/services/users/mutations";
 
 export type ChangePasswordActionState =
   { error?: string; success?: boolean } | undefined;
@@ -51,5 +55,18 @@ export async function updateAppearanceAction(
   if (!parsed.success) return { error: "Invalid appearance settings." };
 
   await updateAppearance(session.user.id, parsed.data);
+  revalidatePath("/", "layout");
+}
+
+export async function updateSeriesGroupingModeAction(
+  input: { mode: string },
+): Promise<{ error?: string } | undefined> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "You must be signed in." };
+
+  const parsed = seriesGroupingModeSchema.safeParse(input);
+  if (!parsed.success) return { error: "Invalid selection." };
+
+  await updateSeriesGroupingMode(session.user.id, parsed.data.mode);
   revalidatePath("/", "layout");
 }

@@ -13,6 +13,7 @@ import {
   updateNotesSchema,
   updateProgressSchema,
   updateRatingSchema,
+  updateSeriesCurrentPositionSchema,
   updateStatusSchema,
   uploadCustomArtSchema,
 } from "@/lib/schemas/library";
@@ -57,7 +58,13 @@ export async function addToLibraryAction(
   );
   if (!result.success) return { error: result.error };
 
+  // In "unified" series-grouping mode, result.mediaId may be the series
+  // parent rather than the item just added — revalidate both, since
+  // that's the page whose status card actually changed.
   revalidatePath(`/media/${parsed.data.mediaId}`);
+  if (result.mediaId !== parsed.data.mediaId) {
+    revalidatePath(`/media/${result.mediaId}`);
+  }
   revalidatePath("/library");
   revalidatePath("/");
 }
@@ -144,6 +151,30 @@ export async function updateRatingAction(
 
   revalidatePath(`/media/${result.mediaId}`);
   revalidatePath("/activity");
+}
+
+export async function updateSeriesCurrentPositionAction(
+  _prevState: LibraryActionState,
+  formData: FormData,
+): Promise<LibraryActionState> {
+  const auth = await requireUserId();
+  if ("error" in auth) return { error: auth.error };
+
+  const parsed = updateSeriesCurrentPositionSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) return { error: "Invalid request." };
+
+  const result = await updateLibraryItem(
+    auth.userId,
+    parsed.data.libraryItemId,
+    { seriesCurrentPosition: parsed.data.seriesCurrentPosition },
+  );
+  if (!result.success) return { error: result.error };
+
+  revalidatePath(`/media/${result.mediaId}`);
+  revalidatePath("/library");
+  revalidatePath("/");
 }
 
 export async function toggleFavoriteAction(

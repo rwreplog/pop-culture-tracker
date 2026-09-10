@@ -1,4 +1,4 @@
-import { Database, Palette, Settings, User } from "lucide-react";
+import { Database, Layers, Palette, Settings, User } from "lucide-react";
 
 import { BackButton } from "@/components/layout/back-button";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
@@ -6,6 +6,7 @@ import { AppearanceForm } from "@/components/settings/appearance-form";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { ClearImageCacheButton } from "@/components/settings/clear-image-cache-button";
 import { ReleasedAt } from "@/components/settings/released-at";
+import { SeriesGroupingForm } from "@/components/settings/series-grouping-form";
 import { auth } from "@/lib/auth";
 import {
   getUserPreferences,
@@ -47,6 +48,16 @@ export default async function SettingsPage() {
           initialTheme={preferences?.theme ?? "system"}
           initialAccentColor={preferences?.accentColor ?? "blue"}
           initialFontFamily={preferences?.fontFamily ?? "space-grotesk"}
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Layers className="text-muted-foreground size-4" />
+          <h2 className="font-medium">Library</h2>
+        </div>
+        <SeriesGroupingForm
+          initialMode={preferences?.seriesGroupingMode ?? "grouped"}
         />
       </div>
 

@@ -33,6 +33,7 @@ import {
   updateNotesAction,
   updateProgressAction,
   updateRatingAction,
+  updateSeriesCurrentPositionAction,
   updateStatusAction,
   type LibraryActionState,
 } from "@/lib/actions/library";
@@ -53,6 +54,7 @@ export function LibraryControls({
   pageCount,
   issueCount,
   ownedLists,
+  seriesMembers,
 }: {
   mediaId: string;
   mediaType: MediaType;
@@ -62,6 +64,10 @@ export function LibraryControls({
   /** Total issues in the series, from ComicVine — same, for comics. */
   issueCount?: number;
   ownedLists: { id: string; name: string }[];
+  /** "Unified" series-grouping mode only: this library item's own media row
+   * is a series, and these are its members — renders a "Currently on"
+   * selector when present. */
+  seriesMembers?: { title: string; position: number }[];
 }) {
   const [showListPrompt, setShowListPrompt] = useState(false);
 
@@ -119,6 +125,13 @@ export function LibraryControls({
             mediaType={mediaType}
             status={libraryItem.status}
           />
+          {seriesMembers && seriesMembers.length > 0 ? (
+            <SeriesPositionForm
+              libraryItemId={libraryItem.id}
+              members={seriesMembers}
+              currentPosition={libraryItem.seriesCurrentPosition}
+            />
+          ) : null}
           <RatingForm
             libraryItemId={libraryItem.id}
             rating={libraryItem.rating}
@@ -259,6 +272,71 @@ function StatusForm({
           {STATUSES.map((value) => (
             <SelectItem key={value} value={value}>
               {libraryStatusLabel(value, mediaType)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {state?.error ? (
+        <p role="alert" className="text-destructive text-sm">
+          {state.error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** "Unified" series-grouping mode only — see LibraryControls's seriesMembers doc. */
+function SeriesPositionForm({
+  libraryItemId,
+  members,
+  currentPosition,
+}: {
+  libraryItemId: string;
+  members: { title: string; position: number }[];
+  currentPosition: number | null;
+}) {
+  const [state, formAction, isPending] = useActionState(
+    withActionToast(updateSeriesCurrentPositionAction, "Updated"),
+    undefined,
+  );
+
+  function handleValueChange(value: string | null) {
+    if (!value) return;
+    const formData = new FormData();
+    formData.set("libraryItemId", libraryItemId);
+    formData.set("seriesCurrentPosition", value);
+    startTransition(() => formAction(formData));
+  }
+
+  const sorted = [...members].sort((a, b) => a.position - b.position);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label
+        className="text-muted-foreground text-xs font-medium"
+        htmlFor="series-position"
+      >
+        Currently on
+      </label>
+      <Select
+        defaultValue={currentPosition ? String(currentPosition) : undefined}
+        onValueChange={handleValueChange}
+        disabled={isPending}
+      >
+        <SelectTrigger id="series-position" className="w-full sm:w-64">
+          <SelectValue>
+            {(value: string) => {
+              const member = sorted.find((m) => String(m.position) === value);
+              return member
+                ? `#${member.position} of ${sorted.length} — ${member.title}`
+                : null;
+            }}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {sorted.map((member) => (
+            <SelectItem key={member.position} value={String(member.position)}>
+              #{member.position} of {sorted.length} — {member.title}
             </SelectItem>
           ))}
         </SelectContent>

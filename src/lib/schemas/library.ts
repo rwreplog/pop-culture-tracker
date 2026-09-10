@@ -72,6 +72,12 @@ export const updateProgressSchema = z.object({
   progress: libraryProgressSchema,
 });
 
+/** "Unified" series-grouping mode only — which installment the user is currently on. */
+export const updateSeriesCurrentPositionSchema = z.object({
+  libraryItemId: z.uuid(),
+  seriesCurrentPosition: z.coerce.number().int().positive(),
+});
+
 export const removeFromLibrarySchema = z.object({
   libraryItemId: z.uuid(),
 });
