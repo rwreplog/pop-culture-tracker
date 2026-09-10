@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ActivityItem } from "@/components/activity/activity-item";
 import { BackButton } from "@/components/layout/back-button";
+import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { LibraryControls } from "@/components/library/library-controls";
 import { ManageMenu } from "@/components/library/manage-menu";
 import { AddToListPicker } from "@/components/lists/add-to-list-picker";
@@ -74,7 +75,7 @@ export default async function MediaDetailPage({
     "rounded-full bg-black/55 text-white backdrop-blur-sm hover:bg-black/70 hover:text-white";
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6 lg:max-w-5xl xl:max-w-6xl">
       <div className="relative -mx-4 -mt-6 h-[440px] w-[calc(100%+2rem)] overflow-hidden md:mx-0 md:mt-0 md:h-[380px] md:w-full md:rounded-3xl">
         <MediaArtwork
           src={artUrl}
@@ -158,51 +159,62 @@ export default async function MediaDetailPage({
             </div>
           ) : null}
 
-          {item.description ? (
-            <Card variant="glass">
-              <CardHeader>
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* Descriptions come from external provider APIs (Google
-                Books in particular often returns real markup); always
-                sanitized before rendering so a provider response can't
-                inject a script tag or event handler attribute. */}
-                <MediaDescription
-                  html={sanitizeDescription(item.description)}
-                />
-              </CardContent>
-            </Card>
-          ) : null}
+          {/* Below `lg` this is a plain stack, identical to before. At
+              `lg` and up it splits into a wider description/left column
+              and a sticky "your data" sidebar — scoped to this tab only,
+              so Activity/Related and everything below `lg` don't change. */}
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
+            <div className="flex flex-col gap-4 lg:col-span-2">
+              {item.description ? (
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle>Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Descriptions come from external provider APIs
+                    (Google Books in particular often returns real
+                    markup); always sanitized before rendering so a
+                    provider response can't inject a script tag or event
+                    handler attribute. */}
+                    <MediaDescription
+                      html={sanitizeDescription(item.description)}
+                    />
+                  </CardContent>
+                </Card>
+              ) : null}
+            </div>
 
-          <LibraryControls
-            mediaId={item.id}
-            mediaType={item.mediaType}
-            libraryItem={libraryItem}
-            pageCount={getMediaPageCount(item)}
-            issueCount={getMediaIssueCount(item)}
-            ownedLists={ownedLists.map((list) => ({
-              id: list.id,
-              name: list.name,
-            }))}
-          />
+            <div className="flex flex-col gap-4 lg:sticky lg:top-20 lg:col-span-1">
+              <LibraryControls
+                mediaId={item.id}
+                mediaType={item.mediaType}
+                libraryItem={libraryItem}
+                pageCount={getMediaPageCount(item)}
+                issueCount={getMediaIssueCount(item)}
+                ownedLists={ownedLists.map((list) => ({
+                  id: list.id,
+                  name: list.name,
+                }))}
+              />
 
-          {ownedLists.length > 0 ? (
-            <Card variant="glass">
-              <CardHeader>
-                <CardTitle>Lists</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <AddToListPicker
-                  mediaId={item.id}
-                  ownedLists={ownedLists.map((list) => ({
-                    id: list.id,
-                    name: list.name,
-                  }))}
-                />
-              </CardContent>
-            </Card>
-          ) : null}
+              {ownedLists.length > 0 ? (
+                <Card variant="glass">
+                  <CardHeader>
+                    <CardTitle>Lists</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <AddToListPicker
+                      mediaId={item.id}
+                      ownedLists={ownedLists.map((list) => ({
+                        id: list.id,
+                        name: list.name,
+                      }))}
+                    />
+                  </CardContent>
+                </Card>
+              ) : null}
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="activity" className="pt-4">
@@ -230,9 +242,12 @@ export default async function MediaDetailPage({
 
         <TabsContent value="related" className="pt-4">
           {related.length > 0 ? (
-            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 [&>*]:snap-start">
+            <DashboardSection>
               {related.map((relatedItem) => (
-                <div key={relatedItem.id} className="w-32 shrink-0 sm:w-40">
+                <div
+                  key={relatedItem.id}
+                  className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+                >
                   <MediaCard
                     href={`/media/${relatedItem.mediaId}`}
                     title={relatedItem.media.title}
@@ -245,7 +260,7 @@ export default async function MediaDetailPage({
                   />
                 </div>
               ))}
-            </div>
+            </DashboardSection>
           ) : (
             <p className="text-muted-foreground text-sm">
               No related titles in your library yet.
