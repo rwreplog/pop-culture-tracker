@@ -16,9 +16,14 @@ export function DesktopNav() {
     >
       {desktopNavGroups.map((group) => (
         <div key={group.label} className="flex flex-col gap-1">
-          <h2 className="text-muted-foreground px-3 text-xs font-medium tracking-wide uppercase">
+          {/* Not a real heading — a label for a nav sub-group, not a
+              document-outline heading, and giving it heading semantics
+              risks colliding with actual page headings of the same text
+              (e.g. "Your library") in unscoped `getByRole("heading")`
+              queries across the app's e2e tests. */}
+          <p className="text-muted-foreground px-3 text-xs font-medium tracking-wide uppercase">
             {group.label}
-          </h2>
+          </p>
           {group.items.map((item) => {
             const isActive =
               item.href === "/"

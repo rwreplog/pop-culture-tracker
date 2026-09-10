@@ -52,37 +52,41 @@ export default async function StatsPage() {
 
       <ActivityChart data={activityChart} />
 
-      {insights.genreBreakdown.length > 0 ? (
-        <Card variant="glass">
-          <CardHeader>
-            <CardTitle
-              as="h2"
-              className="text-base font-semibold tracking-tight"
-            >
-              Top genres
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CountBarList entries={insights.genreBreakdown} />
-          </CardContent>
-        </Card>
-      ) : null}
+      {/* Both are compact ranked-list cards, so they pair naturally side by
+          side once there's room — stacked below `md`, unchanged. */}
+      <div className="flex flex-col gap-8 md:grid md:grid-cols-2 md:items-start md:gap-4">
+        {insights.genreBreakdown.length > 0 ? (
+          <Card variant="glass">
+            <CardHeader>
+              <CardTitle
+                as="h2"
+                className="text-base font-semibold tracking-tight"
+              >
+                Top genres
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CountBarList entries={insights.genreBreakdown} />
+            </CardContent>
+          </Card>
+        ) : null}
 
-      {insights.topCreators.length > 0 ? (
-        <Card variant="glass">
-          <CardHeader>
-            <CardTitle
-              as="h2"
-              className="text-base font-semibold tracking-tight"
-            >
-              Top creators
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CountBarList entries={insights.topCreators} />
-          </CardContent>
-        </Card>
-      ) : null}
+        {insights.topCreators.length > 0 ? (
+          <Card variant="glass">
+            <CardHeader>
+              <CardTitle
+                as="h2"
+                className="text-base font-semibold tracking-tight"
+              >
+                Top creators
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CountBarList entries={insights.topCreators} />
+            </CardContent>
+          </Card>
+        ) : null}
+      </div>
 
       <AnnualSummaryCard summary={insights.annualSummary} />
     </div>

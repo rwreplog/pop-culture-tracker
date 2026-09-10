@@ -7,6 +7,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
@@ -32,6 +33,36 @@ const LINK_ROW_CLASSES =
 function initials(name?: string | null, email?: string | null) {
   const source = name ?? email ?? "?";
   return source.charAt(0).toUpperCase();
+}
+
+/**
+ * A tappable icon tile for the nav grid below — same visual language as
+ * Home's HomeActionCard, adapted to a 2-up grid instead of a full-width
+ * row since these are single-word destinations, not action+description.
+ */
+function ProfileNavTile({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="ring-foreground/10 bg-muted/40 hover:bg-muted/70 active:bg-muted/70 flex touch-manipulation flex-col items-center gap-2 rounded-xl p-4 text-center ring-1 transition-colors active:scale-[0.98] dark:bg-white/[0.045] dark:ring-white/12 dark:hover:bg-white/[0.07] dark:active:bg-white/[0.07]"
+    >
+      <div className="bg-background dark:from-primary/30 dark:to-accent-2/25 flex size-10 items-center justify-center rounded-full dark:bg-linear-to-br">
+        <Icon
+          className="text-muted-foreground dark:text-foreground size-5"
+          aria-hidden="true"
+        />
+      </div>
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
+  );
 }
 
 export default async function ProfilePage() {
@@ -79,21 +110,17 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <EditProfileForm
-        handle={profile?.handle ?? null}
-        bio={profile?.bio ?? null}
-      />
-
-      <nav aria-label="Profile" className="flex flex-col gap-2">
+      {/* Navigation first — this page exists to reach what's not already
+          in the mobile tab bar, so lead with that instead of the (less
+          frequently used) profile-editing form below. */}
+      <nav aria-label="Profile" className="grid grid-cols-2 gap-3">
         {CONTENT_LINKS.map((link) => (
-          <Link
+          <ProfileNavTile
             key={link.href}
             href={link.href}
-            className={cn(LINK_ROW_CLASSES)}
-          >
-            <link.icon className="text-muted-foreground size-4" />
-            {link.label}
-          </Link>
+            icon={link.icon}
+            label={link.label}
+          />
         ))}
       </nav>
 
@@ -110,6 +137,14 @@ export default async function ProfilePage() {
             Sign out
           </button>
         </form>
+      </div>
+
+      <div className="border-border flex flex-col gap-3 border-t pt-4">
+        <h2 className="text-sm font-semibold">Edit profile</h2>
+        <EditProfileForm
+          handle={profile?.handle ?? null}
+          bio={profile?.bio ?? null}
+        />
       </div>
     </div>
   );
