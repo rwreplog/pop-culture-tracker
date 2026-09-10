@@ -39,8 +39,19 @@ field mapping.
 - releaseDate
 - imageUrl
 - metadata
+- seriesId
+- seriesPosition
 - createdAt
 - updatedAt
+
+`seriesId` is self-referential (`Media.id`). When set, this row is one
+installment of the series identified by that other `Media` row, at
+`seriesPosition` within it (1, 2, 3, ...). A row is "a series" purely by
+having other rows point at it via `seriesId` — the parent row is an
+ordinary, user-created `Media` row (a series is never resolved from a
+provider search) with no `MediaExternalId` of its own. Series membership
+is canonical, not per-user, for the same reason `Media` itself is shared
+across users: it's a fact about the media graph, not one user's opinion.
 
 ### MediaExternalId
 
