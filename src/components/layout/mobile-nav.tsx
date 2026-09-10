@@ -12,7 +12,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex transform-gpu justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden"
     >
       <div className="bg-background ring-foreground/10 dark:bg-background/70 dark:supports-[backdrop-filter]:bg-background/60 flex w-full max-w-sm items-center justify-around rounded-full py-1.5 shadow-lg ring-1 dark:shadow-[0_20px_45px_-20px_oklch(0.1_0.04_var(--hue)/0.9)] dark:ring-white/12 dark:supports-[backdrop-filter]:backdrop-blur-xl">
         {mobileNavItems.map((item) => {
