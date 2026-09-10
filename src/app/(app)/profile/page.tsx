@@ -25,10 +25,8 @@ const CONTENT_LINKS = [
   { href: "/lists", label: "Lists", icon: ListChecks },
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/activity", label: "Activity", icon: Activity },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
-
-const LINK_ROW_CLASSES =
-  "border-border hover:bg-muted flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors";
 
 function initials(name?: string | null, email?: string | null) {
   const source = name ?? email ?? "?";
@@ -125,10 +123,6 @@ export default async function ProfilePage() {
       </nav>
 
       <div className="border-border flex flex-col gap-2 border-t pt-4">
-        <Link href="/settings" className={cn(LINK_ROW_CLASSES)}>
-          <Settings className="text-muted-foreground size-4" />
-          Settings
-        </Link>
         <form action={signOutAction}>
           <button
             type="submit"
