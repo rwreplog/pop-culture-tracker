@@ -115,7 +115,10 @@ export default async function HomePage() {
       {sections.continueItems.length > 0 ? (
         <DashboardSection title="Continue">
           {sections.continueItems.map((item) => (
-            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+            <div
+              key={item.id}
+              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+            >
               <MediaCard
                 href={`/media/${item.mediaId}`}
                 title={item.media.title}
@@ -134,7 +137,10 @@ export default async function HomePage() {
       {sections.queue.length > 0 ? (
         <DashboardSection title="Your queue">
           {sections.queue.map((item) => (
-            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+            <div
+              key={item.id}
+              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+            >
               <MediaCard
                 href={`/media/${item.mediaId}`}
                 title={item.media.title}
@@ -153,7 +159,10 @@ export default async function HomePage() {
       {sections.recentlyCompleted.length > 0 ? (
         <DashboardSection title="Recently completed">
           {sections.recentlyCompleted.map((item) => (
-            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+            <div
+              key={item.id}
+              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+            >
               <MediaCard
                 href={`/media/${item.mediaId}`}
                 title={item.media.title}
@@ -172,7 +181,10 @@ export default async function HomePage() {
       {sections.favorites.length > 0 ? (
         <DashboardSection title="Favorites">
           {sections.favorites.map((item) => (
-            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+            <div
+              key={item.id}
+              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+            >
               <MediaCard
                 href={`/media/${item.mediaId}`}
                 title={item.media.title}
@@ -191,7 +203,10 @@ export default async function HomePage() {
       {sections.discovery.length > 0 ? (
         <DashboardSection title="For you">
           {sections.discovery.map((item) => (
-            <div key={item.id} className="w-32 shrink-0 sm:w-40">
+            <div
+              key={item.id}
+              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
+            >
               <MediaCard
                 href={`/media/${item.mediaId}`}
                 title={item.media.title}
