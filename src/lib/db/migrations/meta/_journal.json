@@ -85,6 +85,20 @@
       "when": 1789067897265,
       "tag": "0011_add_media_series_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789071257001,
+      "tag": "0012_add_series_grouping_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789071584321,
+      "tag": "0013_add_series_current_position",
+      "breakpoints": true
     }
   ]
 }

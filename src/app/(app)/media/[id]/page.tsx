@@ -30,8 +30,10 @@ import {
 import { getListsForUser } from "@/lib/services/lists/queries";
 import {
   fetchSeriesTitles,
+  getSeriesById,
   listSeriesForMediaType,
 } from "@/lib/services/series/queries";
+import { getUserPreferences } from "@/lib/services/users/queries";
 import { presignCustomArtUrl } from "@/lib/storage/custom-art";
 import { cn } from "@/lib/utils";
 
@@ -55,15 +57,14 @@ export default async function MediaDetailPage({
 
   const userId = session?.user?.id;
   const [
-    libraryItemResult,
     ownedLists,
     activity,
     related,
     friends,
     seriesTitles,
     existingSeries,
+    preferences,
   ] = await Promise.all([
-    userId ? getLibraryItemForUser(userId, item.id) : null,
     userId ? getListsForUser(userId) : [],
     userId ? getActivityForMedia(userId, item.id) : [],
     userId
@@ -77,8 +78,8 @@ export default async function MediaDetailPage({
     userId ? getFriends(userId) : [],
     userId && item.seriesId ? fetchSeriesTitles([item.seriesId]) : null,
     userId ? listSeriesForMediaType(item.mediaType) : [],
+    userId ? getUserPreferences(userId) : null,
   ]);
-  const libraryItem = libraryItemResult ?? null;
   const currentSeries =
     item.seriesId && seriesTitles
       ? {
@@ -87,6 +88,25 @@ export default async function MediaDetailPage({
           position: item.seriesPosition,
         }
       : null;
+
+  // In "unified" mode, this item's own library status/rating/notes live
+  // on the series parent instead — resolve the library item (and, if
+  // this row turns out to itself be a series, its members for the
+  // "Currently on" selector) from whichever media row actually holds it.
+  const effectiveLibraryMediaId =
+    item.seriesId && preferences?.seriesGroupingMode === "unified"
+      ? item.seriesId
+      : item.id;
+  const [libraryItemResult, seriesResult] = await Promise.all([
+    userId ? getLibraryItemForUser(userId, effectiveLibraryMediaId) : null,
+    userId ? getSeriesById(effectiveLibraryMediaId) : null,
+  ]);
+  const libraryItem = libraryItemResult ?? null;
+  const seriesMembers =
+    seriesResult?.members.map((member) => ({
+      title: member.title,
+      position: member.seriesPosition ?? 0,
+    })) ?? [];
   const hasCustomArt = Boolean(libraryItem?.customImageKey);
   const customArtUrl = libraryItem?.customImageKey
     ? await presignCustomArtUrl(libraryItem.customImageKey)
@@ -227,6 +247,7 @@ export default async function MediaDetailPage({
                   id: list.id,
                   name: list.name,
                 }))}
+                seriesMembers={seriesMembers}
               />
 
               {ownedLists.length > 0 ? (

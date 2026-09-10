@@ -1,0 +1,1 @@
+ALTER TABLE "library_items" ADD COLUMN "series_current_position" integer;

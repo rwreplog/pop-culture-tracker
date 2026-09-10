@@ -3,6 +3,7 @@ import {
   boolean,
   check,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -54,6 +55,17 @@ export const libraryItems = pgTable(
     isFavorite: boolean("is_favorite").notNull().default(false),
     notes: text("notes"),
     progress: jsonb("progress"),
+    /**
+     * "Unified" series-grouping mode only ("grouped" mode never sets this):
+     * when `mediaId` points at a series (a media row other rows point at
+     * via seriesId), this is the seriesPosition of the installment the
+     * user is currently on — e.g. 2 for "book 2 of 3". Kept as its own
+     * column rather than folded into `progress`, since that column's
+     * shape is validated by a per-mediaType zod discriminated union at
+     * the application boundary, and an unrecognized extra key would be
+     * silently stripped on the next save.
+     */
+    seriesCurrentPosition: integer("series_current_position"),
     /** Object key in the `custom-art` bucket for this user's custom artwork override, if set. */
     customImageKey: text("custom_image_key"),
     startedAt: timestamp("started_at"),

@@ -5,6 +5,7 @@ import { users } from "@/lib/db/schema/users";
 import type {
   accentColorEnum,
   fontFamilyEnum,
+  seriesGroupingModeEnum,
   themeEnum,
 } from "@/lib/db/schema/users";
 import { isHandleTaken } from "@/lib/services/users/queries";
@@ -21,6 +22,16 @@ export async function updateAppearance(
   },
 ): Promise<void> {
   await db.update(users).set(appearance).where(eq(users.id, userId));
+}
+
+export async function updateSeriesGroupingMode(
+  userId: string,
+  mode: (typeof seriesGroupingModeEnum.enumValues)[number],
+): Promise<void> {
+  await db
+    .update(users)
+    .set({ seriesGroupingMode: mode })
+    .where(eq(users.id, userId));
 }
 
 export async function updateProfile(

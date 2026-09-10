@@ -39,7 +39,12 @@ export async function userHasPassword(userId: string): Promise<boolean> {
 export async function getUserPreferences(userId: string) {
   return db.query.users.findFirst({
     where: eq(users.id, userId),
-    columns: { theme: true, accentColor: true, fontFamily: true },
+    columns: {
+      theme: true,
+      accentColor: true,
+      fontFamily: true,
+      seriesGroupingMode: true,
+    },
   });
 }
 
