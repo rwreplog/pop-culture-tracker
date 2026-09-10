@@ -83,7 +83,11 @@ export async function addToLibrary(
             error: "Couldn't add this item right now.",
           };
         }
-        return { success: true, libraryItemId: existing.id, mediaId: targetMediaId };
+        return {
+          success: true,
+          libraryItemId: existing.id,
+          mediaId: targetMediaId,
+        };
       }
 
       await recordActivity(tx, userId, "added", targetMediaId, { status });
@@ -95,7 +99,11 @@ export async function addToLibrary(
         await notifyGoalAchievements(tx, userId, now.getFullYear());
       }
 
-      return { success: true, libraryItemId: inserted.id, mediaId: targetMediaId };
+      return {
+        success: true,
+        libraryItemId: inserted.id,
+        mediaId: targetMediaId,
+      };
     });
   } catch {
     return { success: false, error: "Couldn't add this item right now." };

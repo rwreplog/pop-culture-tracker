@@ -63,9 +63,7 @@ export function SeriesGroupingForm({
           ))}
         </SelectContent>
       </Select>
-      <p className="text-muted-foreground text-xs">
-        {MODE_DESCRIPTIONS[mode]}
-      </p>
+      <p className="text-muted-foreground text-xs">{MODE_DESCRIPTIONS[mode]}</p>
     </div>
   );
 }

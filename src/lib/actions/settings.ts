@@ -58,9 +58,9 @@ export async function updateAppearanceAction(
   revalidatePath("/", "layout");
 }
 
-export async function updateSeriesGroupingModeAction(
-  input: { mode: string },
-): Promise<{ error?: string } | undefined> {
+export async function updateSeriesGroupingModeAction(input: {
+  mode: string;
+}): Promise<{ error?: string } | undefined> {
   const session = await auth();
   if (!session?.user?.id) return { error: "You must be signed in." };
 
