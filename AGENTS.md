@@ -106,6 +106,29 @@ Do not silently change documented behavior.
 - Test meaningful business logic.
 - Keep unrelated changes out of feature work.
 
+## Versioning
+
+The app version lives in `package.json`'s `version` field, surfaced to
+users on the Settings page via `NEXT_PUBLIC_APP_VERSION` (wired up in
+`next.config.ts`). Bump it as part of finishing any PR with a
+user-visible effect — don't wait to be asked:
+
+- Patch (`0.5.1` → `0.5.2`): bug fixes, UI/UX tweaks, copy changes, and
+  other small user-visible changes.
+- Minor (`0.5.x` → `0.6.0`): a new feature, a removed feature, or a PR
+  that bundles several patch-worthy changes together.
+- Skip the bump for changes with no user-visible effect: refactors,
+  test-only changes, docs, CI/tooling.
+- The major version stays `0` pre-1.0 — crossing to `1.0.0` is a
+  deliberate product decision, not an automatic bump.
+- If a PR's scope is genuinely borderline between patch and minor, ask
+  rather than guess.
+
+Mechanics (matching existing history — see `git log -- package.json`):
+bump only `package.json`'s `version` field and leave `package-lock.json`
+alone, as its own commit (not folded into the feature/fix commit) on the
+same branch/PR, with the commit message `Bump version to X.Y.Z`.
+
 ## MVP
 
 The MVP includes:
