@@ -1,6 +1,8 @@
 import { relations } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   date,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -32,6 +34,16 @@ export const media = pgTable("media", {
   imageUrl: text("image_url"),
   /** Media-type-specific fields not worth first-class columns (e.g. runtime, platform, page count). */
   metadata: jsonb("metadata"),
+  /**
+   * Self-referential: when set, this row is one installment of the series
+   * identified by that other `media` row (e.g. "The Two Towers" pointing
+   * at "The Lord of the Rings"). A row is "a series" purely by having
+   * other rows point at it — the parent is an ordinary, user-created
+   * `media` row with no provider link of its own. See docs/DATA_MODEL.md.
+   */
+  seriesId: uuid("series_id").references((): AnyPgColumn => media.id),
+  /** This row's position within its series (1, 2, 3, ...). Null outside a series. */
+  seriesPosition: integer("series_position"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -54,8 +66,14 @@ export const mediaExternalIds = pgTable(
   (table) => [unique().on(table.provider, table.externalId)],
 );
 
-export const mediaRelations = relations(media, ({ many }) => ({
+export const mediaRelations = relations(media, ({ one, many }) => ({
   externalIds: many(mediaExternalIds),
+  seriesParent: one(media, {
+    fields: [media.seriesId],
+    references: [media.id],
+    relationName: "seriesMembers",
+  }),
+  seriesMembers: many(media, { relationName: "seriesMembers" }),
 }));
 
 export const mediaExternalIdRelations = relations(

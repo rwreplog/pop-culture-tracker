@@ -5,6 +5,7 @@ import { LibraryFilters } from "@/components/library/library-filters";
 import { MediaCard } from "@/components/media/media-card";
 import { MediaListRow } from "@/components/media/media-list-row";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
+import { SeriesGroupCard } from "@/components/series/series-group-card";
 import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import type { MediaType } from "@/lib/db/schema/media";
@@ -13,6 +14,10 @@ import {
   getLibraryItems,
   type LibrarySort,
 } from "@/lib/services/library/queries";
+import {
+  fetchSeriesTitles,
+  groupLibraryItemsBySeries,
+} from "@/lib/services/series/queries";
 
 const MEDIA_TYPES = new Set<MediaType>([
   "movie",
@@ -68,6 +73,20 @@ export default async function LibraryPage({
   const isListView = view === "list";
   const isFiltered = Boolean(mediaType || status || search?.trim());
 
+  const seriesIds = [
+    ...new Set(
+      items
+        .map((item) => item.media.seriesId)
+        .filter((id): id is string => id != null),
+    ),
+  ];
+  const seriesTitles = isListView
+    ? new Map<string, string>()
+    : await fetchSeriesTitles(seriesIds);
+  const grouped = isListView
+    ? []
+    : groupLibraryItemsBySeries(items, seriesTitles);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -121,19 +140,28 @@ export default async function LibraryPage({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
-          {items.map((item) => (
-            <MediaCard
-              key={item.id}
-              href={`/media/${item.mediaId}`}
-              title={item.media.title}
-              mediaType={item.media.mediaType}
-              releaseDate={item.media.releaseDate}
-              imageUrl={item.media.imageUrl}
-              status={item.status}
-              isFavorite={item.isFavorite}
-              libraryItemId={item.id}
-            />
-          ))}
+          {grouped.map((entry) =>
+            entry.kind === "series" ? (
+              <SeriesGroupCard
+                key={entry.group.seriesId}
+                seriesId={entry.group.seriesId}
+                seriesTitle={entry.group.seriesTitle}
+                members={entry.group.members}
+              />
+            ) : (
+              <MediaCard
+                key={entry.item.id}
+                href={`/media/${entry.item.mediaId}`}
+                title={entry.item.media.title}
+                mediaType={entry.item.media.mediaType}
+                releaseDate={entry.item.media.releaseDate}
+                imageUrl={entry.item.media.imageUrl}
+                status={entry.item.status}
+                isFavorite={entry.item.isFavorite}
+                libraryItemId={entry.item.id}
+              />
+            ),
+          )}
         </div>
       )}
     </div>

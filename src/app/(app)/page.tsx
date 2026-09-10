@@ -4,12 +4,14 @@ import Link from "next/link";
 
 import { ActivityItem } from "@/components/activity/activity-item";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { MediaRailItems } from "@/components/dashboard/media-rail-items";
 import { PlaceholderScreen } from "@/components/layout/placeholder-screen";
 import { MediaCard } from "@/components/media/media-card";
 import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getActivityFeed } from "@/lib/services/activity/queries";
 import { getDashboardSections } from "@/lib/services/library/queries";
+import { fetchSeriesTitles } from "@/lib/services/series/queries";
 import { cn } from "@/lib/utils";
 
 /**
@@ -65,6 +67,22 @@ export default async function HomePage() {
     getActivityFeed(session.user.id, 5),
   ]);
 
+  // One batched lookup covering every rail below (excluding "For you",
+  // whose recommendation "reason" caption doesn't fit the grouped card).
+  const seriesIds = [
+    ...new Set(
+      [
+        ...sections.continueItems,
+        ...sections.queue,
+        ...sections.recentlyCompleted,
+        ...sections.favorites,
+      ]
+        .map((item) => item.media.seriesId)
+        .filter((id): id is string => id != null),
+    ),
+  ];
+  const seriesTitles = await fetchSeriesTitles(seriesIds);
+
   const isEmpty =
     sections.continueItems.length === 0 &&
     sections.queue.length === 0 &&
@@ -114,89 +132,34 @@ export default async function HomePage() {
 
       {sections.continueItems.length > 0 ? (
         <DashboardSection title="Continue">
-          {sections.continueItems.map((item) => (
-            <div
-              key={item.id}
-              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
-            >
-              <MediaCard
-                href={`/media/${item.mediaId}`}
-                title={item.media.title}
-                mediaType={item.media.mediaType}
-                releaseDate={item.media.releaseDate}
-                imageUrl={item.media.imageUrl}
-                status={item.status}
-                isFavorite={item.isFavorite}
-                libraryItemId={item.id}
-              />
-            </div>
-          ))}
+          <MediaRailItems
+            items={sections.continueItems}
+            seriesTitles={seriesTitles}
+          />
         </DashboardSection>
       ) : null}
 
       {sections.queue.length > 0 ? (
         <DashboardSection title="Your queue">
-          {sections.queue.map((item) => (
-            <div
-              key={item.id}
-              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
-            >
-              <MediaCard
-                href={`/media/${item.mediaId}`}
-                title={item.media.title}
-                mediaType={item.media.mediaType}
-                releaseDate={item.media.releaseDate}
-                imageUrl={item.media.imageUrl}
-                status={item.status}
-                isFavorite={item.isFavorite}
-                libraryItemId={item.id}
-              />
-            </div>
-          ))}
+          <MediaRailItems items={sections.queue} seriesTitles={seriesTitles} />
         </DashboardSection>
       ) : null}
 
       {sections.recentlyCompleted.length > 0 ? (
         <DashboardSection title="Recently completed">
-          {sections.recentlyCompleted.map((item) => (
-            <div
-              key={item.id}
-              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
-            >
-              <MediaCard
-                href={`/media/${item.mediaId}`}
-                title={item.media.title}
-                mediaType={item.media.mediaType}
-                releaseDate={item.media.releaseDate}
-                imageUrl={item.media.imageUrl}
-                status={item.status}
-                isFavorite={item.isFavorite}
-                libraryItemId={item.id}
-              />
-            </div>
-          ))}
+          <MediaRailItems
+            items={sections.recentlyCompleted}
+            seriesTitles={seriesTitles}
+          />
         </DashboardSection>
       ) : null}
 
       {sections.favorites.length > 0 ? (
         <DashboardSection title="Favorites">
-          {sections.favorites.map((item) => (
-            <div
-              key={item.id}
-              className="w-32 shrink-0 sm:w-40 md:w-auto md:shrink"
-            >
-              <MediaCard
-                href={`/media/${item.mediaId}`}
-                title={item.media.title}
-                mediaType={item.media.mediaType}
-                releaseDate={item.media.releaseDate}
-                imageUrl={item.media.imageUrl}
-                status={item.status}
-                isFavorite={item.isFavorite}
-                libraryItemId={item.id}
-              />
-            </div>
-          ))}
+          <MediaRailItems
+            items={sections.favorites}
+            seriesTitles={seriesTitles}
+          />
         </DashboardSection>
       ) : null}
 

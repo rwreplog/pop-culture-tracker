@@ -78,6 +78,13 @@
       "when": 1789044343317,
       "tag": "0010_drop_want_to_own",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789067897265,
+      "tag": "0011_add_media_series_columns",
+      "breakpoints": true
     }
   ]
 }

@@ -61,3 +61,8 @@ export function libraryStatusLabel(
   if (status === "completed") return COMPLETED_LABELS[mediaType];
   return STATUS_LABELS[status];
 }
+
+/** Lowercase "completed" verb for a media type (watched/read/completed), e.g. "2 of 3 read". */
+export function completedVerb(mediaType: MediaType): string {
+  return COMPLETED_LABELS[mediaType].toLowerCase();
+}

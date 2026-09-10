@@ -11,6 +11,7 @@ import { MediaArtwork } from "@/components/media/media-artwork";
 import { MediaCard } from "@/components/media/media-card";
 import { MediaDescription } from "@/components/media/media-description";
 import { RecommendDialog } from "@/components/media/recommend-dialog";
+import { AddToSeriesControl } from "@/components/series/add-to-series-control";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,6 +28,10 @@ import {
   getRelatedLibraryItems,
 } from "@/lib/services/library/queries";
 import { getListsForUser } from "@/lib/services/lists/queries";
+import {
+  fetchSeriesTitles,
+  listSeriesForMediaType,
+} from "@/lib/services/series/queries";
 import { presignCustomArtUrl } from "@/lib/storage/custom-art";
 import { cn } from "@/lib/utils";
 
@@ -49,22 +54,39 @@ export default async function MediaDetailPage({
   const releaseYear = item.releaseDate ? item.releaseDate.split("-")[0] : null;
 
   const userId = session?.user?.id;
-  const [libraryItemResult, ownedLists, activity, related, friends] =
-    await Promise.all([
-      userId ? getLibraryItemForUser(userId, item.id) : null,
-      userId ? getListsForUser(userId) : [],
-      userId ? getActivityForMedia(userId, item.id) : [],
-      userId
-        ? getRelatedLibraryItems(
-            userId,
-            item.id,
-            item.mediaType,
-            metadata?.genres ?? [],
-          )
-        : [],
-      userId ? getFriends(userId) : [],
-    ]);
+  const [
+    libraryItemResult,
+    ownedLists,
+    activity,
+    related,
+    friends,
+    seriesTitles,
+    existingSeries,
+  ] = await Promise.all([
+    userId ? getLibraryItemForUser(userId, item.id) : null,
+    userId ? getListsForUser(userId) : [],
+    userId ? getActivityForMedia(userId, item.id) : [],
+    userId
+      ? getRelatedLibraryItems(
+          userId,
+          item.id,
+          item.mediaType,
+          metadata?.genres ?? [],
+        )
+      : [],
+    userId ? getFriends(userId) : [],
+    userId && item.seriesId ? fetchSeriesTitles([item.seriesId]) : null,
+    userId ? listSeriesForMediaType(item.mediaType) : [],
+  ]);
   const libraryItem = libraryItemResult ?? null;
+  const currentSeries =
+    item.seriesId && seriesTitles
+      ? {
+          id: item.seriesId,
+          title: seriesTitles.get(item.seriesId) ?? "Series",
+          position: item.seriesPosition,
+        }
+      : null;
   const hasCustomArt = Boolean(libraryItem?.customImageKey);
   const customArtUrl = libraryItem?.customImageKey
     ? await presignCustomArtUrl(libraryItem.customImageKey)
@@ -150,12 +172,22 @@ export default async function MediaDetailPage({
 
         <TabsContent value="overview" className="flex flex-col gap-4 pt-4">
           {userId ? (
-            // Desktop only — see the mobile-only hero overlay above.
-            <div className="hidden justify-end md:flex">
-              <RecommendDialog
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <AddToSeriesControl
                 mediaId={item.id}
-                friends={friends.map(({ friend }) => friend)}
+                mediaType={item.mediaType}
+                currentSeries={currentSeries}
+                existingSeries={existingSeries.filter(
+                  (series) => series.id !== item.id,
+                )}
               />
+              {/* Desktop only — see the mobile-only hero overlay above. */}
+              <div className="hidden md:flex">
+                <RecommendDialog
+                  mediaId={item.id}
+                  friends={friends.map(({ friend }) => friend)}
+                />
+              </div>
             </div>
           ) : null}
 
