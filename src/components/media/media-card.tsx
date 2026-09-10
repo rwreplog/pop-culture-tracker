@@ -44,7 +44,7 @@ export function MediaCard({
         href={href}
         className="focus-visible:ring-ring flex flex-col gap-2 rounded-2xl outline-none focus-visible:ring-2"
       >
-        <div className="ring-foreground/10 relative overflow-hidden rounded-2xl shadow-[0_10px_24px_-16px_rgba(0,0,0,0.5)] ring-1 transition-shadow group-hover:shadow-[0_16px_32px_-14px_var(--primary)] dark:ring-white/10 dark:group-hover:ring-white/20">
+        <div className="ring-foreground/10 relative overflow-hidden rounded-2xl shadow-[0_10px_24px_-16px_rgba(0,0,0,0.5)] ring-1 transition-shadow group-hover:shadow-[0_16px_32px_-14px_color-mix(in_oklch,var(--primary)_40%,transparent)] dark:ring-white/10 dark:group-hover:ring-white/20">
           <MediaArtwork
             src={imageUrl}
             title={title}
